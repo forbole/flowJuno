@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -14,13 +13,14 @@ import (
 
 	"github.com/desmos-labs/juno/types"
 
+
 	"google.golang.org/grpc"
 
 	tmjson "github.com/tendermint/tendermint/libs/json"
-	rpcclient "github.com/tendermint/tendermint/rpc/client"
-	httpclient "github.com/tendermint/tendermint/rpc/client/http"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
+	"github.com/onflow/flow-go-sdk"
+	"github.com/onflow/flow-go-sdk/client"
 	constypes "github.com/tendermint/tendermint/consensus/types"
 )
 
@@ -30,7 +30,7 @@ type Proxy struct {
 	ctx            context.Context
 	encodingConfig *params.EncodingConfig
 
-	rpcClient rpcclient.Client
+	rpcClient client.Client
 
 	grpConnection   *grpc.ClientConn
 	txServiceClient tx.ServiceClient
@@ -38,24 +38,20 @@ type Proxy struct {
 
 // NewClientProxy allows to build a new Proxy instance
 func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*Proxy, error) {
-	rpcClient, err := httpclient.New(cfg.GetRPCConfig().GetAddress(), "/websocket")
-	if err != nil {
-		return nil, err
+	flowClient,err:=client.New(cfg.GetRPCConfig().GetAddress())
+	if err!=nil{
+		return nil,err
 	}
 
-	if err := rpcClient.Start(); err != nil {
-		return nil, err
-	}
-
-	grpcConnection, err := CreateGrpcConnection(cfg)
-	if err != nil {
-		return nil, err
+	grpcConnection,err:=CreateGrpcConnection(cfg)
+	if err!=nil{
+		return nil,err
 	}
 
 	return &Proxy{
 		encodingConfig:  encodingConfig,
 		ctx:             context.Background(),
-		rpcClient:       rpcClient,
+		rpcClient:       *flowClient,
 		grpConnection:   grpcConnection,
 		txServiceClient: tx.NewServiceClient(grpcConnection),
 	}, nil
@@ -64,29 +60,33 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 // LatestHeight returns the latest block height on the active chain. An error
 // is returned if the query fails.
 func (cp *Proxy) LatestHeight() (int64, error) {
-	status, err := cp.rpcClient.Status(cp.ctx)
-	if err != nil {
-		return -1, err
+	block,err:=cp.rpcClient.GetLatestBlock(cp.ctx,true)
+	if err!=nil{
+		return -1,err
 	}
 
-	height := status.SyncInfo.LatestBlockHeight
+	height := int64(block.Height)
 	return height, nil
 }
 
 // Block queries for a block by height. An error is returned if the query fails.
-func (cp *Proxy) Block(height int64) (*tmctypes.ResultBlock, error) {
-	return cp.rpcClient.Block(cp.ctx, &height)
+func (cp *Proxy) Block(height int64) (*flow.Block, error) {
+	block,err:=cp.rpcClient.GetBlockByHeight(cp.ctx,uint64(height))
+	if err!=nil{
+		return nil,err
+	}
+	return block,nil
 }
 
-// TendermintTx queries for a transaction by hash. An error is returned if the
+// GetTransaction queries for a transaction by hash. An error is returned if the
 // query fails.
-func (cp *Proxy) TendermintTx(hash string) (*tmctypes.ResultTx, error) {
-	hashRaw, err := hex.DecodeString(hash)
+func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
+	transaction,err:=cp.rpcClient.GetTransaction(cp.ctx,flow.HashToID([]byte(hash)))
 	if err != nil {
 		return nil, err
 	}
 
-	return cp.rpcClient.Tx(cp.ctx, hashRaw, false)
+	return transaction,nil
 }
 
 // Validators returns all the known Tendermint validators for a given block
@@ -95,6 +95,8 @@ func (cp *Proxy) Validators(height int64) (*tmctypes.ResultValidators, error) {
 	vals := &tmctypes.ResultValidators{
 		BlockHeight: height,
 	}
+
+	fmt.Sprintf(MainnetContracts().StakingTable)
 
 	page := 1
 	stop := false
@@ -140,7 +142,7 @@ func (cp *Proxy) ConsensusState() (*constypes.RoundStateSimple, error) {
 // the context and handle any errors appropriately.
 func (cp *Proxy) SubscribeEvents(subscriber, query string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	eventCh, err := cp.rpcClient.Subscribe(ctx, subscriber, query)
+	eventCh, err := cp.rpcClient.event
 	return eventCh, cancel, err
 }
 
@@ -166,28 +168,27 @@ func (cp *Proxy) Tx(hash string) (*sdk.TxResponse, *tx.Tx, error) {
 // Txs queries for all the transactions in a block. Transactions are returned
 // in the sdk.TxResponse format which internally contains an sdk.Tx. An error is
 // returned if any query fails.
-func (cp *Proxy) Txs(block *tmctypes.ResultBlock) ([]*types.Tx, error) {
-	txResponses := make([]*types.Tx, len(block.Block.Txs))
-	for i, tmTx := range block.Block.Txs {
-		txResponse, txObj, err := cp.Tx(fmt.Sprintf("%X", tmTx.Hash()))
-		if err != nil {
-			return nil, err
-		}
-
-		convTx, err := types.NewTx(txResponse, txObj)
-		if err != nil {
-			return nil, fmt.Errorf("error converting transaction: %s", err.Error())
-		}
-
-		txResponses[i] = convTx
+func (cp *Proxy) Txs(block *flow.Block) ([]*types.Tx, error) {
+	
+	collection,err:=cp.rpcClient.GetCollection(cp.ctx,block.ID)
+	if err!=nil{
+		return nil,err
 	}
+	txResponses = make([]*types.Tx,len(collection.TransactionIDs))
+	for i,txID:=range collection.TransactionIDs{
+		transactionResult,err:=cp.rpcClient.GetTransactionResult(cp.ctx,txID)
+		if err!=nil{
+			return nil,err
+		}
+		txResponses[i]=types.NewTx(transactionResult)
 
+	}
 	return txResponses, nil
 }
 
 // Stop defers the node stop execution to the RPC client.
 func (cp *Proxy) Stop() {
-	err := cp.rpcClient.Stop()
+	err := cp.rpcClient.Close()
 	if err != nil {
 		log.Fatal().Str("module", "client proxy").Err(err).Msg("error while stopping proxy")
 	}

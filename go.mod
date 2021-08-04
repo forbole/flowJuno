@@ -7,6 +7,7 @@ require (
 	github.com/go-co-op/gocron v0.3.3
 	github.com/gogo/protobuf v1.3.3
 	github.com/lib/pq v1.9.0
+	github.com/onflow/flow-go-sdk v0.21.0
 	github.com/pelletier/go-toml v1.8.1
 	github.com/rs/zerolog v1.21.0
 	github.com/spf13/cobra v1.1.3
