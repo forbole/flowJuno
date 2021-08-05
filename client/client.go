@@ -94,9 +94,9 @@ func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
 	return transaction, nil
 }
 
-// Validators returns all the known Tendermint validators for a given block
+// NodeOperators returns all the known flow node operators for a given block
 // height. An error is returned if the query fails.
-func (cp *Proxy) Validators(height int64) (*types.NodeOperators, error) {
+func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 	script:=fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(): [FlowIDTableStaking.NodeInfo] {

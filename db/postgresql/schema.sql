@@ -1,8 +1,24 @@
-CREATE TABLE validator
+CREATE TABLE node_info
 (
-    consensus_address TEXT NOT NULL PRIMARY KEY, /* Validator consensus address */
-    consensus_pubkey  TEXT NOT NULL UNIQUE /* Validator consensus public key */
+    id TEXT UNIQUE NOT NULL PRIMARY KEY,
+    role BIGINT NOT NULL,
+    networkingAddress TEXT NOT NULL,
+    networkingKey TEXT NOT NULL,
+    stakingKey TEXT NOT NULL,
+    tokensStaked NUMBER NOT NULL,
+    tokensCommitted NUMBER NOT NULL,
+    tokensUnstaking NUMBER NOT NULL,
+    tokensUnstaked NUMBER NOT NULL,
+    tokensRewarded NUMBER NOT NULL,
+
+    delegators NUMBER[] ,
+    delegatorIDCounter BIGINT NOT NULL,
+    tokensRequestedToUnstake NUMBER NOT NULL,
+    initialWeight BIGINT NOT NULL
 );
+
+
+
 
 CREATE TABLE block
 (
@@ -35,13 +51,13 @@ CREATE TABLE transaction
     success      BOOLEAN NOT NULL,
 
     /* Body */
-    messages     JSONB   NOT NULL DEFAULT '[]'::JSONB,
+    messages     JSONB   NOT NULL DEFAULT '[]'JSONB,
     memo         TEXT,
     signatures   TEXT[]  NOT NULL,
 
     /* AuthInfo */
-    signer_infos JSONB   NOT NULL DEFAULT '[]'::JSONB,
-    fee          JSONB   NOT NULL DEFAULT '{}'::JSONB,
+    signer_infos JSONB   NOT NULL DEFAULT '[]'JSONB,
+    fee          JSONB   NOT NULL DEFAULT '{}'JSONB,
 
     /* Tx response */
     gas_wanted   BIGINT           DEFAULT 0,

@@ -90,56 +90,56 @@ func NewNodeInfoFromCandance(node interface{}) (NodeInfo, error) {
 	}
 	id, ok := s.Index(0).Interface().(string)
 	if !ok {
-		fmt.Errorf("id is not type string")
+		return NodeInfo{},fmt.Errorf("id is not type string")
 	}
 	role, ok := s.Index(1).Interface().(uint8)
 	if !ok {
-		fmt.Errorf("role is not type uint8")
+		return NodeInfo{},fmt.Errorf("role is not type uint8")
 	}
 	networkingAddress, ok := s.Index(2).Interface().(string)
 	if !ok {
-		fmt.Errorf("networkingAddress is not string")
+		return NodeInfo{},fmt.Errorf("networkingAddress is not string")
 	}
 	networkingKey, ok := s.Index(3).Interface().(string)
 	if !ok {
-		fmt.Errorf("networkingKey is not string")
+		return NodeInfo{},fmt.Errorf("networkingKey is not string")
 	}
 	stakingKey, ok := s.Index(4).Interface().(string)
 	if !ok {
-		fmt.Errorf("stakingKey is not string")
+		return NodeInfo{},fmt.Errorf("stakingKey is not string")
 	}
 	tokensStaked, ok := s.Index(5).Interface().(uint64)
 	if !ok {
-		fmt.Errorf("tokensStaked is not uint64")
+		return NodeInfo{},fmt.Errorf("tokensStaked is not uint64")
 	}
 	tokensCommitted, ok := s.Index(6).Interface().(uint64)
 	if !ok {
-		fmt.Errorf("tokensCommitted is not uint64")
+		return NodeInfo{},fmt.Errorf("tokensCommitted is not uint64")
 	}
 	tokensUnstaking, ok := s.Index(7).Interface().(uint64)
 	if !ok {
-		fmt.Errorf("tokensUnstaking is not uint64")
+		return NodeInfo{},fmt.Errorf("tokensUnstaking is not uint64")
 	}
 	tokensUnstaked, ok := s.Index(8).Interface().(uint64)
 	if !ok {
-		fmt.Errorf("tokensUnstaked is not uint64")
+		return NodeInfo{},fmt.Errorf("tokensUnstaked is not uint64")
 	}
 	tokensRewarded, ok := s.Index(9).Interface().(uint64)
 	if !ok {
-		fmt.Errorf("tokensRewarded is not uint64")
+		return NodeInfo{},fmt.Errorf("tokensRewarded is not uint64")
 	}
 
 	delegatorIDCounter, ok := s.Index(11).Interface().(uint32)
 	if !ok {
-		fmt.Errorf("delegatorIDCounter is not uint32")
+		return NodeInfo{},fmt.Errorf("delegatorIDCounter is not uint32")
 	}
 	tokensRequestedToUnstake, ok := s.Index(12).Interface().(uint64)
 	if !ok {
-		fmt.Errorf("tokensRequestedToUnstake is not uint64")
+		return NodeInfo{},fmt.Errorf("tokensRequestedToUnstake is not uint64")
 	}
 	initialWeight, ok := s.Index(13).Interface().(uint64)
 	if !ok {
-		fmt.Errorf("initialWeight is not uint64")
+		return NodeInfo{},fmt.Errorf("initialWeight is not uint64")
 	}
 
 	nodeInfo := NewNodeInfo(id,role,networkingAddress,networkingKey,

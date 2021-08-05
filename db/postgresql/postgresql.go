@@ -169,6 +169,37 @@ func (db *Database) SaveValidators(validators []*types.Validator) error {
 	return err
 }
 
+func (db *Database) SaveNodeInfos(infos []types.NodeInfo) error {
+	if len(infos) == 0 {
+		return nil
+	}
+
+	stmt := `INSERT INTO node_info (
+		id ,role,networkingAddress,networkingKey ,stakingKey ,tokensStaked ,
+		tokensCommitted ,tokensUnstaking ,tokensUnstaked ,
+		tokensRewarded ,delegators ,delegatorIDCounter ,
+		tokensRequestedToUnstake, initialWeight
+	) VALUES `
+
+	var vparams []interface{}
+	for i, val := range infos {
+		vi := i * 13
+		
+
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),",
+		 vi+1, vi+2,vi+3,vi+4,vi+5,vi+6,
+		 vi+7,vi+8,vi+9,vi+10,vi+11,vi+12,vi+13)
+		vparams = append(vparams,val.Id ,val.Role,val.NetworkingAddress,val.NetworkingKey ,val.StakingKey ,
+			val.TokensStaked ,val.TokensCommitted ,val.TokensUnstaking ,val.TokensUnstaked ,val.TokensRewarded ,
+			val.Delegators ,val.DelegatorIDCounter ,val.TokensRequestedToUnstake,val. InitialWeight)
+	}
+
+	stmt = stmt[:len(stmt)-1] // Remove trailing ,
+	stmt += " ON CONFLICT DO NOTHING"
+	_, err := db.Sql.Exec(stmt, vparams...)
+	return err
+}
+
 // SaveCommitSignatures implements db.Database
 func (db *Database) SaveCommitSignatures(signatures []*types.CommitSig) error {
 	if len(signatures) == 0 {

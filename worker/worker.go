@@ -108,9 +108,9 @@ func (w Worker) process(height int64) error {
 		return err
 	}
 
-	vals, err := w.cp.Validators(height)
+	vals, err := w.cp.NodeOperators(height)
 	if err != nil {
-		log.Error().Err(err).Int64("height", height).Msg("failed to get validators for block")
+		log.Error().Err(err).Int64("height", height).Msg("failed to get node operators for block")
 		return err
 	}
 
@@ -173,19 +173,6 @@ func (w Worker) HandleGenesis(genesis *tmtypes.GenesisDoc) error {
 // consensus public key. An error is returned if the public key cannot be Bech32
 // encoded or if the DB write fails.
 func (w Worker) SaveValidators(vals []*tmtypes.Validator) error {
-	var validators = make([]*types.Validator, len(vals))
-	for index, val := range vals {
-		consAddr := sdk.ConsAddress(val.Address).String()
-
-		consPubKey, err := types.ConvertValidatorPubKeyToBech32String(val.PubKey)
-		if err != nil {
-			log.Error().Err(err).Str("validator", consAddr).Msg("failed to convert validator public key")
-			return err
-		}
-
-		validators[index] = types.NewValidator(consAddr, consPubKey)
-	}
-
 	err := w.db.SaveValidators(validators)
 	if err != nil {
 		return fmt.Errorf("error while saving validators: %s", err)
@@ -194,12 +181,20 @@ func (w Worker) SaveValidators(vals []*tmtypes.Validator) error {
 	return nil
 }
 
+func (w Worker) SaveNodeInfos(vals []*types.NodeInfo)error{
+	err:=w.db.SaveNodeInfos(vals)
+	if err!=nil{
+		return fmt.Errorf("error while saving node infos: %s", err)
+	}
+	return nil
+}
+
 // ExportBlock accepts a finalized block and a corresponding set of transactions
 // and persists them to the database along with attributable metadata. An error
 // is returned if the write fails.
-func (w Worker) ExportBlock(b *flow.Block, txs []*types.Tx, vals *tmctypes.ResultValidators) error {
+func (w Worker) ExportBlock(b *flow.Block, txs []*types.Tx, vals *types.NodeOperators) error {
 	// Save all validators
-	err := w.SaveValidators(vals.Validators)
+	err := w.SaveNodeInfos(vals.NodeInfos)
 	if err != nil {
 		return err
 	}
