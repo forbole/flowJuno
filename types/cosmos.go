@@ -1,13 +1,9 @@
 package types
 
 import (
-	"fmt"
 	"time"
 
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/tx"
 )
 
 // Validator contains the data of a single validator
@@ -83,7 +79,6 @@ func NewBlockFromTmBlock(blk *tmctypes.ResultBlock, totalGas uint64) *Block {
 		blk.Block.Time,
 	)
 }
-
 
 // Message represents the data of a single message
 type Message struct {

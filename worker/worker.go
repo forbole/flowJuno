@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/desmos-labs/juno/types/logging"
+	"github.com/onflow/flow-go-sdk"
 
 	tmjson "github.com/tendermint/tendermint/libs/json"
 
@@ -196,7 +197,7 @@ func (w Worker) SaveValidators(vals []*tmtypes.Validator) error {
 // ExportBlock accepts a finalized block and a corresponding set of transactions
 // and persists them to the database along with attributable metadata. An error
 // is returned if the write fails.
-func (w Worker) ExportBlock(b *tmctypes.ResultBlock, txs []*types.Tx, vals *tmctypes.ResultValidators) error {
+func (w Worker) ExportBlock(b *flow.Block, txs []*types.Tx, vals *tmctypes.ResultValidators) error {
 	// Save all validators
 	err := w.SaveValidators(vals.Validators)
 	if err != nil {
