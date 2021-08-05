@@ -31,7 +31,7 @@ func (tx Tx) FindEventByType(index int, eventType string) (flow.Event, error) {
 		}
 	}
 
-	return flow.Event{}, fmt.Errorf("no %s event found inside tx with hash %s", eventType, tx.TxHash)
+	return flow.Event{}, fmt.Errorf("no %s event found inside tx", eventType, )
 }
 
 // Successful tells whether this tx is successful or not
@@ -40,8 +40,15 @@ func (tx Tx) Successful() bool {
 }
 
 type NodeOperators struct {
-	BlockHeight   int64
-	NodeOperators []*NodeInfo
+	Height   int64
+	NodeInfos []*NodeInfo
+}
+
+func NewNodeOperators(height int64,nodeInfos []*NodeInfo)NodeOperators{
+	return NodeOperators{
+		Height: height,
+		NodeInfos: nodeInfos,
+	}
 }
 
 type NodeInfo struct {
@@ -64,7 +71,7 @@ type NodeInfo struct {
 
 // NewNodeOperatorInfoFromInterface create a NodeOperatorInfo from []interface{}
 // **Unsafe** Make sure it is FlowIDTableStaking.NodeInfo type from Candance
-func NewNodeInfoFromCandance(node []interface{}) (NodeInfo, error) {
+func NewNodeInfoFromCandance(node interface{}) (NodeInfo, error) {
 	s := reflect.ValueOf(node)
 	//Delegator:=s.Index(10).Interface()
 	//delegations:=reflect.ValueOf(s.Index(10))

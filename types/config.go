@@ -154,6 +154,7 @@ func (g *grpcConfig) IsInsecure() bool {
 type RPCConfig interface {
 	GetClientName() string
 	GetAddress() string
+	GetContracts() string
 }
 
 var _ RPCConfig = &rpcConfig{}
@@ -161,13 +162,15 @@ var _ RPCConfig = &rpcConfig{}
 type rpcConfig struct {
 	ClientName string `toml:"client_name"`
 	Address    string `toml:"address"`
+	Contracts    string `toml:"contracts"`
 }
 
 // NewRPCConfig allows to build a new RPCConfig instance
-func NewRPCConfig(clientName, address string) RPCConfig {
+func NewRPCConfig(clientName, address,contracts string) RPCConfig {
 	return &rpcConfig{
 		ClientName: clientName,
 		Address:    address,
+		Contracts: contracts,
 	}
 }
 
@@ -179,6 +182,11 @@ func (r *rpcConfig) GetClientName() string {
 // GetAddress implements RPCConfig
 func (r *rpcConfig) GetAddress() string {
 	return r.Address
+}
+
+// GetContract implenments RPCConfig
+func (r *rpcConfig) GetContracts() string {
+	return r.Contracts
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

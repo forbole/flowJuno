@@ -1,11 +1,13 @@
-type Contracts{
+package client
+
+type Contracts struct{
 	FungibleToken string
 	FlowToken string
 	FlowFee string
 	StakingTable string
 	LockedTokens string
 	NonFungibleToken string
-	StakingProxy: string
+	StakingProxy string
 }
 
 func MainnetContracts() Contracts{
@@ -16,12 +18,9 @@ func MainnetContracts() Contracts{
 		StakingTable: "0x8624b52f9ddcd04a",
 		LockedTokens: "0x8d0e87b65159ae63",
 		NonFungibleToken: "0x1d7e57aa55817448",
-		StakingProxy: "0x62430cf28c26d095"
+		StakingProxy: "0x62430cf28c26d095",
 	}
 }
-
-func 
-
 func TestnetContracts() Contracts {
 	return Contracts{
 		FungibleToken: "0x9a0766d93b6608b7",
@@ -30,6 +29,6 @@ func TestnetContracts() Contracts {
 		StakingTable: "0x9eca2b38b18b5dfe",
 		LockedTokens: "0x95e019a17d0e23d7",
 		NonFungibleToken: "0x631e88ae7f1d7c20",
-		StakingProxy: "0x7aad92e5a0715d21"
+		StakingProxy: "0x7aad92e5a0715d21",
 	}
 }

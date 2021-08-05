@@ -45,12 +45,20 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		return nil, err
 	}
 
+	var contracts Contracts
+	if cfg.GetRPCConfig().GetContracts()=="Mainnet"{
+		contracts=MainnetContracts()
+	} else if cfg.GetRPCConfig().GetContracts()=="Testnet"{
+		contracts=TestnetContracts()
+	}
+
 	return &Proxy{
 		encodingConfig:  encodingConfig,
 		ctx:             context.Background(),
 		rpcClient:       *flowClient,
 		grpConnection:   grpcConnection,
 		txServiceClient: tx.NewServiceClient(grpcConnection),
+		contract: contracts,
 	}, nil
 }
 
@@ -89,38 +97,37 @@ func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
 // Validators returns all the known Tendermint validators for a given block
 // height. An error is returned if the query fails.
 func (cp *Proxy) Validators(height int64) (*types.NodeOperators, error) {
-	vals := &tmctypes.ResultValidators{
-		BlockHeight: height,
-	}
-
-	script:=`
-import FlowIDTableStaking from 0x8624b52f9ddcd04a
-pub fun main(): [FlowIDTableStaking.NodeInfo] {
-	let nodes:[FlowIDTableStaking.NodeInfo]=[]
-	for node in FlowIDTableStaking.getStakedNodeIDs() {
-		nodes.append(FlowIDTableStaking.NodeInfo(node))
-	}
-	return nodes
-}`
-
-	fmt.Sprintf(MainnetContracts().StakingTable)
-
-	page := 1
-	stop := false
-	for !stop {
-		result, err := cp.rpcClient.Validators(cp.ctx, &height, &page, nil)
-		if err != nil {
-			return nil, err
+	script:=fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(): [FlowIDTableStaking.NodeInfo] {
+		let nodes:[FlowIDTableStaking.NodeInfo]=[]
+		for node in FlowIDTableStaking.getStakedNodeIDs() {
+			nodes.append(FlowIDTableStaking.NodeInfo(node))
 		}
-		vals.Validators = append(vals.Validators, result.Validators...)
-		vals.Count += result.Count
-		vals.Total = result.Total
+		return nodes
+	}`,cp.contract.StakingTable)
 
-		page += 1
-		stop = vals.Count == vals.Total
+
+	result,err:=cp.rpcClient.ExecuteScriptAtBlockHeight(cp.ctx,uint64(height),[]byte(script),nil)
+	if err!=nil{
+		return nil,err
+	}
+	value:=result.ToGoValue()
+	nodes,ok:=value.([]interface{})
+	if !ok{
+		fmt.Errorf("candance value cannot change to valid []interface{}")
+	}
+	nodeInfos:=make([]*types.NodeInfo,len(nodes))
+	for i,node :=range nodes{
+		nodeInfo,err:=types.NewNodeInfoFromCandance(node)
+		if err!=nil{
+			return nil,err
+		}
+		nodeInfos[i]=&nodeInfo
 	}
 
-	return vals, nil
+	nodeOperators:=types.NewNodeOperators(height,nodeInfos)
+	return &nodeOperators, nil
 }
 
 /*
