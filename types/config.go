@@ -162,15 +162,15 @@ var _ RPCConfig = &rpcConfig{}
 type rpcConfig struct {
 	ClientName string `toml:"client_name"`
 	Address    string `toml:"address"`
-	Contracts    string `toml:"contracts"`
+	Contracts  string `toml:"contracts"`
 }
 
 // NewRPCConfig allows to build a new RPCConfig instance
-func NewRPCConfig(clientName, address,contracts string) RPCConfig {
+func NewRPCConfig(clientName, address, contracts string) RPCConfig {
 	return &rpcConfig{
 		ClientName: clientName,
 		Address:    address,
-		Contracts: contracts,
+		Contracts:  contracts,
 	}
 }
 

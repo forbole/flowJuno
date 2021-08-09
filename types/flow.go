@@ -5,65 +5,72 @@ import (
 	"reflect"
 
 	"github.com/onflow/flow-go-sdk"
-	"github.com/tendermint/tendermint/types"
-	"google.golang.org/api/script/v1"
 )
 
 // Tx represents an already existing blockchain transaction
 type Txs []*Tx
 
-type Tx struct{
+type Tx struct {
 	//TransactionResult
 	Status string
 	Height uint64
 
-	//Transaction Result Event
-	Type string
-	TransactionID string
-	TransactionIndex string
-	EventIndex int
-	Value string
-	
 	//Transaction Details
-	script []byte
-	Arguments [][]byte
-	ReferenceBlockID string
-	GasLimit uint64
-	ProposalKey string
-	Payer string
-	Authorizers string
-	PayloadSignatures string
+	script             []byte
+	Arguments          [][]byte
+	ReferenceBlockID   string
+	GasLimit           uint64
+	ProposalKey        string
+	Payer              string
+	Authorizers        string
+	PayloadSignatures  string
 	EnvelopeSignatures string
 }
 
-func newTx(status string,height uint64,
-	t string,transactionID string,transactionIndex string,eventIndex int,
-	value string,script []byte,arguments [][]byte,referenceBlockID string,
-	gasLimit uint64,proposalKey string,payer string,authorizers string,payloadSignatures string,
-	envelopeSignatures string)Tx{
-		return Tx{
-			Status :status ,
-			Height :height ,
+func newTx(status string, height uint64,
+	script []byte, arguments [][]byte, referenceBlockID string,
+	gasLimit uint64, proposalKey string, payer string, authorizers string, payloadSignatures string,
+	envelopeSignatures string) Tx {
+	return Tx{
+		Status: status,
+		Height: height,
 
-			//Transaction Result Event
-			Type :t, 
-			TransactionID :transactionID ,
-			TransactionIndex : transactionIndex,
-			EventIndex :eventIndex ,
-			Value :value ,
-			
-			//Transaction Details
-			script :script ,
-			Arguments :arguments ,
-			ReferenceBlockID :referenceBlockID ,
-			GasLimit : gasLimit,
-			ProposalKey :proposalKey ,
-			Payer : payer,
-			Authorizers :authorizers ,
-			PayloadSignatures : payloadSignatures,
-			EnvelopeSignatures :envelopeSignatures ,
-		}
+		//Transaction Details
+		script:             script,
+		Arguments:          arguments,
+		ReferenceBlockID:   referenceBlockID,
+		GasLimit:           gasLimit,
+		ProposalKey:        proposalKey,
+		Payer:              payer,
+		Authorizers:        authorizers,
+		PayloadSignatures:  payloadSignatures,
+		EnvelopeSignatures: envelopeSignatures,
 	}
+}
+
+type Event struct {
+	Height int
+	//Transaction Result Event
+	Type             string
+	TransactionID    string
+	TransactionIndex string
+	EventIndex       int
+	Value            string
+}
+
+func NewEvent(height int, t string, transactionID string, transactionIndex string, eventIndex int,
+	value string) Event {
+
+	return Event{
+		Height: height,
+		//Transaction Result Event
+		Type:             t,
+		TransactionID:    transactionID,
+		TransactionIndex: transactionIndex,
+		EventIndex:       eventIndex,
+		Value:            value,
+	}
+}
 
 // FindEventByType searches inside the given tx events for the message having the specified index, in order
 // to find the event having the given type, and returns it.
@@ -75,10 +82,8 @@ func (txs Txs) FindEventByType(index int, eventType string) (Tx, error) {
 		}
 	}
 
-	return Tx{}, fmt.Errorf("no %s event found inside tx", eventType )
+	return Tx{}, fmt.Errorf("no %s event found inside tx", eventType)
 }
-
-
 
 // Successful tells whether this tx is successful or not
 func (tx Tx) Successful() bool {
@@ -86,13 +91,13 @@ func (tx Tx) Successful() bool {
 }
 
 type NodeOperators struct {
-	Height   int64
+	Height    int64
 	NodeInfos []*NodeInfo
 }
 
-func NewNodeOperators(height int64,nodeInfos []*NodeInfo)NodeOperators{
+func NewNodeOperators(height int64, nodeInfos []*NodeInfo) NodeOperators {
 	return NodeOperators{
-		Height: height,
+		Height:    height,
 		NodeInfos: nodeInfos,
 	}
 }
@@ -136,63 +141,63 @@ func NewNodeInfoFromCandance(node interface{}) (NodeInfo, error) {
 	}
 	id, ok := s.Index(0).Interface().(string)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("id is not type string")
+		return NodeInfo{}, fmt.Errorf("id is not type string")
 	}
 	role, ok := s.Index(1).Interface().(uint8)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("role is not type uint8")
+		return NodeInfo{}, fmt.Errorf("role is not type uint8")
 	}
 	networkingAddress, ok := s.Index(2).Interface().(string)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("networkingAddress is not string")
+		return NodeInfo{}, fmt.Errorf("networkingAddress is not string")
 	}
 	networkingKey, ok := s.Index(3).Interface().(string)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("networkingKey is not string")
+		return NodeInfo{}, fmt.Errorf("networkingKey is not string")
 	}
 	stakingKey, ok := s.Index(4).Interface().(string)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("stakingKey is not string")
+		return NodeInfo{}, fmt.Errorf("stakingKey is not string")
 	}
 	tokensStaked, ok := s.Index(5).Interface().(uint64)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("tokensStaked is not uint64")
+		return NodeInfo{}, fmt.Errorf("tokensStaked is not uint64")
 	}
 	tokensCommitted, ok := s.Index(6).Interface().(uint64)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("tokensCommitted is not uint64")
+		return NodeInfo{}, fmt.Errorf("tokensCommitted is not uint64")
 	}
 	tokensUnstaking, ok := s.Index(7).Interface().(uint64)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("tokensUnstaking is not uint64")
+		return NodeInfo{}, fmt.Errorf("tokensUnstaking is not uint64")
 	}
 	tokensUnstaked, ok := s.Index(8).Interface().(uint64)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("tokensUnstaked is not uint64")
+		return NodeInfo{}, fmt.Errorf("tokensUnstaked is not uint64")
 	}
 	tokensRewarded, ok := s.Index(9).Interface().(uint64)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("tokensRewarded is not uint64")
+		return NodeInfo{}, fmt.Errorf("tokensRewarded is not uint64")
 	}
 
 	delegatorIDCounter, ok := s.Index(11).Interface().(uint32)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("delegatorIDCounter is not uint32")
+		return NodeInfo{}, fmt.Errorf("delegatorIDCounter is not uint32")
 	}
 	tokensRequestedToUnstake, ok := s.Index(12).Interface().(uint64)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("tokensRequestedToUnstake is not uint64")
+		return NodeInfo{}, fmt.Errorf("tokensRequestedToUnstake is not uint64")
 	}
 	initialWeight, ok := s.Index(13).Interface().(uint64)
 	if !ok {
-		return NodeInfo{},fmt.Errorf("initialWeight is not uint64")
+		return NodeInfo{}, fmt.Errorf("initialWeight is not uint64")
 	}
 
-	nodeInfo := NewNodeInfo(id,role,networkingAddress,networkingKey,
-		stakingKey,tokensStaked,tokensCommitted,tokensUnstaking,
-		tokensUnstaked,tokensRewarded,delegators,delegatorIDCounter,
-		tokensRequestedToUnstake,initialWeight)
-		
+	nodeInfo := NewNodeInfo(id, role, networkingAddress, networkingKey,
+		stakingKey, tokensStaked, tokensCommitted, tokensUnstaking,
+		tokensUnstaked, tokensRewarded, delegators, delegatorIDCounter,
+		tokensRequestedToUnstake, initialWeight)
+
 	return nodeInfo, nil
 }
 

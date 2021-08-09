@@ -79,25 +79,24 @@ func (db *Database) HasBlock(height int64) (bool, error) {
 // SaveBlock implements db.Database
 func (db *Database) SaveBlock(block *flow.Block) error {
 	stmt := `INSERT INTO block (height,id,parent_id ,collection_guarantees,timestamp) VALUES ($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING`
-    
-	grauntees:=make([]string,len(block.CollectionGuarantees))
-	for i,collectionGuarantee:=range block.CollectionGuarantees{
-		grauntees[i]=collectionGuarantee.CollectionID.String()
+
+	grauntees := make([]string, len(block.CollectionGuarantees))
+	for i, collectionGuarantee := range block.CollectionGuarantees {
+		grauntees[i] = collectionGuarantee.CollectionID.String()
 	}
 	_, err := db.Sql.Exec(stmt,
-		block.Height, block.ID, block.ParentID,grauntees,block.Timestamp,
+		block.Height, block.ID, block.ParentID, grauntees, block.Timestamp,
 	)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	var params []interface{}
-	stmt=`INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
-	for i, seal:=range block.Seals{
+	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	for i, seal := range block.Seals {
 		vi := i * 3
-		stmt += fmt.Sprintf("($%d, $%d, $%d),", vi+1, vi+2,vi+3)	
-		params=append(params, block.Height, seal.ExecutionReceiptID.String(),seal.ExecutionReceiptSignatures,
-		)	
+		stmt += fmt.Sprintf("($%d, $%d, $%d),", vi+1, vi+2, vi+3)
+		params = append(params, block.Height, seal.ExecutionReceiptID.String(), seal.ExecutionReceiptSignatures)
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
@@ -203,14 +202,13 @@ func (db *Database) SaveNodeInfos(infos []*types.NodeInfo) error {
 	var vparams []interface{}
 	for i, val := range infos {
 		vi := i * 13
-		
 
 		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),",
-		 vi+1, vi+2,vi+3,vi+4,vi+5,vi+6,
-		 vi+7,vi+8,vi+9,vi+10,vi+11,vi+12,vi+13)
-		vparams = append(vparams,val.Id ,val.Role,val.NetworkingAddress,val.NetworkingKey ,val.StakingKey ,
-			val.TokensStaked ,val.TokensCommitted ,val.TokensUnstaking ,val.TokensUnstaked ,val.TokensRewarded ,
-			val.Delegators ,val.DelegatorIDCounter ,val.TokensRequestedToUnstake,val. InitialWeight)
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6,
+			vi+7, vi+8, vi+9, vi+10, vi+11, vi+12, vi+13)
+		vparams = append(vparams, val.Id, val.Role, val.NetworkingAddress, val.NetworkingKey, val.StakingKey,
+			val.TokensStaked, val.TokensCommitted, val.TokensUnstaking, val.TokensUnstaked, val.TokensRewarded,
+			val.Delegators, val.DelegatorIDCounter, val.TokensRequestedToUnstake, val.InitialWeight)
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
@@ -293,4 +291,3 @@ WHERE message.transaction_hash = transaction.hash AND transaction.height = $1
 `, height)
 	return err
 }
-

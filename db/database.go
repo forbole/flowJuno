@@ -5,7 +5,6 @@ import (
 
 	"github.com/desmos-labs/juno/types"
 	"github.com/onflow/flow-go-sdk"
-
 )
 
 // Database represents an abstract database that can be used to save data inside it

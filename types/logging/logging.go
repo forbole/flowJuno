@@ -2,12 +2,10 @@ package logging
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
 	"github.com/desmos-labs/juno/modules"
 	"github.com/desmos-labs/juno/types"
 	"github.com/onflow/flow-go-sdk"
-
 )
 
 const (
