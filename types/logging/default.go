@@ -5,9 +5,9 @@ import (
 	"os"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/onflow/flow-go-sdk"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
 	"github.com/desmos-labs/juno/modules"
 	"github.com/desmos-labs/juno/types"
@@ -54,19 +54,19 @@ func (d *defaultLogger) LogGenesisError(module modules.Module, err error) {
 }
 
 // LogBLockError implements Logger
-func (d *defaultLogger) LogBLockError(module modules.Module, block *tmctypes.ResultBlock, err error) {
-	log.Error().Err(err).Str(LogKeyModule, module.Name()).Int64(LogKeyHeight, block.Block.Height).
+func (d *defaultLogger) LogBLockError(module modules.Module, block *flow.Block, err error) {
+	log.Error().Err(err).Str(LogKeyModule, module.Name()).Int64(LogKeyHeight, int64(block.Height)).
 		Msg("error while handling block")
 }
 
 // LogTxError implements Logger
-func (d *defaultLogger) LogTxError(module modules.Module, tx *types.Tx, err error) {
+func (d *defaultLogger) LogTxError(module modules.Module, tx *types.Txs, err error) {
 	log.Error().Err(err).Str(LogKeyModule, module.Name()).Int64("height", tx.Height).
 		Str(LogKeyTxHash, tx.TxHash).Msg("error while handling transaction")
 }
 
 // LogMsgError implements Logger
-func (d *defaultLogger) LogMsgError(module modules.Module, tx *types.Tx, msg sdk.Msg, err error) {
+func (d *defaultLogger) LogMsgError(module modules.Module, tx *types.Txs, msg sdk.Msg, err error) {
 	log.Error().Err(err).Str(LogKeyModule, module.Name()).Int64(LogKeyHeight, tx.Height).
 		Str(LogKeyTxHash, tx.TxHash).Str(LogKeyMsgType, msg.Type()).Msg("error while handling message")
 }

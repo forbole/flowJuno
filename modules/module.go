@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/go-co-op/gocron"
+	"github.com/onflow/flow-go-sdk"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 
@@ -78,7 +79,7 @@ type BlockModule interface {
 	// For each transaction present inside the block, HandleTx will be called as well.
 	// NOTE. The returned error will be logged using the logging.LogBlockError method. All other modules' handlers
 	// will still be called.
-	HandleBlock(block *tmctypes.ResultBlock, txs []*types.Tx, vals *tmctypes.ResultValidators) error
+	HandleBlock(block *flow.Block, txs []*types.Txs, vals *types.NodeOperators) error
 }
 
 type TransactionModule interface {
@@ -86,7 +87,7 @@ type TransactionModule interface {
 	// For each message present inside the transaction, HandleMsg will be called as well.
 	// NOTE. The returned error will be logged using the logging.LogTxError method. All other modules' handlers
 	// will still be called.
-	HandleTx(tx *types.Tx) error
+	HandleTx(txs *types.Txs) error
 }
 
 type MessageModule interface {
@@ -95,5 +96,5 @@ type MessageModule interface {
 	// are passed as well.
 	// NOTE. The returned error will be logged using the logging.LogMsgError method. All other modules' handlers
 	// will still be called.
-	HandleMsg(index int, msg sdk.Msg, tx *types.Tx) error
+	HandleMsg(index int, msg sdk.Msg, tx *types.Txs) error
 }

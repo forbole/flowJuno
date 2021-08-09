@@ -89,10 +89,10 @@ func (w Worker) process(height int64) error {
 				return err
 			}
 		}
- */
+
 		return w.HandleGenesis(genesis)
 	}
-
+ */
 	//log.Debug().Int64("height", height).Msg("processing block")
 
 	block, err := w.cp.Block(height)
@@ -190,40 +190,20 @@ func (w Worker) SaveNodeInfos(vals []*types.NodeInfo)error{
 // ExportBlock accepts a finalized block and a corresponding set of transactions
 // and persists them to the database along with attributable metadata. An error
 // is returned if the write fails.
-func (w Worker) ExportBlock(b *flow.Block, txs []*types.Tx, vals *types.NodeOperators) error {
+func (w Worker) ExportBlock(b *flow.Block, txs []*types.Txs, vals *types.NodeOperators) error {
 	// Save all validators
 	err := w.SaveNodeInfos(vals.NodeInfos)
 	if err != nil {
 		return err
 	}
 
-	// Make sure the proposer exists
-	proposerAddr := sdk.ConsAddress(b.Block.ProposerAddress)
-	val := findValidatorByAddr(proposerAddr.String(), vals)
-	if val == nil {
-		err := fmt.Errorf("failed to find validator")
-		log.Error().
-			Err(err).
-			Int64("height", b.Block.Height).
-			Str("validator_hex", b.Block.ProposerAddress.String()).
-			Str("validator_bech32", proposerAddr.String()).
-			Time("commit_timestamp", b.Block.Time).
-			Send()
-		return err
-	}
-
 	// Save the block
-	err = w.db.SaveBlock(types.NewBlockFromTmBlock(b, sumGasTxs(txs)))
+	err = w.db.SaveBlock(b)
 	if err != nil {
-		log.Error().Err(err).Int64("height", b.Block.Height).Msg("failed to persist block")
+		log.Error().Err(err).Int64("height", int64(b.BlockHeader.Height)).Msg("failed to persist block")
 		return err
 	}
 
-	// Save the commits
-	err = w.ExportCommit(b.Block.LastCommit, vals)
-	if err != nil {
-		return err
-	}
 
 	// Call the block handlers
 	for _, module := range w.modules {
@@ -236,7 +216,7 @@ func (w Worker) ExportBlock(b *flow.Block, txs []*types.Tx, vals *types.NodeOper
 	}
 
 	// Export the transactions
-	return w.ExportTxs(txs)
+	return w.ExportTxEvents(txs)
 }
 
 // ExportCommit accepts a block commitment and a corresponding set of
@@ -283,13 +263,13 @@ func (w Worker) ExportCommit(commit *tmtypes.Commit, vals *tmctypes.ResultValida
 
 // ExportTxs accepts a slice of transactions and persists then inside the database.
 // An error is returned if the write fails.
-func (w Worker) ExportTxEvents(txs []*types.Tx) error {
+func (w Worker) ExportTxEvents(txs []*types.Txs) error {
 	// Handle all the transactions inside the block
 	for _, tx := range txs {
 		// Save the transaction itself
 		err := w.db.SaveTx(tx)
 		if err != nil {
-			log.Error().Err(err).Str("hash", tx.TxHash).Msg("failed to handle transaction")
+			log.Error().Err(err).Str("Height", string(tx.Height)).Msg("failed to handle transaction")
 			return err
 		}
 

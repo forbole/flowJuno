@@ -6,6 +6,8 @@ import (
 
 	"github.com/desmos-labs/juno/modules"
 	"github.com/desmos-labs/juno/types"
+	"github.com/onflow/flow-go-sdk"
+
 )
 
 const (
@@ -20,9 +22,9 @@ type Logger interface {
 	SetLogLevel(level string) error
 	SetLogFormat(format string) error
 	LogGenesisError(module modules.Module, err error)
-	LogBLockError(module modules.Module, block *tmctypes.ResultBlock, err error)
-	LogTxError(module modules.Module, tx *types.Tx, err error)
-	LogMsgError(module modules.Module, tx *types.Tx, msg sdk.Msg, err error)
+	LogBLockError(module modules.Module, block *flow.Block, err error)
+	LogTxError(module modules.Module, tx *types.Txs, err error)
+	LogMsgError(module modules.Module, tx *types.Txs, err error)
 }
 
 // logger represents the currently used logger
@@ -46,16 +48,17 @@ func LogGenesisError(module modules.Module, err error) {
 }
 
 // LogBLockError logs the error returned while handling the given block inside the specified module
-func LogBLockError(module modules.Module, block *tmctypes.ResultBlock, err error) {
+func LogBLockError(module modules.Module, block *flow.Block, err error) {
 	logger.LogBLockError(module, block, err)
 }
 
 // LogTxError logs the error returned while handling the provided transaction inside the given module
-func LogTxError(module modules.Module, tx *types.Tx, err error) {
+func LogTxError(module modules.Module, tx *types.Txs, err error) {
 	logger.LogTxError(module, tx, err)
 }
 
 // LogMsgError logs there error returned while handling the specified message inside the given module
-func LogMsgError(module modules.Module, tx *types.Tx, msg sdk.Msg, err error) {
+func LogMsgError(module modules.Module, tx *types.Txs, msg sdk.Msg, err error) {
 	logger.LogMsgError(module, tx, msg, err)
+	flow.NewTransaction()
 }

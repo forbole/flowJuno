@@ -108,7 +108,7 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 }
 
 // SaveTx implements db.Database
-func (db *Database) SaveTx(tx *types.Tx) error {
+func (db *Database) SaveTx(tx *types.Txs) error {
 	sqlStatement := `
 INSERT INTO transaction 
     (hash, height, success, messages, memo, signatures, signer_infos, fee, gas_wanted, gas_used, raw_log, logs) 

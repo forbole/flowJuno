@@ -7,14 +7,12 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 
 	"github.com/desmos-labs/juno/types"
 
 	"google.golang.org/grpc"
 
-	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/client"
@@ -80,7 +78,6 @@ func (cp *Proxy) Block(height int64) (*flow.Block, error) {
 	if err != nil {
 		return nil, err
 	}
-	block
 	return block, nil
 }
 
@@ -108,8 +105,6 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 		return nodes
 	}`,cp.contract.StakingTable)
 	
-
-
 	result,err:=cp.flowClient.ExecuteScriptAtBlockHeight(cp.ctx,uint64(height),[]byte(script),nil)
 	if err!=nil{
 		return nil,err
@@ -117,7 +112,7 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 	value:=result.ToGoValue()
 	nodes,ok:=value.([]interface{})
 	if !ok{
-		fmt.Errorf("candance value cannot change to valid []interface{}")
+		return nil,fmt.Errorf("candance value cannot change to valid []interface{}")
 	}
 	nodeInfos:=make([]*types.NodeInfo,len(nodes))
 	for i,node :=range nodes{
@@ -171,16 +166,6 @@ func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEv
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
 }
 */
-// Tx queries for a transaction from the REST client and decodes it into a sdk.Tx
-// if the transaction exists. An error is returned if the tx doesn't exist or
-// decoding fails.
-func (cp *Proxy) Tx(hash string) (*sdk.TxResponse, *tx.Tx, error) {
-	res, err := cp.txServiceClient.GetTx(context.Background(), &tx.GetTxRequest{Hash: hash})
-	if err != nil {
-		return nil, nil, err
-	}
-	return res.TxResponse, res.Tx, nil
-}
 
 // Txs queries for all the transactions in a block. Transactions are returned
 // in the TransactionResult format which internally contains an array of Transactions. An error is

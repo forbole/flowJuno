@@ -3,6 +3,7 @@ package pruning
 import (
 	"fmt"
 
+	"github.com/onflow/flow-go-sdk"
 	"github.com/rs/zerolog/log"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
@@ -33,13 +34,13 @@ func (m *Module) Name() string {
 }
 
 // HandleBlock implements modules.BlockModule
-func (m *Module) HandleBlock(block *tmctypes.ResultBlock, _ []*types.Tx, _ *tmctypes.ResultValidators) error {
+func (m *Module) HandleBlock(block *flow.Block, _ []*types.Txs, _ *tmctypes.ResultValidators) error {
 	if m.cfg == nil {
 		// Nothing to do, pruning is disabled
 		return nil
 	}
 
-	if block.Block.Height%m.cfg.GetInterval() != 0 {
+	if int64(block.Height)%m.cfg.GetInterval() != 0 {
 		// Not an interval height, so just skip
 		return nil
 	}
@@ -57,7 +58,7 @@ func (m *Module) HandleBlock(block *tmctypes.ResultBlock, _ []*types.Tx, _ *tmct
 
 	// Iterate from last pruned height until (current block height - keep recent) to
 	// avoid pruning the recent blocks that should be kept
-	for ; height < block.Block.Height-m.cfg.GetKeepRecent(); height++ {
+	for ; height < int64(block.Height)-m.cfg.GetKeepRecent(); height++ {
 
 		if height%m.cfg.GetKeepEvery() == 0 {
 			// The height should be kept, so just skip
