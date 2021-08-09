@@ -293,3 +293,4 @@ WHERE message.transaction_hash = transaction.hash AND transaction.height = $1
 `, height)
 	return err
 }
+

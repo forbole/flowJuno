@@ -170,21 +170,26 @@ func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEv
 // Txs queries for all the transactions in a block. Transactions are returned
 // in the TransactionResult format which internally contains an array of Transactions. An error is
 // returned if any query fails.
-func (cp *Proxy) Txs(block *flow.Block) ([]*types.Txs, error) {
+func (cp *Proxy) Txs(block *flow.Block) (*types.Txs, error) {
 
 	collection, err := cp.flowClient.GetCollection(cp.ctx, block.ID)
 	if err != nil {
 		return nil, err
 	}
 	
-	txResponses := make([]*types.Txs, len(collection.TransactionIDs))
+	txResponses := make([]*types.Tx, len(collection.TransactionIDs))
 	for i, txID := range collection.TransactionIDs {
 		transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, txID)
 		if err != nil {
 			return nil, err
 		}
-		txs:=types.NewTxs(*transactionResult,block.Height)
+
+		transaction,err:=cp.flowClient.GetTransaction(cp.ctx,txID,nil)
+
+		txs:=types.NewTx(transaction.)
 		txResponses[i] = &txs
+
+
 	}
 	return txResponses, nil
 }

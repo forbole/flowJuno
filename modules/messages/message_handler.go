@@ -26,6 +26,8 @@ func HandleMsg(
 		return err
 	}
 
+	
+
 	return db.SaveMessage(types.NewMessage(
 		tx.TxHash,
 		index,

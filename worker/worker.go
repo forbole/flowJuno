@@ -103,7 +103,7 @@ func (w Worker) process(height int64) error {
 
 	txs, err := w.cp.Txs(block)
 	if err != nil {
-		log.Error().Err(err).Int64("height", height).Msg("failed to get transactions for block")
+		log.Error().Err(err).Int64("height", height).Msg("failed to get transaction Result for block")
 		return err
 	}
 
@@ -271,6 +271,16 @@ func (w Worker) ExportTxEvents(txs []*types.Txs) error {
 		if err != nil {
 			log.Error().Err(err).Str("Height", string(tx.Height)).Msg("failed to handle transaction")
 			return err
+		}
+
+		for _,event := range tx.Events{
+			transaction,err:=w.cp.GetTransaction(event.TransactionID.String())
+			if err!=nil{
+				return err
+			}
+			transaction.
+
+						
 		}
 
 		// Call the tx handlers

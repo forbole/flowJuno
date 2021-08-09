@@ -5,36 +5,80 @@ import (
 	"reflect"
 
 	"github.com/onflow/flow-go-sdk"
+	"github.com/tendermint/tendermint/types"
+	"google.golang.org/api/script/v1"
 )
 
 // Tx represents an already existing blockchain transaction
-type Txs struct {
-	Events []flow.Event
+type Txs []*Tx
+
+type Tx struct{
+	//TransactionResult
 	Status string
 	Height uint64
+
+	//Transaction Result Event
+	Type string
+	TransactionID string
+	TransactionIndex string
+	EventIndex int
+	Value string
+	
+	//Transaction Details
+	script []byte
+	Arguments [][]byte
+	ReferenceBlockID string
+	GasLimit uint64
+	ProposalKey string
+	Payer string
+	Authorizers string
+	PayloadSignatures string
+	EnvelopeSignatures string
 }
 
-// NewTx allows to create a new Tx instance from the given txResponse
-func NewTxs(txs flow.TransactionResult,height uint64) Txs {
-	return Txs{
-		Events: txs.Events,
-		Status: txs.Status.String(),
-		Height: height,
+func newTx(status string,height uint64,
+	t string,transactionID string,transactionIndex string,eventIndex int,
+	value string,script []byte,arguments [][]byte,referenceBlockID string,
+	gasLimit uint64,proposalKey string,payer string,authorizers string,payloadSignatures string,
+	envelopeSignatures string)Tx{
+		return Tx{
+			Status :status ,
+			Height :height ,
+
+			//Transaction Result Event
+			Type :t, 
+			TransactionID :transactionID ,
+			TransactionIndex : transactionIndex,
+			EventIndex :eventIndex ,
+			Value :value ,
+			
+			//Transaction Details
+			script :script ,
+			Arguments :arguments ,
+			ReferenceBlockID :referenceBlockID ,
+			GasLimit : gasLimit,
+			ProposalKey :proposalKey ,
+			Payer : payer,
+			Authorizers :authorizers ,
+			PayloadSignatures : payloadSignatures,
+			EnvelopeSignatures :envelopeSignatures ,
+		}
 	}
-}
 
 // FindEventByType searches inside the given tx events for the message having the specified index, in order
 // to find the event having the given type, and returns it.
 // If no such event is found, returns an error instead.
-func (tx Txs) FindEventByType(index int, eventType string) (flow.Event, error) {
-	for _, ev := range tx.Events {
-		if ev.Type == eventType {
-			return ev, nil
+func (txs Txs) FindEventByType(index int, eventType string) (Tx, error) {
+	for _, tx := range txs {
+		if tx.Type == eventType {
+			return *tx, nil
 		}
 	}
 
-	return flow.Event{}, fmt.Errorf("no %s event found inside tx", eventType, )
+	return Tx{}, fmt.Errorf("no %s event found inside tx", eventType )
 }
+
+
 
 // Successful tells whether this tx is successful or not
 func (tx Tx) Successful() bool {
