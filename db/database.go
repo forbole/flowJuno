@@ -20,7 +20,7 @@ type Database interface {
 
 	// SaveTx will be called to save each transaction contained inside a block.
 	// An error is returned if the operation fails.
-	SaveTx(tx *types.Tx) error
+	SaveTx(tx *types.Txs) error
 
 	// HasValidator returns true if a given validator by consensus address exists.
 	// An error is returned if the operation fails.
@@ -32,7 +32,7 @@ type Database interface {
 
 	// SaveNodeInfo stores a list of Node Operator Info if they do not already exist.
 	// An error is returned if the operation fails.
-	SaveNodeInfo(validators []*types.Validator) error
+	SaveNodeInfos(vals []*types.NodeInfo) error
 
 	// SaveCommitSignatures stores a  slice of validator commit signatures.
 	// An error is returned if the operation fails.

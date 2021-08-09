@@ -17,18 +17,21 @@ CREATE TABLE node_info
     initialWeight BIGINT NOT NULL
 );
 
-
-
-
 CREATE TABLE block
 (
     height           BIGINT UNIQUE PRIMARY KEY,
-    hash             TEXT                        NOT NULL UNIQUE,
-    num_txs          INTEGER DEFAULT 0,
-    total_gas        BIGINT  DEFAULT 0,
-    proposer_address TEXT REFERENCES validator (consensus_address),
+    id TEXT NOT NULL,
+    parent_id TEXT NOT NULL,
+    collection_guarantees []TEXT NOT NULL,
     timestamp        TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
+
+CREATE TABLE block_seal
+(
+    height BIGINT NOT NULL,
+    execution_receipt_id TEXT NOT NULL,
+    execution_receipt_signatures [][]TEXT NOT NULL
+)
 CREATE INDEX block_hash_index ON block (hash);
 CREATE INDEX block_proposer_address_index ON block (proposer_address);
 

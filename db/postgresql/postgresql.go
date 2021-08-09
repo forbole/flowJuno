@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/onflow/flow-go-sdk"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
@@ -76,15 +77,33 @@ func (db *Database) HasBlock(height int64) (bool, error) {
 }
 
 // SaveBlock implements db.Database
-func (db *Database) SaveBlock(block *types.Block) error {
-	sqlStatement := `
-INSERT INTO block (height, hash, num_txs, total_gas, proposer_address, timestamp)
-VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING`
-
-	proposerAddress := sql.NullString{Valid: len(block.ProposerAddress) != 0, String: block.ProposerAddress}
-	_, err := db.Sql.Exec(sqlStatement,
-		block.Height, block.Hash, block.TxNum, block.TotalGas, proposerAddress, block.Timestamp,
+func (db *Database) SaveBlock(block *flow.Block) error {
+	stmt := `INSERT INTO block (height,id,parent_id ,collection_guarantees,timestamp) VALUES ($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING`
+    
+	grauntees:=make([]string,len(block.CollectionGuarantees))
+	for i,collectionGuarantee:=range block.CollectionGuarantees{
+		grauntees[i]=collectionGuarantee.CollectionID.String()
+	}
+	_, err := db.Sql.Exec(stmt,
+		block.Height, block.ID, block.ParentID,grauntees,block.Timestamp,
 	)
+	if err!=nil{
+		return err
+	}
+
+	var params []interface{}
+	stmt=`INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	for i, seal:=range block.Seals{
+		vi := i * 3
+		stmt += fmt.Sprintf("($%d, $%d, $%d),", vi+1, vi+2,vi+3)	
+		params=append(params, block.Height, seal.ExecutionReceiptID.String(),seal.ExecutionReceiptSignatures,
+		)	
+	}
+
+	stmt = stmt[:len(stmt)-1] // Remove trailing ,
+	stmt += " ON CONFLICT DO NOTHING"
+	_, err = db.Sql.Exec(stmt, params...)
+
 	return err
 }
 
@@ -169,7 +188,7 @@ func (db *Database) SaveValidators(validators []*types.Validator) error {
 	return err
 }
 
-func (db *Database) SaveNodeInfos(infos []types.NodeInfo) error {
+func (db *Database) SaveNodeInfos(infos []*types.NodeInfo) error {
 	if len(infos) == 0 {
 		return nil
 	}

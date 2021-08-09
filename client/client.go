@@ -27,7 +27,7 @@ type Proxy struct {
 	encodingConfig *params.EncodingConfig
 	contract       Contracts
 
-	rpcClient client.Client
+	flowClient client.Client
 
 	grpConnection   *grpc.ClientConn
 	txServiceClient tx.ServiceClient
@@ -55,7 +55,7 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 	return &Proxy{
 		encodingConfig:  encodingConfig,
 		ctx:             context.Background(),
-		rpcClient:       *flowClient,
+		flowClient:       *flowClient,
 		grpConnection:   grpcConnection,
 		txServiceClient: tx.NewServiceClient(grpcConnection),
 		contract: contracts,
@@ -65,7 +65,7 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 // LatestHeight returns the latest block height on the active chain. An error
 // is returned if the query fails.
 func (cp *Proxy) LatestHeight() (int64, error) {
-	block, err := cp.rpcClient.GetLatestBlock(cp.ctx, true)
+	block, err := cp.flowClient.GetLatestBlock(cp.ctx, true)
 	if err != nil {
 		return -1, err
 	}
@@ -76,17 +76,18 @@ func (cp *Proxy) LatestHeight() (int64, error) {
 
 // Block queries for a block by height. An error is returned if the query fails.
 func (cp *Proxy) Block(height int64) (*flow.Block, error) {
-	block, err := cp.rpcClient.GetBlockByHeight(cp.ctx, uint64(height))
+	block, err := cp.flowClient.GetBlockByHeight(cp.ctx, uint64(height))
 	if err != nil {
 		return nil, err
 	}
+	block
 	return block, nil
 }
 
 // GetTransaction queries for a transaction by hash. An error is returned if the
 // query fails.
 func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
-	transaction, err := cp.rpcClient.GetTransaction(cp.ctx, flow.HashToID([]byte(hash)))
+	transaction, err := cp.flowClient.GetTransaction(cp.ctx, flow.HashToID([]byte(hash)))
 	if err != nil {
 		return nil, err
 	}
@@ -106,9 +107,10 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 		}
 		return nodes
 	}`,cp.contract.StakingTable)
+	
 
 
-	result,err:=cp.rpcClient.ExecuteScriptAtBlockHeight(cp.ctx,uint64(height),[]byte(script),nil)
+	result,err:=cp.flowClient.ExecuteScriptAtBlockHeight(cp.ctx,uint64(height),[]byte(script),nil)
 	if err!=nil{
 		return nil,err
 	}
@@ -133,12 +135,12 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 /*
 // Genesis returns the genesis state
 func (cp *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {
-	return cp.rpcClient.Genesis(cp.ctx)
+	return cp.flowClient.Genesis(cp.ctx)
 }
 
 // ConsensusState returns the consensus state of the chain
 func (cp *Proxy) ConsensusState() (*constypes.RoundStateSimple, error) {
-	state, err := cp.rpcClient.ConsensusState(context.Background())
+	state, err := cp.flowClient.ConsensusState(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +159,7 @@ func (cp *Proxy) ConsensusState() (*constypes.RoundStateSimple, error) {
 // the context and handle any errors appropriately.
 func (cp *Proxy) SubscribeEvents(subscriber, query string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	eventCh, err := cp.rpcClient.event
+	eventCh, err := cp.flowClient.event
 	return eventCh, cancel, err
 }
 
@@ -181,29 +183,30 @@ func (cp *Proxy) Tx(hash string) (*sdk.TxResponse, *tx.Tx, error) {
 }
 
 // Txs queries for all the transactions in a block. Transactions are returned
-// in the sdk.TxResponse format which internally contains an sdk.Tx. An error is
+// in the TransactionResult format which internally contains an array of Transactions. An error is
 // returned if any query fails.
-func (cp *Proxy) Txs(block *flow.Block) ([]*types.Tx, error) {
+func (cp *Proxy) Txs(block *flow.Block) ([]*types.Txs, error) {
 
-	collection, err := cp.rpcClient.GetCollection(cp.ctx, block.ID)
+	collection, err := cp.flowClient.GetCollection(cp.ctx, block.ID)
 	if err != nil {
 		return nil, err
 	}
-	txResponses := make([]*types.Tx, len(collection.TransactionIDs))
+	
+	txResponses := make([]*types.Txs, len(collection.TransactionIDs))
 	for i, txID := range collection.TransactionIDs {
-		transactionResult, err := cp.rpcClient.GetTransactionResult(cp.ctx, txID)
+		transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, txID)
 		if err != nil {
 			return nil, err
 		}
-		txResponses[i] = (types.NewTx(transactionResult))
-
+		txs:=types.NewTxs(*transactionResult,block.Height)
+		txResponses[i] = &txs
 	}
 	return txResponses, nil
 }
 
 // Stop defers the node stop execution to the RPC client.
 func (cp *Proxy) Stop() {
-	err := cp.rpcClient.Close()
+	err := cp.flowClient.Close()
 	if err != nil {
 		log.Fatal().Str("module", "client proxy").Err(err).Msg("error while stopping proxy")
 	}

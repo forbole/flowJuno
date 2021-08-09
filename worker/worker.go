@@ -74,10 +74,9 @@ func (w Worker) process(height int64) error {
 		log.Debug().Int64("height", height).Msg("skipping already exported block")
 		return nil
 	}
-
+/* 
 	if height == 0 {
 		cfg := types.Cfg.GetParsingConfig()
-
 		var genesis *tmtypes.GenesisDoc
 		if strings.TrimSpace(cfg.GetGenesisFilePath()) != "" {
 			genesis, err = w.getGenesisFromFilePath(cfg.GetGenesisFilePath())
@@ -90,11 +89,11 @@ func (w Worker) process(height int64) error {
 				return err
 			}
 		}
-
+ */
 		return w.HandleGenesis(genesis)
 	}
 
-	log.Debug().Int64("height", height).Msg("processing block")
+	//log.Debug().Int64("height", height).Msg("processing block")
 
 	block, err := w.cp.Block(height)
 	if err != nil {
@@ -120,7 +119,6 @@ func (w Worker) process(height int64) error {
 // getGenesisFromRPC returns the genesis read from the RPC endpoint
 func (w Worker) getGenesisFromRPC() (*tmtypes.GenesisDoc, error) {
 	log.Debug().Msg("getting genesis")
-
 	response, err := w.cp.Genesis()
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get genesis")
@@ -285,7 +283,7 @@ func (w Worker) ExportCommit(commit *tmtypes.Commit, vals *tmctypes.ResultValida
 
 // ExportTxs accepts a slice of transactions and persists then inside the database.
 // An error is returned if the write fails.
-func (w Worker) ExportTxs(txs []*types.Tx) error {
+func (w Worker) ExportTxEvents(txs []*types.Tx) error {
 	// Handle all the transactions inside the block
 	for _, tx := range txs {
 		// Save the transaction itself

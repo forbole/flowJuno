@@ -8,23 +8,25 @@ import (
 )
 
 // Tx represents an already existing blockchain transaction
-type Tx struct {
+type Txs struct {
 	Events []flow.Event
 	Status string
+	Height uint64
 }
 
 // NewTx allows to create a new Tx instance from the given txResponse
-func NewTx(tx flow.TransactionResult) Tx {
-	return Tx{
-		Events: tx.Events,
-		Status: tx.Status.String(),
+func NewTxs(txs flow.TransactionResult,height uint64) Txs {
+	return Txs{
+		Events: txs.Events,
+		Status: txs.Status.String(),
+		Height: height,
 	}
 }
 
 // FindEventByType searches inside the given tx events for the message having the specified index, in order
 // to find the event having the given type, and returns it.
 // If no such event is found, returns an error instead.
-func (tx Tx) FindEventByType(index int, eventType string) (flow.Event, error) {
+func (tx Txs) FindEventByType(index int, eventType string) (flow.Event, error) {
 	for _, ev := range tx.Events {
 		if ev.Type == eventType {
 			return ev, nil
