@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/rs/zerolog/log"
@@ -12,7 +13,6 @@ import (
 	"github.com/desmos-labs/juno/types"
 
 	"google.golang.org/grpc"
-
 
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/client"
@@ -170,13 +170,12 @@ func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEv
 // Txs queries for all the transactions in a block. Transactions are returned
 // in the TransactionResult format which internally contains an array of Transactions. An error is
 // returned if any query fails.
-func (cp *Proxy) Txs(block *flow.Block) (*types.Txs, error) {
+func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 	collection, err := cp.flowClient.GetCollection(cp.ctx, block.ID)
 	if err != nil {
 		return nil, err
 	}
-	
 	
 	txResponses := make([]*types.Tx, len(collection.TransactionIDs))
 	for i, txID := range collection.TransactionIDs {
@@ -184,15 +183,63 @@ func (cp *Proxy) Txs(block *flow.Block) (*types.Txs, error) {
 		if err != nil {
 			return nil, err
 		}
-
 		transaction,err:=cp.flowClient.GetTransaction(cp.ctx,txID,nil)
 
-		txs:=types.newTx(transactionResult.Status.String(),block.Height,transaction.)
-		txResponses[i] = &txs
+		authoriser:=make([]string,len(transaction.Authorizers))
+		for i, auth:= range transaction.Authorizers{
+			authoriser[i] = auth.String()
+		}
 
+	
+		payloadSignitures,err:=json.Marshal(transaction.PayloadSignatures)
+		if err!=nil{
+			return nil,err
+		}
 
+		envelopeSigniture,err:=json.Marshal(transaction.EnvelopeSignatures)
+		if err!=nil{
+			return nil,err
+		}
+
+		tx:=types.NewTx(transactionResult.Status.String(),block.Height,txID.String(),transaction.Script,transaction.Arguments,
+	transaction.ReferenceBlockID.String(),transaction.GasLimit,transaction.ProposalKey.Address.String(),transaction.Payer.String(),
+authoriser,payloadSignitures,envelopeSigniture)
+		txResponses[i] = &tx
 	}
 	return txResponses, nil
+}
+
+func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error){
+	txs,err:=cp.Txs(block)
+	if err!=nil{
+		return nil,err
+	}
+	var event []types.Event
+
+	for _,tx:=range txs{
+		ev,err:=cp.Events(tx.TransactionID)
+		if err!=nil{
+			return []types.Event{},err
+		}
+		event=append(event,ev...)
+	}
+	return event,nil
+}
+
+func (cp *Proxy) Events(transactionID string) ([]types.Event, error){
+	transactionResult,err:=cp.flowClient.GetTransactionResult(cp.ctx,flow.BytesToID([]byte(transactionID)),nil)
+	if err!=nil{
+		return []types.Event{},err
+	}
+
+	ev:=make([]types.Event,len(transactionResult.Events))
+	for i,event:=range transactionResult.Events{
+		ev[i]=types.NewEvent(event.Type,event.TransactionID.String(),event.TransactionIndex,
+	event.EventIndex,event.Value.String())
+	}
+	return ev,nil
+
+	
 }
 
 // Stop defers the node stop execution to the RPC client.

@@ -113,7 +113,14 @@ func (w Worker) process(height int64) error {
 		return err
 	}
 
-	return w.ExportBlock(block, txs, vals)
+	events,err:=w.cp.EventsInBlock(block)
+	if err!=nil{
+		log.Error().Err(err).Int64("height", height).Msg("failed to get events for block")
+		return err
+	}
+
+
+	return w.ExportBlock(block, &txs, vals,events)
 }
 
 // getGenesisFromRPC returns the genesis read from the RPC endpoint
@@ -190,7 +197,7 @@ func (w Worker) SaveNodeInfos(vals []*types.NodeInfo)error{
 // ExportBlock accepts a finalized block and a corresponding set of transactions
 // and persists them to the database along with attributable metadata. An error
 // is returned if the write fails.
-func (w Worker) ExportBlock(b *flow.Block, txs []*types.Txs, vals *types.NodeOperators) error {
+func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOperators,events []types.Event) error {
 	// Save all validators
 	err := w.SaveNodeInfos(vals.NodeInfos)
 	if err != nil {
@@ -271,16 +278,6 @@ func (w Worker) ExportTxEvents(txs []*types.Txs) error {
 		if err != nil {
 			log.Error().Err(err).Str("Height", string(tx.Height)).Msg("failed to handle transaction")
 			return err
-		}
-
-		for _,event := range tx.Events{
-			transaction,err:=w.cp.GetTransaction(event.TransactionID.String())
-			if err!=nil{
-				return err
-			}
-			transaction.
-
-						
 		}
 
 		// Call the tx handlers

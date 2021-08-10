@@ -14,6 +14,7 @@ type Tx struct {
 	//TransactionResult
 	Status string
 	Height uint64
+	TransactionID string
 
 	//Transaction Details
 	script             []byte
@@ -22,18 +23,19 @@ type Tx struct {
 	GasLimit           uint64
 	ProposalKey        string
 	Payer              string
-	Authorizers        string
-	PayloadSignatures  string
-	EnvelopeSignatures string
+	Authorizers        []string
+	PayloadSignatures  []byte
+	EnvelopeSignatures []byte
 }
 
-func newTx(status string, height uint64,
+func NewTx(status string, height uint64,transactionID string,
 	script []byte, arguments [][]byte, referenceBlockID string,
-	gasLimit uint64, proposalKey string, payer string, authorizers string, payloadSignatures string,
-	envelopeSignatures string) Tx {
+	gasLimit uint64, proposalKey string, payer string, authorizers []string, payloadSignatures []byte,
+	envelopeSignatures []byte) Tx {
 	return Tx{
 		Status: status,
 		Height: height,
+		TransactionID:transactionID,
 
 		//Transaction Details
 		script:             script,
@@ -49,20 +51,18 @@ func newTx(status string, height uint64,
 }
 
 type Event struct {
-	Height int
 	//Transaction Result Event
 	Type             string
 	TransactionID    string
-	TransactionIndex string
+	TransactionIndex int
 	EventIndex       int
 	Value            string
 }
 
-func NewEvent(height int, t string, transactionID string, transactionIndex string, eventIndex int,
+func NewEvent(t string, transactionID string, transactionIndex int, eventIndex int,
 	value string) Event {
 
 	return Event{
-		Height: height,
 		//Transaction Result Event
 		Type:             t,
 		TransactionID:    transactionID,
