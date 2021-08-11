@@ -33,7 +33,7 @@ type Proxy struct {
 
 // NewClientProxy allows to build a new Proxy instance
 func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*Proxy, error) {
-	flowClient, err := client.New(cfg.GetRPCConfig().GetAddress())
+	flowClient, err := client.New(cfg.GetRPCConfig().GetAddress(), grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -172,18 +172,25 @@ func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEv
 // returned if any query fails.
 func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
-	collection, err := cp.flowClient.GetCollection(cp.ctx, block.ID)
-	if err != nil {
-		return nil, err
+	var transactionIDs []flow.Identifier
+	collectionsID := block.CollectionGuarantees
+	for _,c:= range collectionsID{
+		c,err:=cp.flowClient.GetCollection(cp.ctx,c.CollectionID)
+		if err!=nil{
+			return nil,err
+		}
+		transactionIDs=append(transactionIDs,(c.TransactionIDs)...)
 	}
 
-	txResponses := make([]*types.Tx, len(collection.TransactionIDs))
-	for i, txID := range collection.TransactionIDs {
+
+
+	txResponses := make([]*types.Tx, len(transactionIDs))
+	for i, txID := range transactionIDs {
 		transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, txID)
 		if err != nil {
 			return nil, err
 		}
-		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID, nil)
+		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID)
 
 		authoriser := make([]string, len(transaction.Authorizers))
 		for i, auth := range transaction.Authorizers {

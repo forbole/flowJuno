@@ -5,15 +5,15 @@ CREATE TABLE node_info
     networkingAddress TEXT NOT NULL,
     networkingKey TEXT NOT NULL,
     stakingKey TEXT NOT NULL,
-    tokensStaked NUMBER NOT NULL,
-    tokensCommitted NUMBER NOT NULL,
-    tokensUnstaking NUMBER NOT NULL,
-    tokensUnstaked NUMBER NOT NULL,
-    tokensRewarded NUMBER NOT NULL,
+    tokensStaked NUMERIC NOT NULL,
+    tokensCommitted NUMERIC NOT NULL,
+    tokensUnstaking NUMERIC NOT NULL,
+    tokensUnstaked NUMERIC NOT NULL,
+    tokensRewarded NUMERIC NOT NULL,
 
-    delegators NUMBER[] ,
+    delegators NUMERIC[] ,
     delegatorIDCounter BIGINT NOT NULL,
-    tokensRequestedToUnstake NUMBER NOT NULL,
+    tokensRequestedToUnstake NUMERIC NOT NULL,
     initialWeight BIGINT NOT NULL
 );
 
@@ -22,7 +22,7 @@ CREATE TABLE block
     height           BIGINT UNIQUE PRIMARY KEY,
     id TEXT NOT NULL,
     parent_id TEXT NOT NULL,
-    collection_guarantees []TEXT NOT NULL,
+    collection_guarantees TEXT[] NOT NULL,
     timestamp        TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
@@ -30,9 +30,8 @@ CREATE TABLE block_seal
 (
     height BIGINT NOT NULL,
     execution_receipt_id TEXT NOT NULL,
-    execution_receipt_signatures [][]TEXT NOT NULL
-)
-CREATE INDEX block_proposer_address_index ON block (proposer_address);
+    execution_receipt_signatures TEXT[][] NOT NULL
+);
 
 CREATE TABLE transaction
 (
@@ -50,8 +49,6 @@ CREATE TABLE transaction
 		payload_signature TEXT,
 		envelope_signatures TEXT
 );
-CREATE INDEX transaction_hash_index ON transaction (hash);
-CREATE INDEX transaction_height_index ON transaction (height);
 
 CREATE TABLE event
 (
@@ -60,10 +57,10 @@ CREATE TABLE event
     transaction_id TEXT,
     transaction_index TEXT,
     event_index BIGINT,
-    value TEXT,
-)
+    value TEXT
+);
 
 CREATE TABLE pruning
 (
     last_pruned_height BIGINT NOT NULL
-)
+);
