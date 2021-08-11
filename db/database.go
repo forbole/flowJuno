@@ -21,7 +21,7 @@ type Database interface {
 
 	// SaveTx will be called to save each transaction contained inside a block.
 	// An error is returned if the operation fails.
-	SaveTx(tx *types.Txs) error
+	SaveTxs(txs types.Txs) error
 
 	// HasValidator returns true if a given validator by consensus address exists.
 	// An error is returned if the operation fails.

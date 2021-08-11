@@ -3,7 +3,6 @@ package postgresql
 import (
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/onflow/flow-go-sdk"
 	"github.com/rs/zerolog/log"
@@ -107,53 +106,25 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 }
 
 // SaveTx implements db.Database
-func (db *Database) SaveTx(tx *types.Txs) error {
+func (db *Database) SaveTxs(txs types.Txs) error {
 	sqlStatement := `
 INSERT INTO transaction 
-    (hash, height, success, messages, memo, signatures, signer_infos, fee, gas_wanted, gas_used, raw_log, logs) 
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) ON CONFLICT DO NOTHING`
+    (status,height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures ) 
+VALUES `
 
-	var sigs = make([]string, len(tx.Signatures))
-	for index, sig := range sigs {
-		sigs[index] = sig
+	var vparams []interface{}
+	for i, tx := range txs {
+		vi := i * 12
+		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),`,
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11, vi+12)
+		vparams = append(vparams, tx.Status, tx.Height, tx.TransactionID, tx.Script, tx.Arguments, tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, tx.Authorizers,
+			tx.PayloadSignatures, tx.EnvelopeSignatures)
+
 	}
+	sqlStatement = sqlStatement[:len(sqlStatement)-1] // Remove trailing ,
 
-	var msgs = make([]string, len(tx.Body.Messages))
-	for index, msg := range tx.Body.Messages {
-		bz, err := db.EncodingConfig.Marshaler.MarshalJSON(msg)
-		if err != nil {
-			return err
-		}
-		msgs[index] = string(bz)
-	}
-	msgsBz := fmt.Sprintf("[%s]", strings.Join(msgs, ","))
-
-	feeBz, err := db.EncodingConfig.Marshaler.MarshalJSON(tx.AuthInfo.Fee)
-	if err != nil {
-		return fmt.Errorf("failed to JSON encode tx fee: %s", err)
-	}
-
-	var sigInfos = make([]string, len(tx.AuthInfo.SignerInfos))
-	for index, info := range tx.AuthInfo.SignerInfos {
-		bz, err := db.EncodingConfig.Marshaler.MarshalJSON(info)
-		if err != nil {
-			return err
-		}
-		sigInfos[index] = string(bz)
-	}
-	sigInfoBz := fmt.Sprintf("[%s]", strings.Join(sigInfos, ","))
-
-	logsBz, err := db.EncodingConfig.Amino.MarshalJSON(tx.Logs)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Sql.Exec(sqlStatement,
-		tx.TxHash, tx.Height, tx.Successful(),
-		msgsBz, tx.Body.Memo, pq.Array(sigs),
-		sigInfoBz, string(feeBz),
-		tx.GasWanted, tx.GasUsed, tx.RawLog, string(logsBz),
-	)
+	sqlStatement += `ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(sqlStatement, vparams...)
 	return err
 }
 
@@ -216,6 +187,7 @@ func (db *Database) SaveNodeInfos(infos []*types.NodeInfo) error {
 	_, err := db.Sql.Exec(stmt, vparams...)
 	return err
 }
+
 
 // SaveCommitSignatures implements db.Database
 func (db *Database) SaveCommitSignatures(signatures []*types.CommitSig) error {

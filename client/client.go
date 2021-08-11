@@ -44,19 +44,19 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 	}
 
 	var contracts Contracts
-	if cfg.GetRPCConfig().GetContracts()=="Mainnet"{
-		contracts=MainnetContracts()
-	} else if cfg.GetRPCConfig().GetContracts()=="Testnet"{
-		contracts=TestnetContracts()
+	if cfg.GetRPCConfig().GetContracts() == "Mainnet" {
+		contracts = MainnetContracts()
+	} else if cfg.GetRPCConfig().GetContracts() == "Testnet" {
+		contracts = TestnetContracts()
 	}
 
 	return &Proxy{
 		encodingConfig:  encodingConfig,
 		ctx:             context.Background(),
-		flowClient:       *flowClient,
+		flowClient:      *flowClient,
 		grpConnection:   grpcConnection,
 		txServiceClient: tx.NewServiceClient(grpcConnection),
-		contract: contracts,
+		contract:        contracts,
 	}, nil
 }
 
@@ -95,7 +95,7 @@ func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
 // NodeOperators returns all the known flow node operators for a given block
 // height. An error is returned if the query fails.
 func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
-	script:=fmt.Sprintf(`
+	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(): [FlowIDTableStaking.NodeInfo] {
 		let nodes:[FlowIDTableStaking.NodeInfo]=[]
@@ -103,31 +103,31 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 			nodes.append(FlowIDTableStaking.NodeInfo(node))
 		}
 		return nodes
-	}`,cp.contract.StakingTable)
-	
-	result,err:=cp.flowClient.ExecuteScriptAtBlockHeight(cp.ctx,uint64(height),[]byte(script),nil)
-	if err!=nil{
-		return nil,err
+	}`, cp.contract.StakingTable)
+
+	result, err := cp.flowClient.ExecuteScriptAtBlockHeight(cp.ctx, uint64(height), []byte(script), nil)
+	if err != nil {
+		return nil, err
 	}
-	value:=result.ToGoValue()
-	nodes,ok:=value.([]interface{})
-	if !ok{
-		return nil,fmt.Errorf("candance value cannot change to valid []interface{}")
+	value := result.ToGoValue()
+	nodes, ok := value.([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("candance value cannot change to valid []interface{}")
 	}
-	nodeInfos:=make([]*types.NodeInfo,len(nodes))
-	for i,node :=range nodes{
-		nodeInfo,err:=types.NewNodeInfoFromCandance(node)
-		if err!=nil{
-			return nil,err
+	nodeInfos := make([]*types.NodeInfo, len(nodes))
+	for i, node := range nodes {
+		nodeInfo, err := types.NewNodeInfoFromCandance(node)
+		if err != nil {
+			return nil, err
 		}
-		nodeInfos[i]=&nodeInfo
+		nodeInfos[i] = &nodeInfo
 	}
 
-	nodeOperators:=types.NewNodeOperators(height,nodeInfos)
+	nodeOperators := types.NewNodeOperators(height, nodeInfos)
 	return &nodeOperators, nil
 }
 
-/*
+/* 
 // Genesis returns the genesis state
 func (cp *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {
 	return cp.flowClient.Genesis(cp.ctx)
@@ -147,7 +147,7 @@ func (cp *Proxy) ConsensusState() (*constypes.RoundStateSimple, error) {
 	}
 	return &data, nil
 }
-
+ */
 // SubscribeEvents subscribes to new events with the given query through the RPC
 // client with the given subscriber name. A receiving only channel, context
 // cancel function and an error is returned. It is up to the caller to cancel
@@ -165,7 +165,7 @@ func (cp *Proxy) SubscribeEvents(subscriber, query string) (<-chan tmctypes.Resu
 func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
 }
-*/
+
 
 // Txs queries for all the transactions in a block. Transactions are returned
 // in the TransactionResult format which internally contains an array of Transactions. An error is
@@ -176,70 +176,68 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	txResponses := make([]*types.Tx, len(collection.TransactionIDs))
 	for i, txID := range collection.TransactionIDs {
 		transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, txID)
 		if err != nil {
 			return nil, err
 		}
-		transaction,err:=cp.flowClient.GetTransaction(cp.ctx,txID,nil)
+		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID, nil)
 
-		authoriser:=make([]string,len(transaction.Authorizers))
-		for i, auth:= range transaction.Authorizers{
+		authoriser := make([]string, len(transaction.Authorizers))
+		for i, auth := range transaction.Authorizers {
 			authoriser[i] = auth.String()
 		}
 
-	
-		payloadSignitures,err:=json.Marshal(transaction.PayloadSignatures)
-		if err!=nil{
-			return nil,err
+		payloadSignitures, err := json.Marshal(transaction.PayloadSignatures)
+		if err != nil {
+			return nil, err
 		}
 
-		envelopeSigniture,err:=json.Marshal(transaction.EnvelopeSignatures)
-		if err!=nil{
-			return nil,err
+		envelopeSigniture, err := json.Marshal(transaction.EnvelopeSignatures)
+		if err != nil {
+			return nil, err
 		}
 
-		tx:=types.NewTx(transactionResult.Status.String(),block.Height,txID.String(),transaction.Script,transaction.Arguments,
-	transaction.ReferenceBlockID.String(),transaction.GasLimit,transaction.ProposalKey.Address.String(),transaction.Payer.String(),
-authoriser,payloadSignitures,envelopeSigniture)
+		tx := types.NewTx(transactionResult.Status.String(), block.Height, txID.String(), transaction.Script, transaction.Arguments,
+			transaction.ReferenceBlockID.String(), transaction.GasLimit, transaction.ProposalKey.Address.String(), transaction.Payer.String(),
+			authoriser, payloadSignitures, envelopeSigniture)
 		txResponses[i] = &tx
 	}
 	return txResponses, nil
 }
 
-func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error){
-	txs,err:=cp.Txs(block)
-	if err!=nil{
-		return nil,err
+func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
+	txs, err := cp.Txs(block)
+	if err != nil {
+		return nil, err
 	}
 	var event []types.Event
 
-	for _,tx:=range txs{
-		ev,err:=cp.Events(tx.TransactionID)
-		if err!=nil{
-			return []types.Event{},err
+	for _, tx := range txs {
+		ev, err := cp.Events(tx.TransactionID)
+		if err != nil {
+			return []types.Event{}, err
 		}
-		event=append(event,ev...)
+		event = append(event, ev...)
 	}
-	return event,nil
+	return event, nil
 }
 
-func (cp *Proxy) Events(transactionID string) ([]types.Event, error){
-	transactionResult,err:=cp.flowClient.GetTransactionResult(cp.ctx,flow.BytesToID([]byte(transactionID)),nil)
-	if err!=nil{
-		return []types.Event{},err
+func (cp *Proxy) Events(transactionID string) ([]types.Event, error) {
+	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.BytesToID([]byte(transactionID)), nil)
+	if err != nil {
+		return []types.Event{}, err
 	}
 
-	ev:=make([]types.Event,len(transactionResult.Events))
-	for i,event:=range transactionResult.Events{
-		ev[i]=types.NewEvent(event.Type,event.TransactionID.String(),event.TransactionIndex,
-	event.EventIndex,event.Value.String())
+	ev := make([]types.Event, len(transactionResult.Events))
+	for i, event := range transactionResult.Events {
+		ev[i] = types.NewEvent(event.Type, event.TransactionID.String(), event.TransactionIndex,
+			event.EventIndex, event.Value.String())
 	}
-	return ev,nil
+	return ev, nil
 
-	
 }
 
 // Stop defers the node stop execution to the RPC client.

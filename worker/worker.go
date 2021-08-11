@@ -3,7 +3,6 @@ package worker
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/desmos-labs/juno/types/logging"
 	"github.com/onflow/flow-go-sdk"
@@ -119,19 +118,19 @@ func (w Worker) process(height int64) error {
 		return err
 	}
 
-
 	return w.ExportBlock(block, &txs, vals,events)
 }
 
 // getGenesisFromRPC returns the genesis read from the RPC endpoint
 func (w Worker) getGenesisFromRPC() (*tmtypes.GenesisDoc, error) {
-	log.Debug().Msg("getting genesis")
+	return nil,fmt.Errorf("Not implenment genesisi from grpc")
+	/* log.Debug().Msg("getting genesis")
 	response, err := w.cp.Genesis()
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get genesis")
 		return nil, err
 	}
-	return response.Genesis, nil
+	return response.Genesis, nil */
 }
 
 // getGenesisFromFilePath tries reading the genesis doc from the given path
@@ -174,18 +173,6 @@ func (w Worker) HandleGenesis(genesis *tmtypes.GenesisDoc) error {
 	return nil
 }
 
-// SaveValidators persists a list of Tendermint validators with an address and a
-// consensus public key. An error is returned if the public key cannot be Bech32
-// encoded or if the DB write fails.
-func (w Worker) SaveValidators(vals []*tmtypes.Validator) error {
-	err := w.db.SaveValidators(validators)
-	if err != nil {
-		return fmt.Errorf("error while saving validators: %s", err)
-	}
-
-	return nil
-}
-
 func (w Worker) SaveNodeInfos(vals []*types.NodeInfo)error{
 	err:=w.db.SaveNodeInfos(vals)
 	if err!=nil{
@@ -212,6 +199,8 @@ func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOpera
 	}
 
 
+/* 
+
 	// Call the block handlers
 	for _, module := range w.modules {
 		if blockModule, ok := module.(modules.BlockModule); ok {
@@ -220,7 +209,7 @@ func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOpera
 				logging.LogBLockError(module, b, err)
 			}
 		}
-	}
+	} */
 
 	// Export the transactions
 	return w.ExportTxEvents(txs)
@@ -270,16 +259,13 @@ func (w Worker) ExportCommit(commit *tmtypes.Commit, vals *tmctypes.ResultValida
 
 // ExportTxs accepts a slice of transactions and persists then inside the database.
 // An error is returned if the write fails.
-func (w Worker) ExportTxEvents(txs []*types.Txs) error {
+func (w Worker) ExportTxEvents(txs *types.Txs) error {
 	// Handle all the transactions inside the block
-	for _, tx := range txs {
-		// Save the transaction itself
-		err := w.db.SaveTx(tx)
-		if err != nil {
-			log.Error().Err(err).Str("Height", string(tx.Height)).Msg("failed to handle transaction")
-			return err
-		}
-
+	err:=w.db.SaveTxs(*txs)
+	if err!=nil{
+		return err
+	}
+/* 
 		// Call the tx handlers
 		for _, module := range w.modules {
 			if transactionModule, ok := module.(modules.TransactionModule); ok {
@@ -289,26 +275,10 @@ func (w Worker) ExportTxEvents(txs []*types.Txs) error {
 				}
 			}
 		}
+ */
 
-		// Handle all the messages contained inside the transaction
-		for i, msg := range tx.Body.Messages {
-			var stdMsg sdk.Msg
-			err = w.encodingConfig.Marshaler.UnpackAny(msg, &stdMsg)
-			if err != nil {
-				return err
-			}
+	
 
-			// Call the handlers
-			for _, module := range w.modules {
-				if messageModule, ok := module.(modules.MessageModule); ok {
-					err = messageModule.HandleMsg(i, stdMsg, tx)
-					if err != nil {
-						logging.LogMsgError(module, tx, stdMsg, err)
-					}
-				}
-			}
-		}
-	}
 
 	return nil
 }

@@ -34,7 +34,7 @@ func (m *Module) Name() string {
 }
 
 // HandleBlock implements modules.BlockModule
-func (m *Module) HandleBlock(block *flow.Block, _ []*types.Txs, _ *tmctypes.ResultValidators) error {
+func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs, _ *tmctypes.ResultValidators) error {
 	if m.cfg == nil {
 		// Nothing to do, pruning is disabled
 		return nil

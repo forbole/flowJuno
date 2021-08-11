@@ -38,17 +38,17 @@ CREATE TABLE transaction
 (
    		status TEXT NOT NULL,
 		height BIGINT NOT NULL,
-        id TEXT,
+        transaction_id TEXT,
 
 		script TEXT ,
-		Arguments TEXT,
-		ReferenceBlockID TEXT,
-		GasLimit BIGINT,
-		ProposalKey TEXT,
-		Payer TEXT,
-		Authorizers TEXT,
-		PayloadSignature TEXT,
-		EnvelopeSignatures TEXT
+		arguments TEXT,
+		reference_block_id TEXT,
+		gas_limit BIGINT,
+		proposal_key TEXT,
+		payer TEXT,
+		authorizers TEXT,
+		payload_signature TEXT,
+		envelope_signatures TEXT
 );
 CREATE INDEX transaction_hash_index ON transaction (hash);
 CREATE INDEX transaction_height_index ON transaction (height);

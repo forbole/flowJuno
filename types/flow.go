@@ -12,12 +12,12 @@ type Txs []*Tx
 
 type Tx struct {
 	//TransactionResult
-	Status string
-	Height uint64
+	Status        string
+	Height        uint64
 	TransactionID string
 
 	//Transaction Details
-	script             []byte
+	Script             []byte
 	Arguments          [][]byte
 	ReferenceBlockID   string
 	GasLimit           uint64
@@ -28,17 +28,17 @@ type Tx struct {
 	EnvelopeSignatures []byte
 }
 
-func NewTx(status string, height uint64,transactionID string,
+func NewTx(status string, height uint64, transactionID string,
 	script []byte, arguments [][]byte, referenceBlockID string,
 	gasLimit uint64, proposalKey string, payer string, authorizers []string, payloadSignatures []byte,
 	envelopeSignatures []byte) Tx {
 	return Tx{
-		Status: status,
-		Height: height,
-		TransactionID:transactionID,
+		Status:        status,
+		Height:        height,
+		TransactionID: transactionID,
 
 		//Transaction Details
-		script:             script,
+		Script:             script,
 		Arguments:          arguments,
 		ReferenceBlockID:   referenceBlockID,
 		GasLimit:           gasLimit,
