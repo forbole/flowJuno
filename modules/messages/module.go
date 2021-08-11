@@ -34,5 +34,6 @@ func (m *Module) Name() string {
 
 // HandleMsg implements modules.MessageModule
 func (m *Module) HandleMsg(index int, msg sdk.Msg, tx *types.Txs) error {
-	return HandleMsg(index, msg, tx, m.parser, m.cdc, m.db)
+	//return HandleMsg(index, msg, tx, m.parser, m.cdc, m.db)
+	return nil
 }

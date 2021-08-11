@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
-	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/desmos-labs/juno/client"
 	"github.com/desmos-labs/juno/modules"
@@ -100,7 +99,7 @@ func StartParsing(data *ParserData) error {
 	}
 
 	if cfg.ShouldParseNewBlocks() {
-		go startNewBlockListener(exportQueue, data)
+		//go startNewBlockListener(exportQueue, data)
 	}
 
 	// Block main process (signal capture will call WaitGroup's Done)
@@ -143,7 +142,7 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, data *ParserData) {
 		}
 	}
 }
-
+/* 
 // startNewBlockListener subscribes to new block events via the Tendermint RPC
 // and enqueues each new block height onto the provided queue. It blocks as new
 // blocks are incoming.
@@ -164,7 +163,7 @@ func startNewBlockListener(exportQueue types.HeightQueue, data *ParserData) {
 		log.Debug().Int64("height", height).Msg("enqueueing new block")
 		exportQueue <- height
 	}
-}
+} */
 
 // trapSignal will listen for any OS signal and invoke Done on the main
 // WaitGroup allowing the main process to gracefully exit.

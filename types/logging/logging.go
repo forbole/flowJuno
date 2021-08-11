@@ -1,7 +1,6 @@
 package logging
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/desmos-labs/juno/modules"
 	"github.com/desmos-labs/juno/types"
@@ -21,8 +20,7 @@ type Logger interface {
 	SetLogFormat(format string) error
 	LogGenesisError(module modules.Module, err error)
 	LogBLockError(module modules.Module, block *flow.Block, err error)
-	LogTxError(module modules.Module, tx *types.Txs, err error)
-	LogMsgError(module modules.Module, tx *types.Txs, err error)
+	LogTxError(module modules.Module, tx types.Txs, err error)
 }
 
 // logger represents the currently used logger
@@ -51,12 +49,6 @@ func LogBLockError(module modules.Module, block *flow.Block, err error) {
 }
 
 // LogTxError logs the error returned while handling the provided transaction inside the given module
-func LogTxError(module modules.Module, tx *types.Txs, err error) {
+func LogTxError(module modules.Module, tx types.Txs, err error) {
 	logger.LogTxError(module, tx, err)
-}
-
-// LogMsgError logs there error returned while handling the specified message inside the given module
-func LogMsgError(module modules.Module, tx *types.Txs, msg sdk.Msg, err error) {
-	logger.LogMsgError(module, tx, msg, err)
-	flow.NewTransaction()
 }

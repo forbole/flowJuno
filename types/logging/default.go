@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/onflow/flow-go-sdk"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -60,13 +59,7 @@ func (d *defaultLogger) LogBLockError(module modules.Module, block *flow.Block, 
 }
 
 // LogTxError implements Logger
-func (d *defaultLogger) LogTxError(module modules.Module, tx *types.Txs, err error) {
-	log.Error().Err(err).Str(LogKeyModule, module.Name()).Int64("height", tx.Height).
-		Str(LogKeyTxHash, tx.TxHash).Msg("error while handling transaction")
-}
-
-// LogMsgError implements Logger
-func (d *defaultLogger) LogMsgError(module modules.Module, tx *types.Txs, msg sdk.Msg, err error) {
-	log.Error().Err(err).Str(LogKeyModule, module.Name()).Int64(LogKeyHeight, tx.Height).
-		Str(LogKeyTxHash, tx.TxHash).Str(LogKeyMsgType, msg.Type()).Msg("error while handling message")
+func (d *defaultLogger) LogTxError(module modules.Module, tx types.Txs, err error) {
+	log.Error().Err(err).Str(LogKeyModule, module.Name()).Int64("height", int64(tx[0].Height)).
+		Str(LogKeyTxHash,tx[0].TransactionID).Msg("error while handling transaction")
 }

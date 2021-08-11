@@ -72,18 +72,6 @@ func NewEvent(t string, transactionID string, transactionIndex int, eventIndex i
 	}
 }
 
-// FindEventByType searches inside the given tx events for the message having the specified index, in order
-// to find the event having the given type, and returns it.
-// If no such event is found, returns an error instead.
-func (txs Txs) FindEventByType(index int, eventType string) (Tx, error) {
-	for _, tx := range txs {
-		if tx.Type == eventType {
-			return *tx, nil
-		}
-	}
-
-	return Tx{}, fmt.Errorf("no %s event found inside tx", eventType)
-}
 
 // Successful tells whether this tx is successful or not
 func (tx Tx) Successful() bool {

@@ -17,6 +17,7 @@ const (
 
 	flagRPCClientName = "client-name"
 	flagRPCAddress    = "rpc-address"
+	flagRPCContract = "contract-type"
 
 	flagGRPCAddress  = "grpc-address"
 	flagGRPCInsecure = "grpc-insecure"
@@ -90,7 +91,8 @@ func InitCmd(cfg *Config) *cobra.Command {
 	command.Flags().Bool(flagReplace, false, "replaces any existing configuration with a new one")
 
 	command.Flags().String(flagRPCClientName, "juno", "Name of the subscriber to use when listening to events")
-	command.Flags().String(flagRPCAddress, "http://localhost:26657", "RPC address to use")
+	command.Flags().String(flagRPCAddress, "http://localhost:9000", "RPC address to use")
+	command.Flags().String(flagRPCContract,"Mainnet","Apply Mainnet contract address into Candance query")
 
 	command.Flags().String(flagGRPCAddress, "localhost:9090", "gRPC address to use")
 	command.Flags().Bool(flagGRPCInsecure, true, "Tells whether the gRPC host should be treated as insecure or not")
