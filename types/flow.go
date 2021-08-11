@@ -8,7 +8,7 @@ import (
 )
 
 // Tx represents an already existing blockchain transaction
-type Txs []*Tx
+type Txs []Tx
 
 type Tx struct {
 	//TransactionResult

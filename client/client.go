@@ -43,7 +43,7 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		return nil, err
 	}
 
-	var contracts Contracts
+	contracts:=MainnetContracts()
 	if cfg.GetRPCConfig().GetContracts() == "Mainnet" {
 		contracts = MainnetContracts()
 	} else if cfg.GetRPCConfig().GetContracts() == "Testnet" {
@@ -105,7 +105,7 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 		return nodes
 	}`, cp.contract.StakingTable)
 
-	result, err := cp.flowClient.ExecuteScriptAtBlockHeight(cp.ctx, uint64(height), []byte(script), nil)
+	result, err := cp.flowClient.ExecuteScriptAtLatestBlock(cp.ctx,[]byte(script),nil)
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 
 
-	txResponses := make([]*types.Tx, len(transactionIDs))
+	txResponses := make([]types.Tx, len(transactionIDs))
 	for i, txID := range transactionIDs {
 		transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, txID)
 		if err != nil {
@@ -210,7 +210,7 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 		tx := types.NewTx(transactionResult.Status.String(), block.Height, txID.String(), transaction.Script, transaction.Arguments,
 			transaction.ReferenceBlockID.String(), transaction.GasLimit, transaction.ProposalKey.Address.String(), transaction.Payer.String(),
 			authoriser, payloadSignitures, envelopeSigniture)
-		txResponses[i] = &tx
+		txResponses[i] = tx
 	}
 	return txResponses, nil
 }
@@ -221,8 +221,9 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 		return nil, err
 	}
 	var event []types.Event
-
+	fmt.Println("txs:")
 	for _, tx := range txs {
+		fmt.Println(tx.TransactionID)
 		ev, err := cp.Events(tx.TransactionID)
 		if err != nil {
 			return []types.Event{}, err
@@ -233,7 +234,7 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 }
 
 func (cp *Proxy) Events(transactionID string) ([]types.Event, error) {
-	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.BytesToID([]byte(transactionID)), nil)
+	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.BytesToID([]byte(transactionID)))
 	if err != nil {
 		return []types.Event{}, err
 	}
