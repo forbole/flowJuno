@@ -110,6 +110,9 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 
 // SaveTx implements db.Database
 func (db *Database) SaveTxs(txs types.Txs) error {
+	if len(txs)==0{
+		return nil
+	}
 	sqlStatement := `
 INSERT INTO transaction 
     (status,height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures ) 
