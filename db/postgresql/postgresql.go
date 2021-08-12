@@ -273,7 +273,7 @@ func (db *Database) SaveEvents(events []types.Event,height uint64) error{
 	}
 	
 	stmt := `INSERT INTO event (
-		height,type,transaction_id,transaction_index,value
+		height,type,transaction_id,transaction_index,event_index,value
 	) VALUES `
 
 	var vparams []interface{}
@@ -282,7 +282,7 @@ func (db *Database) SaveEvents(events []types.Event,height uint64) error{
 
 		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d),",
 			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6)
-		vparams = append(vparams, height,event.Type,event.TransactionID,event.TransactionIndex,event.Value)
+		vparams = append(vparams, height,event.Type,event.TransactionID,event.TransactionIndex,event.EventIndex,event.Value)
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
