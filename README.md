@@ -4,7 +4,7 @@
 
 ![banner](.docs/.img/logo.png)
 
-> This branch is intended to be used with Flow Go SDK `v0.40.x`.
+> This branch is intended to be used with Flow Go SDK.
 
 <!-- [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/desmos-labs/juno/Tests)](https://github.com/desmos-labs/juno/actions?query=workflow%3ATests)
 [![Go Report Card](https://goreportcard.com/badge/github.com/desmos-labs/juno)](https://goreportcard.com/report/github.com/desmos-labs/juno)
