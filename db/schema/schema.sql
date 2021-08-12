@@ -29,8 +29,8 @@ CREATE TABLE block
 CREATE TABLE block_seal
 (
     height BIGINT NOT NULL,
-    execution_receipt_id TEXT NOT NULL,
-    execution_receipt_signatures TEXT[][] NOT NULL
+    execution_receipt_id TEXT ,
+    execution_receipt_signatures TEXT[][]
 );
 
 CREATE TABLE transaction

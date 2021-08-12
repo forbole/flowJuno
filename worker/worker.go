@@ -186,13 +186,13 @@ func (w Worker) SaveNodeInfos(vals []*types.NodeInfo)error{
 // is returned if the write fails.
 func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOperators,events []types.Event) error {
 	// Save all validators
-	err := w.SaveNodeInfos(vals.NodeInfos)
+	/* err := w.SaveNodeInfos(vals.NodeInfos)
 	if err != nil {
 		return err
-	}
+	} */
 
 	// Save the block
-	err = w.db.SaveBlock(b)
+	err := w.db.SaveBlock(b)
 	if err != nil {
 		log.Error().Err(err).Int64("height", int64(b.BlockHeader.Height)).Msg("failed to persist block")
 		return err
@@ -263,6 +263,7 @@ func (w Worker) ExportTxEvents(txs *types.Txs) error {
 	// Handle all the transactions inside the block
 	err:=w.db.SaveTxs(*txs)
 	if err!=nil{
+		log.Error().Err(err).Int64("height", int64((*txs)[0].Height)).Msg("failed to export txs")
 		return err
 	}
 /* 

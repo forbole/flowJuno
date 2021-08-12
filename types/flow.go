@@ -121,7 +121,6 @@ func NewNodeInfoFromCandance(node interface{}) (NodeInfo, error) {
 	}
 	delegators := make([]uint32, len(d))
 	for i, a := range d {
-		println(a.(uint32))
 		delegators[i], ok = a.(uint32)
 		if !ok {
 			return NodeInfo{}, fmt.Errorf("delegators are not uint32")

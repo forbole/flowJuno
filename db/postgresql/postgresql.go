@@ -10,8 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/lib/pq"
 
-	_ "github.com/lib/pq" // nolint
-
 	"github.com/desmos-labs/juno/db"
 	"github.com/desmos-labs/juno/types"
 )
@@ -83,23 +81,31 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 	for i, collectionGuarantee := range block.CollectionGuarantees {
 		grauntees[i] = collectionGuarantee.CollectionID.String()
 	}
+	//graunteesByte,err:=json.Marshal(grauntees)
+	fmt.Println(grauntees)
+
 	_, err := db.Sql.Exec(stmt,
-		block.Height, block.ID, block.ParentID, grauntees, block.Timestamp,
+		block.Height, block.ID.String(), block.ParentID.String(), pq.StringArray(grauntees), block.Timestamp,
 	)
 	if err != nil {
 		return err
 	}
 
+	if len(block.Seals)==0{
+		return nil
+	}
+
 	var params []interface{}
-	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures) VALUES `
 	for i, seal := range block.Seals {
 		vi := i * 3
 		stmt += fmt.Sprintf("($%d, $%d, $%d),", vi+1, vi+2, vi+3)
-		params = append(params, block.Height, seal.ExecutionReceiptID.String(), seal.ExecutionReceiptSignatures)
+		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures))
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
 	stmt += " ON CONFLICT DO NOTHING"
+	fmt.Println(stmt)
 	_, err = db.Sql.Exec(stmt, params...)
 
 	return err
@@ -117,7 +123,7 @@ VALUES `
 		vi := i * 12
 		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),`,
 			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11, vi+12)
-		vparams = append(vparams, tx.Status, tx.Height, tx.TransactionID, tx.Script, tx.Arguments, tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, tx.Authorizers,
+		vparams = append(vparams, tx.Status, tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer,pq.StringArray(tx.Authorizers),
 			tx.PayloadSignatures, tx.EnvelopeSignatures)
 
 	}
