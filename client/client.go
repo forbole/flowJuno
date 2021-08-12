@@ -221,9 +221,7 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 		return nil, err
 	}
 	var event []types.Event
-	fmt.Println("txs:")
 	for _, tx := range txs {
-		fmt.Println(tx.TransactionID)
 		ev, err := cp.Events(tx.TransactionID)
 		if err != nil {
 			return []types.Event{}, err

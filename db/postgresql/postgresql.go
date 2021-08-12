@@ -81,8 +81,6 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 	for i, collectionGuarantee := range block.CollectionGuarantees {
 		grauntees[i] = collectionGuarantee.CollectionID.String()
 	}
-	//graunteesByte,err:=json.Marshal(grauntees)
-	fmt.Println(grauntees)
 
 	_, err := db.Sql.Exec(stmt,
 		block.Height, block.ID.String(), block.ParentID.String(), pq.StringArray(grauntees), block.Timestamp,
@@ -105,7 +103,6 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
 	stmt += " ON CONFLICT DO NOTHING"
-	fmt.Println(stmt)
 	_, err = db.Sql.Exec(stmt, params...)
 
 	return err
