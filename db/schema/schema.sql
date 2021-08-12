@@ -56,7 +56,6 @@ CREATE TABLE event
     type TEXT,
     transaction_id TEXT,
     transaction_index TEXT,
-    event_index BIGINT,
     value TEXT
 );
 

@@ -198,6 +198,11 @@ func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOpera
 		return err
 	}
 
+	err=w.db.SaveEvents(events,b.Height)
+	if err != nil {
+		log.Error().Err(err).Int64("height", int64(b.BlockHeader.Height)).Msg("failed to save event in persist block")
+		return err
+	}
 
 /* 
 
@@ -266,6 +271,7 @@ func (w Worker) ExportTxEvents(txs *types.Txs) error {
 		log.Error().Err(err).Int64("height", int64((*txs)[0].Height)).Msg("failed to export txs")
 		return err
 	}
+
 /* 
 		// Call the tx handlers
 		for _, module := range w.modules {

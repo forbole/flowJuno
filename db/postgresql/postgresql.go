@@ -266,3 +266,27 @@ WHERE message.transaction_hash = transaction.hash AND transaction.height = $1
 `, height)
 	return err
 }
+
+func (db *Database) SaveEvents(events []types.Event,height uint64) error{
+	if len(events)==0{
+		return nil
+	}
+	
+	stmt := `INSERT INTO event (
+		height,type,transaction_id,transaction_index,value
+	) VALUES `
+
+	var vparams []interface{}
+	for i, event := range events {
+		vi := i * 6
+
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d),",
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6)
+		vparams = append(vparams, height,event.Type,event.TransactionID,event.TransactionIndex,event.Value)
+	}
+
+	stmt = stmt[:len(stmt)-1] // Remove trailing ,
+	stmt += " ON CONFLICT DO NOTHING"
+	_, err := db.Sql.Exec(stmt, vparams...)
+	return err
+}
