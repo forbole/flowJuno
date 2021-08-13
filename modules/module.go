@@ -87,4 +87,3 @@ type TransactionModule interface {
 	// will still be called.
 	HandleTx(txs *types.Txs) error
 }
-

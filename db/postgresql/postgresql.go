@@ -89,7 +89,7 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 		return err
 	}
 
-	if len(block.Seals)==0{
+	if len(block.Seals) == 0 {
 		return nil
 	}
 
@@ -110,7 +110,7 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 
 // SaveTx implements db.Database
 func (db *Database) SaveTxs(txs types.Txs) error {
-	if len(txs)==0{
+	if len(txs) == 0 {
 		return nil
 	}
 	sqlStatement := `
@@ -123,7 +123,7 @@ VALUES `
 		vi := i * 12
 		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),`,
 			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11, vi+12)
-		vparams = append(vparams, tx.Status, tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer,pq.StringArray(tx.Authorizers),
+		vparams = append(vparams, tx.Status, tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, pq.StringArray(tx.Authorizers),
 			tx.PayloadSignatures, tx.EnvelopeSignatures)
 
 	}
@@ -193,7 +193,6 @@ func (db *Database) SaveNodeInfos(infos []*types.NodeInfo) error {
 	_, err := db.Sql.Exec(stmt, vparams...)
 	return err
 }
-
 
 // SaveCommitSignatures implements db.Database
 func (db *Database) SaveCommitSignatures(signatures []*types.CommitSig) error {
@@ -270,11 +269,11 @@ WHERE message.transaction_hash = transaction.hash AND transaction.height = $1
 	return err
 }
 
-func (db *Database) SaveEvents(events []types.Event) error{
-	if len(events)==0{
+func (db *Database) SaveEvents(events []types.Event) error {
+	if len(events) == 0 {
 		return nil
 	}
-	
+
 	stmt := `INSERT INTO event (
 		height,type,transaction_id,transaction_index,event_index,value
 	) VALUES `
@@ -285,7 +284,7 @@ func (db *Database) SaveEvents(events []types.Event) error{
 
 		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d),",
 			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6)
-		vparams = append(vparams, event.Height,event.Type,event.TransactionID,event.TransactionIndex,event.EventIndex,event.Value)
+		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value)
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,

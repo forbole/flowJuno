@@ -61,5 +61,5 @@ func (d *defaultLogger) LogBLockError(module modules.Module, block *flow.Block, 
 // LogTxError implements Logger
 func (d *defaultLogger) LogTxError(module modules.Module, tx types.Txs, err error) {
 	log.Error().Err(err).Str(LogKeyModule, module.Name()).Int64("height", int64(tx[0].Height)).
-		Str(LogKeyTxHash,tx[0].TransactionID).Msg("error while handling transaction")
+		Str(LogKeyTxHash, tx[0].TransactionID).Msg("error while handling transaction")
 }

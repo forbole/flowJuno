@@ -52,7 +52,7 @@ func NewTx(status string, height uint64, transactionID string,
 
 type Event struct {
 	//Transaction Result Event
-	Height int
+	Height           int
 	Type             string
 	TransactionID    string
 	TransactionIndex int
@@ -60,12 +60,12 @@ type Event struct {
 	Value            string
 }
 
-func NewEvent(height int,t string, transactionID string, transactionIndex int, eventIndex int,
+func NewEvent(height int, t string, transactionID string, transactionIndex int, eventIndex int,
 	value string) Event {
 
 	return Event{
 		//Transaction Result Event
-		Height: height,
+		Height:           height,
 		Type:             t,
 		TransactionID:    transactionID,
 		TransactionIndex: transactionIndex,
@@ -73,7 +73,6 @@ func NewEvent(height int,t string, transactionID string, transactionIndex int, e
 		Value:            value,
 	}
 }
-
 
 // Successful tells whether this tx is successful or not
 func (tx Tx) Successful() bool {

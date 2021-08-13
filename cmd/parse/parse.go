@@ -142,7 +142,8 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, data *ParserData) {
 		}
 	}
 }
-/* 
+
+/*
 // startNewBlockListener subscribes to new block events via the Tendermint RPC
 // and enqueues each new block height onto the provided queue. It blocks as new
 // blocks are incoming.

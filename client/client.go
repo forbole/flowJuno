@@ -43,7 +43,7 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		return nil, err
 	}
 
-	contracts:=MainnetContracts()
+	contracts := MainnetContracts()
 	if cfg.GetRPCConfig().GetContracts() == "Mainnet" {
 		contracts = MainnetContracts()
 	} else if cfg.GetRPCConfig().GetContracts() == "Testnet" {
@@ -105,7 +105,7 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 		return nodes
 	}`, cp.contract.StakingTable)
 
-	result, err := cp.flowClient.ExecuteScriptAtLatestBlock(cp.ctx,[]byte(script),nil)
+	result, err := cp.flowClient.ExecuteScriptAtLatestBlock(cp.ctx, []byte(script), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 	return &nodeOperators, nil
 }
 
-/* 
+/*
 // Genesis returns the genesis state
 func (cp *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {
 	return cp.flowClient.Genesis(cp.ctx)
@@ -147,7 +147,7 @@ func (cp *Proxy) ConsensusState() (*constypes.RoundStateSimple, error) {
 	}
 	return &data, nil
 }
- */
+*/
 // SubscribeEvents subscribes to new events with the given query through the RPC
 // client with the given subscriber name. A receiving only channel, context
 // cancel function and an error is returned. It is up to the caller to cancel
@@ -166,7 +166,6 @@ func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEv
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
 } */
 
-
 // Txs queries for all the transactions in a block. Transactions are returned
 // in the TransactionResult format which internally contains an array of Transactions. An error is
 // returned if any query fails.
@@ -174,15 +173,13 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 	var transactionIDs []flow.Identifier
 	collectionsID := block.CollectionGuarantees
-	for _,c:= range collectionsID{
-		c,err:=cp.flowClient.GetCollection(cp.ctx,c.CollectionID)
-		if err!=nil{
-			return nil,err
+	for _, c := range collectionsID {
+		c, err := cp.flowClient.GetCollection(cp.ctx, c.CollectionID)
+		if err != nil {
+			return nil, err
 		}
-		transactionIDs=append(transactionIDs,(c.TransactionIDs)...)
+		transactionIDs = append(transactionIDs, (c.TransactionIDs)...)
 	}
-
-
 
 	txResponses := make([]types.Tx, len(transactionIDs))
 	for i, txID := range transactionIDs {
@@ -191,6 +188,9 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 			return nil, err
 		}
 		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID)
+		if err!=nil{
+			return nil,err
+		}
 
 		authoriser := make([]string, len(transaction.Authorizers))
 		for i, auth := range transaction.Authorizers {
@@ -223,7 +223,7 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 	var event []types.Event
 	for _, tx := range txs {
 		fmt.Println(tx.TransactionID)
-		ev, err := cp.Events(tx.TransactionID,int(tx.Height))
+		ev, err := cp.Events(tx.TransactionID, int(tx.Height))
 		if err != nil {
 			return []types.Event{}, err
 		}
@@ -232,7 +232,7 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 	return event, nil
 }
 
-func (cp *Proxy) Events(transactionID string,height int) ([]types.Event, error) {
+func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error) {
 	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.HexToID(transactionID))
 	if err != nil {
 		return []types.Event{}, err
@@ -242,7 +242,7 @@ func (cp *Proxy) Events(transactionID string,height int) ([]types.Event, error) 
 	ev := make([]types.Event, len(transactionResult.Events))
 	for i, event := range transactionResult.Events {
 		fmt.Println(event.EventIndex)
-		ev[i] = types.NewEvent(height,event.Type, event.TransactionID.String(), event.TransactionIndex,
+		ev[i] = types.NewEvent(height, event.Type, event.TransactionID.String(), event.TransactionIndex,
 			event.EventIndex, event.Value.String())
 	}
 	return ev, nil

@@ -71,25 +71,25 @@ func (w Worker) process(height int64) error {
 		log.Debug().Int64("height", height).Msg("skipping already exported block")
 		return nil
 	}
-/* 
-	if height == 0 {
-		cfg := types.Cfg.GetParsingConfig()
-		var genesis *tmtypes.GenesisDoc
-		if strings.TrimSpace(cfg.GetGenesisFilePath()) != "" {
-			genesis, err = w.getGenesisFromFilePath(cfg.GetGenesisFilePath())
-			if err != nil {
-				return err
+	/*
+		if height == 0 {
+			cfg := types.Cfg.GetParsingConfig()
+			var genesis *tmtypes.GenesisDoc
+			if strings.TrimSpace(cfg.GetGenesisFilePath()) != "" {
+				genesis, err = w.getGenesisFromFilePath(cfg.GetGenesisFilePath())
+				if err != nil {
+					return err
+				}
+			} else {
+				genesis, err = w.getGenesisFromRPC()
+				if err != nil {
+					return err
+				}
 			}
-		} else {
-			genesis, err = w.getGenesisFromRPC()
-			if err != nil {
-				return err
-			}
-		}
 
-		return w.HandleGenesis(genesis)
-	}
- */
+			return w.HandleGenesis(genesis)
+		}
+	*/
 	//log.Debug().Int64("height", height).Msg("processing block")
 
 	block, err := w.cp.Block(height)
@@ -110,18 +110,18 @@ func (w Worker) process(height int64) error {
 		return err
 	}
 
-	events,err:=w.cp.EventsInBlock(block)
-	if err!=nil{
+	events, err := w.cp.EventsInBlock(block)
+	if err != nil {
 		log.Error().Err(err).Int64("height", height).Msg("failed to get events for block")
 		return err
 	}
 
-	return w.ExportBlock(block, &txs, vals,events)
+	return w.ExportBlock(block, &txs, vals, events)
 }
 
 // getGenesisFromRPC returns the genesis read from the RPC endpoint
 func (w Worker) getGenesisFromRPC() (*tmtypes.GenesisDoc, error) {
-	return nil,fmt.Errorf("Not implenment genesisi from grpc")
+	return nil, fmt.Errorf("Not implenment genesisi from grpc")
 	/* log.Debug().Msg("getting genesis")
 	response, err := w.cp.Genesis()
 	if err != nil {
@@ -171,9 +171,9 @@ func (w Worker) HandleGenesis(genesis *tmtypes.GenesisDoc) error {
 	return nil
 }
 
-func (w Worker) SaveNodeInfos(vals []*types.NodeInfo)error{
-	err:=w.db.SaveNodeInfos(vals)
-	if err!=nil{
+func (w Worker) SaveNodeInfos(vals []*types.NodeInfo) error {
+	err := w.db.SaveNodeInfos(vals)
+	if err != nil {
 		return fmt.Errorf("error while saving node infos: %s", err)
 	}
 	return nil
@@ -182,7 +182,7 @@ func (w Worker) SaveNodeInfos(vals []*types.NodeInfo)error{
 // ExportBlock accepts a finalized block and a corresponding set of transactions
 // and persists them to the database along with attributable metadata. An error
 // is returned if the write fails.
-func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOperators,events []types.Event) error {
+func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOperators, events []types.Event) error {
 	// Save all validators
 	/* err := w.SaveNodeInfos(vals.NodeInfos)
 	if err != nil {
@@ -196,20 +196,18 @@ func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOpera
 		return err
 	}
 
-
-	err=w.ExportEvents(events)
-	if err!=nil{
+	err = w.ExportEvents(events)
+	if err != nil {
 		return err
 	}
-
 
 	return w.ExportTx(txs)
 }
 
 // ExportEvents accepts a slice of Event and persists then inside the database.
 // An error is returned if the write fails.
-func (w Worker) ExportEvents(events []types.Event)error{
-	err:=w.db.SaveEvents(events)
+func (w Worker) ExportEvents(events []types.Event) error {
+	err := w.db.SaveEvents(events)
 	if err != nil {
 		log.Error().Err(err).Int64("height", int64(events[0].Height)).Msg("failed to save event in persist block")
 		return err
@@ -218,18 +216,17 @@ func (w Worker) ExportEvents(events []types.Event)error{
 	return nil
 }
 
-
 // ExportTxs accepts a slice of transactions and persists then inside the database.
 // An error is returned if the write fails.
 func (w Worker) ExportTx(txs *types.Txs) error {
 	// Handle all the transactions inside the block
-	err:=w.db.SaveTxs(*txs)
-	if err!=nil{
+	err := w.db.SaveTxs(*txs)
+	if err != nil {
 		log.Error().Err(err).Int64("height", int64((*txs)[0].Height)).Msg("failed to export txs")
 		return err
 	}
 
-/* 
+	/*
 		// Call the tx handlers
 		for _, module := range w.modules {
 			if transactionModule, ok := module.(modules.TransactionModule); ok {
@@ -241,10 +238,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 		}
 
 
- */
-
-	
-
+	*/
 
 	return nil
 }
