@@ -7,9 +7,9 @@ import (
 	"github.com/rs/zerolog/log"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
-	"github.com/desmos-labs/juno/db"
-	"github.com/desmos-labs/juno/modules"
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/db"
+	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/types"
 )
 
 var _ modules.Module = &Module{}

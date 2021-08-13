@@ -1,16 +1,16 @@
 <div align="center">
-  <h1> Juno </h1>
+  <h1> flowJuno </h1>
 </div>
 
 ![banner](.docs/.img/logo.png)
 
 > This branch is intended to be used with Flow Go SDK.
 
-<!-- [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/desmos-labs/juno/Tests)](https://github.com/desmos-labs/juno/actions?query=workflow%3ATests)
-[![Go Report Card](https://goreportcard.com/badge/github.com/desmos-labs/juno)](https://goreportcard.com/report/github.com/desmos-labs/juno)
-[![Codecov](https://img.shields.io/codecov/c/github/desmos-labs/juno)](https://codecov.io/gh/desmos-labs/juno/branch/cosmos-v0.40.x) -->
+<!-- [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/forbole/flowJuno/Tests)](https://github.com/forbole/flowJuno/actions?query=workflow%3ATests)
+[![Go Report Card](https://goreportcard.com/badge/github.com/forbole/flowJuno)](https://goreportcard.com/report/github.com/forbole/flowJuno)
+[![Codecov](https://img.shields.io/codecov/c/github/forbole/flowJuno)](https://codecov.io/gh/forbole/flowJuno/branch/cosmos-v0.40.x) -->
 
-> Juno is a Flow blockchain data aggregator and exporter that provides the ability for developers and clients to query for indexed chain data.
+> flowJuno is a Flow blockchain data aggregator and exporter that provides the ability for developers and clients to query for indexed chain data.
 
 ## Table of Contents
   - [Background](#background)
@@ -20,7 +20,7 @@
   - [License](#license)
 
 ## Background
-This version of Juno is a fork of [FissionLabs's Juno](https://github.com/fissionlabsio/juno). 
+This version of flowJuno is a fork of [FissionLabs's Juno](https://github.com/fissionlabsio/juno). 
 
 The main reason behind the fork what to improve the original project by: 
 
@@ -32,7 +32,7 @@ We achieved the first objective by supporting both PostgreSQL and MongoDB. We al
 On the other hand, to achieve a highly modular code, we implemented extension points through the `worker.RegisterBlockHandler`, `worker.RegisterTxHandler` and `worker.RegisterMsgHandler` methods. You can use those to extend the default working of the code (which simply parses and saves the data on the database) with whatever operation you want.    
 
 ## Usage
-To know how to setup and run Juno, please refer to the [docs folder](.docs).
+To know how to setup and run flowJuno, please refer to the [docs folder](.docs).
 
 ## Testing
 If you want to test the code, you can do so by running

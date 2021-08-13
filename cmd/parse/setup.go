@@ -5,10 +5,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/desmos-labs/juno/client"
-	"github.com/desmos-labs/juno/modules"
-	modsregistrar "github.com/desmos-labs/juno/modules/registrar"
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/modules"
+	modsregistrar "github.com/forbole/flowJuno/modules/registrar"
+	"github.com/forbole/flowJuno/types"
 )
 
 // SetupParsing setups all the things that should be later passed to StartParsing in order

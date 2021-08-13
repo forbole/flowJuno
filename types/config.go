@@ -20,7 +20,7 @@ type configToml struct {
 	Pruning  *pruningConfig  `toml:"pruning"`
 }
 
-// DefaultConfigParser attempts to read and parse a Juno config from the given string bytes.
+// DefaultConfigParser attempts to read and parse a flowjuno config from the given string bytes.
 // An error reading or parsing the config results in a panic.
 func DefaultConfigParser(configData []byte) (Config, error) {
 	var cfg configToml
@@ -38,7 +38,7 @@ func DefaultConfigParser(configData []byte) (Config, error) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Config represents the configuration to run Juno
+// Config represents the configuration to run flowjuno
 type Config interface {
 	GetRPCConfig() RPCConfig
 	GetGrpcConfig() GrpcConfig
@@ -51,7 +51,7 @@ type Config interface {
 
 var _ Config = &config{}
 
-// Config defines all necessary juno configuration parameters.
+// Config defines all necessary flowjuno configuration parameters.
 type config struct {
 	RPC      RPCConfig      `toml:"rpc"`
 	Grpc     GrpcConfig     `toml:"grpc"`

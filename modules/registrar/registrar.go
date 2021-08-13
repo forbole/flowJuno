@@ -5,15 +5,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/rs/zerolog/log"
 
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/types"
 
-	"github.com/desmos-labs/juno/modules/pruning"
+	"github.com/forbole/flowJuno/modules/pruning"
 
-	"github.com/desmos-labs/juno/modules"
-	"github.com/desmos-labs/juno/modules/messages"
+	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/modules/messages"
 
-	"github.com/desmos-labs/juno/client"
-	"github.com/desmos-labs/juno/db"
+	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/db"
 )
 
 // Registrar represents a modules registrar. This allows to build a list of modules that can later be used by
@@ -38,7 +38,7 @@ func (*EmptyRegistrar) BuildModules(
 
 // ------------------------------------------------------------------------------------------------------------------
 
-// DefaultRegistrar represents a registrar that allows to handle the default Juno modules
+// DefaultRegistrar represents a registrar that allows to handle the default flowjuno modules
 type DefaultRegistrar struct {
 	parser messages.MessageAddressesParser
 }

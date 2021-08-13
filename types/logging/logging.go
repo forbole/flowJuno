@@ -1,9 +1,8 @@
 package logging
 
 import (
-
-	"github.com/desmos-labs/juno/modules"
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/types"
 	"github.com/onflow/flow-go-sdk"
 )
 

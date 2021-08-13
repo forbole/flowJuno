@@ -12,7 +12,7 @@ prefix = "cosmos"
 
 [rpc]
 address = "http://localhost:26657"
-client_name = "juno"
+client_name = "flowjuno"
 
 [grpc]
 address = "localhost:9090"
@@ -87,7 +87,7 @@ This section contains the details of the chain RPC to which BDJuno will connect.
 | Attribute | Type | Description | Example |
 | :-------: | :---: | :--------- | :------ |
 | `address` | `string` | Address of the RPC endpoint | `http://localhost:26657` |
-| `client_name` | `string` | Client name used when subscribing to the Tendermint websocket | `juno` |
+| `client_name` | `string` | Client name used when subscribing to the Tendermint websocket | `flowjuno` |
 
 ## `grpc` 
 This section contains the details of the gRPC endpoint that BDJuno will use to query the data.
@@ -115,8 +115,8 @@ This section contains all the different configuration related to the PostgreSQL 
 | :-------: | :---: | :--------- | :------ |
 | `host` | `string` | Host where the database is found | `localhost` | 
 | `port` | `integer` | Port to be used to connect to the PostgreSQL instance | `5432` |
-| `name` | `string` | Name of the database to which connect to | `juno` | 
-| `user` | `string` | Name of the user to use when connecting to the database. This user must have read/write access to all the database. | `juno` | 
+| `name` | `string` | Name of the database to which connect to | `flowjuno` | 
+| `user` | `string` | Name of the user to use when connecting to the database. This user must have read/write access to all the database. | `flowjuno` | 
 | `password` | `string` | Password to be used to connect to the database instance | `password` | 
 | `schema` | `string` | Schema to be used inside the database (default: `public`) | `public` | 
 | `ssl_mode` | `string` | [PostgreSQL SSL mode](https://www.postgresql.org/docs/9.1/libpq-ssl.html) to be used when connecting to the database. If not set, `disable` will be used. | `verify-ca` |

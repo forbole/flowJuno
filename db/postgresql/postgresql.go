@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/lib/pq"
 
-	"github.com/desmos-labs/juno/db"
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/db"
+	"github.com/forbole/flowJuno/types"
 )
 
 // Builder creates a database connection with the given database connection info

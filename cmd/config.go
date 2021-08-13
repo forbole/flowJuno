@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	initcmd "github.com/desmos-labs/juno/cmd/init"
-	parsecmd "github.com/desmos-labs/juno/cmd/parse"
+	initcmd "github.com/forbole/flowJuno/cmd/init"
+	parsecmd "github.com/forbole/flowJuno/cmd/parse"
 )
 
 // Config represents the general configuration for the commands

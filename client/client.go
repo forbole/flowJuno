@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/cosmos/cosmos-sdk/types/tx"
 
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/types"
 
 	"google.golang.org/grpc"
 

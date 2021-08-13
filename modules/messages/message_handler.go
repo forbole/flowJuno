@@ -1,12 +1,13 @@
 package messages
-/* 
+
+/*
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/desmos-labs/juno/db"
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/db"
+	"github.com/forbole/flowJuno/types"
 )
 
 // HandleMsg represents a message handler that stores the given message inside the proper database table
@@ -34,4 +35,4 @@ func HandleMsg(
 		addresses,
 	))
 }
- */
+*/

@@ -3,17 +3,17 @@ package main
 import (
 	"os"
 
-	"github.com/desmos-labs/juno/cmd/parse"
+	"github.com/forbole/flowJuno/cmd/parse"
 
-	"github.com/desmos-labs/juno/modules/messages"
-	"github.com/desmos-labs/juno/modules/registrar"
+	"github.com/forbole/flowJuno/modules/messages"
+	"github.com/forbole/flowJuno/modules/registrar"
 
-	"github.com/desmos-labs/juno/cmd"
+	"github.com/forbole/flowJuno/cmd"
 )
 
 func main() {
 	// Config the runner
-	config := cmd.NewConfig("juno").
+	config := cmd.NewConfig("flowjuno").
 		WithParseConfig(parse.NewConfig().
 			WithRegistrar(registrar.NewDefaultRegistrar(
 				messages.CosmosMessageAddressesParser,

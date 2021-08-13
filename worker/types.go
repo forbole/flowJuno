@@ -3,10 +3,10 @@ package worker
 import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 
-	"github.com/desmos-labs/juno/client"
-	"github.com/desmos-labs/juno/db"
-	"github.com/desmos-labs/juno/modules"
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/db"
+	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/types"
 )
 
 type Config struct {

@@ -3,11 +3,11 @@ package builder
 import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/types"
 
-	"github.com/desmos-labs/juno/db"
+	"github.com/forbole/flowJuno/db"
 
-	"github.com/desmos-labs/juno/db/postgresql"
+	"github.com/forbole/flowJuno/db/postgresql"
 )
 
 // Builder represents a generic Builder implementation that build the proper database

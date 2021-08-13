@@ -15,7 +15,7 @@ func TestDefaultConfigParser(t *testing.T) {
   ]
 
 [rpc]
-  client_name = "juno"
+  client_name = "flowjuno"
   address = "http://localhost:26657"
 
 [grpc]
@@ -36,7 +36,7 @@ func TestDefaultConfigParser(t *testing.T) {
 
 [database]
   host = "localhost"
-  name = "juno"
+  name = "flowjuno"
   password = "password"
   port = 5432
   schema = "public"
@@ -55,7 +55,7 @@ func TestDefaultConfigParser(t *testing.T) {
 	require.Equal(t, "cosmos", cfg.GetCosmosConfig().GetPrefix())
 	require.Equal(t, []string{"pruning"}, cfg.GetCosmosConfig().GetModules())
 
-	require.Equal(t, "juno", cfg.GetRPCConfig().GetClientName())
+	require.Equal(t, "flowjuno", cfg.GetRPCConfig().GetClientName())
 	require.Equal(t, "http://localhost:26657", cfg.GetRPCConfig().GetAddress())
 
 	require.Equal(t, "localhost:9090", cfg.GetGrpcConfig().GetAddress())

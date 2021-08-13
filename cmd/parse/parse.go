@@ -11,12 +11,12 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 
-	"github.com/desmos-labs/juno/client"
-	"github.com/desmos-labs/juno/modules"
-	"github.com/desmos-labs/juno/types"
-	"github.com/desmos-labs/juno/worker"
+	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/types"
+	"github.com/forbole/flowJuno/worker"
 
-	"github.com/desmos-labs/juno/db"
+	"github.com/forbole/flowJuno/db"
 
 	"github.com/spf13/cobra"
 )

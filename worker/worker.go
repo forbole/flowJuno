@@ -4,24 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/desmos-labs/juno/types/logging"
+	"github.com/forbole/flowJuno/types/logging"
 	"github.com/onflow/flow-go-sdk"
 
 	tmjson "github.com/tendermint/tendermint/libs/json"
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 
-	"github.com/desmos-labs/juno/modules"
+	"github.com/forbole/flowJuno/modules"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/rs/zerolog/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
-	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/desmos-labs/juno/client"
-	"github.com/desmos-labs/juno/db"
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/db"
+	"github.com/forbole/flowJuno/types"
 )
 
 // Worker defines a job consumer that is responsible for getting and
@@ -198,62 +196,32 @@ func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOpera
 		return err
 	}
 
-	err=w.db.SaveEvents(events)
-	if err != nil {
-		log.Error().Err(err).Int64("height", int64(b.BlockHeader.Height)).Msg("failed to save event in persist block")
+
+	err=w.ExportEvents(events)
+	if err!=nil{
 		return err
 	}
 
 
-
-	return w.ExportTxEvents(txs,events,b.Height)
+	return w.ExportTx(txs)
 }
 
-// ExportCommit accepts a block commitment and a corresponding set of
-// validators for the commitment and persists them to the database. An error is
-// returned if any write fails or if there is any missing aggregated data.
-func (w Worker) ExportCommit(commit *tmtypes.Commit, vals *tmctypes.ResultValidators) error {
-	var signatures []*types.CommitSig
-	for _, commitSig := range commit.Signatures {
-		// Avoid empty commits
-		if commitSig.Signature == nil {
-			continue
-		}
-
-		valAddr := sdk.ConsAddress(commitSig.ValidatorAddress)
-		val := findValidatorByAddr(valAddr.String(), vals)
-		if val == nil {
-			err := fmt.Errorf("failed to find validator")
-			log.Error().
-				Err(err).
-				Int64("height", commit.Height).
-				Str("validator_hex", commitSig.ValidatorAddress.String()).
-				Str("validator_bech32", valAddr.String()).
-				Time("commit_timestamp", commitSig.Timestamp).
-				Send()
-			return err
-		}
-
-		signatures = append(signatures, types.NewCommitSig(
-			types.ConvertValidatorAddressToBech32String(commitSig.ValidatorAddress),
-			val.VotingPower,
-			val.ProposerPriority,
-			commit.Height,
-			commitSig.Timestamp,
-		))
-	}
-
-	err := w.db.SaveCommitSignatures(signatures)
+// ExportEvents accepts a slice of Event and persists then inside the database.
+// An error is returned if the write fails.
+func (w Worker) ExportEvents(events []types.Event)error{
+	err:=w.db.SaveEvents(events)
 	if err != nil {
-		return fmt.Errorf("error while saving commit signatures: %s", err)
+		log.Error().Err(err).Int64("height", int64(events[0].Height)).Msg("failed to save event in persist block")
+		return err
 	}
 
 	return nil
 }
 
+
 // ExportTxs accepts a slice of transactions and persists then inside the database.
 // An error is returned if the write fails.
-func (w Worker) ExportTxEvents(txs *types.Txs,event []types.Event,height uint64) error {
+func (w Worker) ExportTx(txs *types.Txs) error {
 	// Handle all the transactions inside the block
 	err:=w.db.SaveTxs(*txs)
 	if err!=nil{

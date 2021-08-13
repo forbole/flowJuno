@@ -9,23 +9,23 @@ all: lint test-unit install
 # Build / Install
 ###############################################################################
 
-LD_FLAGS = -X github.com/desmos-labs/juno.Version=$(VERSION) \
-	-X github.com/desmos-labs/juno.Commit=$(COMMIT)
+LD_FLAGS = -X github.com/forbole/flowJuno.Version=$(VERSION) \
+	-X github.com/forbole/flowJuno.Commit=$(COMMIT)
 
 BUILD_FLAGS := -ldflags '$(LD_FLAGS)'
 
 build: go.sum
 ifeq ($(OS),Windows_NT)
-	@echo "building juno binary..."
-	@go build -mod=readonly $(BUILD_FLAGS) -o build/juno.exe ./cmd/juno
+	@echo "building flowjuno binary..."
+	@go build -mod=readonly $(BUILD_FLAGS) -o build/flowjuno.exe ./cmd/flowjuno
 else
-	@echo "building juno binary..."
-	@go build -mod=readonly $(BUILD_FLAGS) -o build/juno ./cmd/juno
+	@echo "building flowjuno binary..."
+	@go build -mod=readonly $(BUILD_FLAGS) -o build/flowjuno ./cmd/flowjuno
 endif
 
 install: go.sum
-	@echo "installing juno binary..."
-	@go install -mod=readonly $(BUILD_FLAGS) ./cmd/juno
+	@echo "installing flowjuno binary..."
+	@go install -mod=readonly $(BUILD_FLAGS) ./cmd/flowjuno
 
 ###############################################################################
 # Tests / CI
@@ -50,7 +50,7 @@ lint-fix:
 format:
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -name '*.pb.go' | xargs gofmt -w -s
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -name '*.pb.go' | xargs misspell -w
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -name '*.pb.go' | xargs goimports -w -local github.com/desmos-labs/juno
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -name '*.pb.go' | xargs goimports -w -local github.com/forbole/flowJuno
 .PHONY: format
 
 clean:

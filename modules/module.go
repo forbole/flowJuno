@@ -7,7 +7,7 @@ import (
 	"github.com/onflow/flow-go-sdk"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/types"
 )
 
 // Module represents a generic module without any particular handling of data

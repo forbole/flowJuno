@@ -3,9 +3,9 @@ package parse
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/desmos-labs/juno/types/logging"
+	"github.com/forbole/flowJuno/types/logging"
 
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/types"
 )
 
 // setupLogging setups the logging for the entire project
