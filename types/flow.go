@@ -52,6 +52,7 @@ func NewTx(status string, height uint64, transactionID string,
 
 type Event struct {
 	//Transaction Result Event
+	Height int
 	Type             string
 	TransactionID    string
 	TransactionIndex int
@@ -59,11 +60,12 @@ type Event struct {
 	Value            string
 }
 
-func NewEvent(t string, transactionID string, transactionIndex int, eventIndex int,
+func NewEvent(height int,t string, transactionID string, transactionIndex int, eventIndex int,
 	value string) Event {
 
 	return Event{
 		//Transaction Result Event
+		Height: height,
 		Type:             t,
 		TransactionID:    transactionID,
 		TransactionIndex: transactionIndex,

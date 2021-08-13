@@ -270,7 +270,7 @@ WHERE message.transaction_hash = transaction.hash AND transaction.height = $1
 	return err
 }
 
-func (db *Database) SaveEvents(events []types.Event,height uint64) error{
+func (db *Database) SaveEvents(events []types.Event) error{
 	if len(events)==0{
 		return nil
 	}
@@ -285,7 +285,7 @@ func (db *Database) SaveEvents(events []types.Event,height uint64) error{
 
 		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d),",
 			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6)
-		vparams = append(vparams, height,event.Type,event.TransactionID,event.TransactionIndex,event.EventIndex,event.Value)
+		vparams = append(vparams, event.Height,event.Type,event.TransactionID,event.TransactionIndex,event.EventIndex,event.Value)
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,

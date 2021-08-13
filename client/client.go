@@ -223,7 +223,7 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 	var event []types.Event
 	for _, tx := range txs {
 		fmt.Println(tx.TransactionID)
-		ev, err := cp.Events(tx.TransactionID)
+		ev, err := cp.Events(tx.TransactionID,int(tx.Height))
 		if err != nil {
 			return []types.Event{}, err
 		}
@@ -232,7 +232,7 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 	return event, nil
 }
 
-func (cp *Proxy) Events(transactionID string) ([]types.Event, error) {
+func (cp *Proxy) Events(transactionID string,height int) ([]types.Event, error) {
 	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.HexToID(transactionID))
 	if err != nil {
 		return []types.Event{}, err
@@ -242,7 +242,7 @@ func (cp *Proxy) Events(transactionID string) ([]types.Event, error) {
 	ev := make([]types.Event, len(transactionResult.Events))
 	for i, event := range transactionResult.Events {
 		fmt.Println(event.EventIndex)
-		ev[i] = types.NewEvent(event.Type, event.TransactionID.String(), event.TransactionIndex,
+		ev[i] = types.NewEvent(height,event.Type, event.TransactionID.String(), event.TransactionIndex,
 			event.EventIndex, event.Value.String())
 	}
 	return ev, nil

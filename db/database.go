@@ -45,7 +45,7 @@ type Database interface {
 
 	// SaveEvent store an array of event emitted in a block.
 	// An error is returned if the operation fails.
-	SaveEvents(events []types.Event,height uint64) error
+	SaveEvents(events []types.Event) error
 
 	// Close closes the connection to the database
 	Close()

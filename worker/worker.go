@@ -198,26 +198,15 @@ func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, vals *types.NodeOpera
 		return err
 	}
 
-	err=w.db.SaveEvents(events,b.Height)
+	err=w.db.SaveEvents(events)
 	if err != nil {
 		log.Error().Err(err).Int64("height", int64(b.BlockHeader.Height)).Msg("failed to save event in persist block")
 		return err
 	}
 
-/* 
 
-	// Call the block handlers
-	for _, module := range w.modules {
-		if blockModule, ok := module.(modules.BlockModule); ok {
-			err = blockModule.HandleBlock(b, txs, vals)
-			if err != nil {
-				logging.LogBLockError(module, b, err)
-			}
-		}
-	} */
 
-	// Export the transactions
-	return w.ExportTxEvents(txs)
+	return w.ExportTxEvents(txs,events,b.Height)
 }
 
 // ExportCommit accepts a block commitment and a corresponding set of
@@ -264,7 +253,7 @@ func (w Worker) ExportCommit(commit *tmtypes.Commit, vals *tmctypes.ResultValida
 
 // ExportTxs accepts a slice of transactions and persists then inside the database.
 // An error is returned if the write fails.
-func (w Worker) ExportTxEvents(txs *types.Txs) error {
+func (w Worker) ExportTxEvents(txs *types.Txs,event []types.Event,height uint64) error {
 	// Handle all the transactions inside the block
 	err:=w.db.SaveTxs(*txs)
 	if err!=nil{
@@ -282,6 +271,8 @@ func (w Worker) ExportTxEvents(txs *types.Txs) error {
 				}
 			}
 		}
+
+
  */
 
 	
