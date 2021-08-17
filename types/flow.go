@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/onflow/cadence"
 	"github.com/onflow/flow-go-sdk"
 )
 
@@ -57,11 +58,11 @@ type Event struct {
 	TransactionID    string
 	TransactionIndex int
 	EventIndex       int
-	Value            string
+	Value            cadence.Event
 }
 
 func NewEvent(height int, t string, transactionID string, transactionIndex int, eventIndex int,
-	value string) Event {
+	value cadence.Event) Event {
 
 	return Event{
 		//Transaction Result Event
