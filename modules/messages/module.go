@@ -4,12 +4,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/forbole/flowJuno/module/modules"
 	"github.com/forbole/flowJuno/db"
-	"github.com/forbole/flowJuno/modules"
 	"github.com/forbole/flowJuno/types"
 )
 
-var _ modules.Module = &Module{}
+var _ modules.Module = Module{}
 
 // Module represents the module allowing to store messages properly inside a dedicated table
 type Module struct {
