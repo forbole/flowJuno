@@ -284,7 +284,7 @@ func (db *Database) SaveEvents(events []types.Event) error {
 
 		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d),",
 			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6)
-		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value)
+		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value.String())
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,

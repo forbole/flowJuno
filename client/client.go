@@ -252,7 +252,7 @@ func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error)
 	for i, event := range transactionResult.Events {
 		fmt.Println(event.EventIndex)
 		ev[i] = types.NewEvent(height, event.Type, event.TransactionID.String(), event.TransactionIndex,
-			event.EventIndex, event.Value.String())
+			event.EventIndex, event.Value)
 	}
 	return ev, nil
 
