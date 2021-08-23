@@ -9,7 +9,7 @@ import (
 	"github.com/forbole/flowJuno/types"
 )
 
-var _ modules.Module = Module{}
+var _ modules.Module = &Module{}
 
 // Module represents the module allowing to store messages properly inside a dedicated table
 type Module struct {

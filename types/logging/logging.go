@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
 	"github.com/onflow/flow-go-sdk"
 )

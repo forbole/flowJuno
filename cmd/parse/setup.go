@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/forbole/flowJuno/client"
-	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/modules/modules"
 	modsregistrar "github.com/forbole/flowJuno/modules/registrar"
 	"github.com/forbole/flowJuno/types"
 )

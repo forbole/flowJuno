@@ -7,7 +7,7 @@ import (
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/db"
 	"github.com/forbole/flowJuno/db/builder"
-	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/modules/registrar"
 	"github.com/forbole/flowJuno/types"
 )

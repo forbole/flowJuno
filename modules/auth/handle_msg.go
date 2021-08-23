@@ -4,18 +4,17 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/types"
-	"github.com/rs/zerolog/log"
 
-	"github.com/forbole/bdjuno/database"
-	authutils "github.com/forbole/bdjuno/modules/auth/utils"
 	"github.com/forbole/flowJuno/client"
-
+	"github.com/forbole/flowJuno/db"
+	authutils "github.com/forbole/flowJuno/modules/auth/utils"
 )
 
 // HandleMsg handles any message updating the involved accounts
-func HandleMsg(msg types.Event, getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *database.Db, height int64, flowClient client.Proxy) error {
-	addresses := msg.Value.Fields[0].String()
+func HandleMsg(msg types.Event, getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Database, height int64, flowClient client.Proxy) error {
+	address := msg.Value.Fields[0].String()
+	addresses:=[]string{address}
 
-	return authutils.UpdateAccounts(utils.FilterNonAccountAddresses(addresses), cdc, db, height, flowClient)
+	return authutils.UpdateAccounts(addresses, db, height, flowClient)
 
 }

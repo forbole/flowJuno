@@ -11,7 +11,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 
-	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/modules/modules"
 
 	"github.com/rs/zerolog/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
