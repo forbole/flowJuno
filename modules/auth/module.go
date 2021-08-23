@@ -3,14 +3,13 @@ package auth
 import (
 	"encoding/json"
 
-	database "github.com/forbole/flowJuno/db"
-
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
 
 	"github.com/forbole/flowJuno/client"
+	db "github.com/forbole/flowJuno/db/postgresql"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
@@ -26,14 +25,14 @@ type Module struct {
 	messagesParser messages.MessageAddressesParser
 	encodingConfig *params.EncodingConfig
 	flowClient     client.Proxy
-	db             *database.Database
+	db             *db.Db
 }
 
 // NewModule builds a new Module instance
 func NewModule(
 	messagesParser messages.MessageAddressesParser,
 	flowClient client.Proxy,
-	encodingConfig *params.EncodingConfig, db *database.Database,
+	encodingConfig *params.EncodingConfig, db *db.Db,
 ) *Module {
 	return &Module{
 		messagesParser: messagesParser,

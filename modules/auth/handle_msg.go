@@ -6,12 +6,12 @@ import (
 	"github.com/forbole/flowJuno/types"
 
 	"github.com/forbole/flowJuno/client"
-	"github.com/forbole/flowJuno/db"
+	db "github.com/forbole/flowJuno/db/postgresql"
 	authutils "github.com/forbole/flowJuno/modules/auth/utils"
 )
 
 // HandleMsg handles any message updating the involved accounts
-func HandleMsg(msg types.Event, getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Database, height int64, flowClient client.Proxy) error {
+func HandleMsg(msg types.Event, getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, height int64, flowClient client.Proxy) error {
 	address := msg.Value.Fields[0].String()
 	addresses:=[]string{address}
 

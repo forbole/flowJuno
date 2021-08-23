@@ -8,7 +8,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/forbole/flowJuno/db"
+	db "github.com/forbole/flowJuno/db/postgresql"
+
 
 	"github.com/forbole/flowJuno/types"
 )
@@ -55,7 +56,7 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types
 			return nil, fmt.Errorf("address is not valid and cannot get details")
 		}
 
-		accounts = append(accounts, types.NewAccount(account.Address))
+		accounts = append(accounts, types.NewAccount(account.Address.String()))
 
 	}
 
@@ -64,13 +65,12 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types
 
 // UpdateAccounts takes the given addresses and for each one queries the chain
 // retrieving the account data and stores it inside the database.
-func UpdateAccounts(addresses []string, db *db.Database, height int64, client client.Proxy) error {
+func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.Proxy) error {
 	accounts, err := GetAccounts(addresses, height, client)
 	if err != nil {
 		return err
 	}
 	fmt.Println(accounts)
 
-	//return db.SaveAccounts(accounts)
-	return nil
+	return db.SaveAccounts(accounts)
 }

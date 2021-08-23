@@ -1,13 +1,11 @@
 package types
 
-import "github.com/onflow/flow-go-sdk"
-
 type Account struct{
 	Address string
 }
 
-func NewAccount(address flow.Address) Account{
+func NewAccount(address string) Account{
 	return Account{
-		Address:address.String(),
+		Address:address,
 	}
 }

@@ -4,8 +4,10 @@ go 1.13
 
 require (
 	github.com/cosmos/cosmos-sdk v0.42.9
+	github.com/desmos-labs/juno v0.0.0-20210820090829-4142e0029177
 	github.com/forbole/bdjuno v0.0.0-20210823053810-1b7ba77bf8d9
 	github.com/go-co-op/gocron v0.3.3
+	github.com/jmoiron/sqlx v1.2.1-0.20200324155115-ee514944af4b
 	github.com/lib/pq v1.9.0
 	github.com/onflow/cadence v0.18.0
 	github.com/onflow/flow-go-sdk v0.21.0
