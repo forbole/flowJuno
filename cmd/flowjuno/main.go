@@ -9,6 +9,8 @@ import (
 	"github.com/forbole/flowJuno/modules/registrar"
 
 	"github.com/forbole/flowJuno/cmd"
+	"github.com/forbole/flowJuno/modules"
+
 )
 
 func main() {
@@ -17,7 +19,8 @@ func main() {
 		WithParseConfig(parse.NewConfig().
 			WithRegistrar(registrar.NewDefaultRegistrar(
 				messages.CosmosMessageAddressesParser,
-			)),
+			)).
+			WithRegistrar(modules.NewRegistrar(nil)),
 		)
 
 	// Run the commands and panic on any error
