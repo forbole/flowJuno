@@ -60,12 +60,13 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 	}, nil
 }
 
-func NewFlowClientConnection(cfg types.Config)(*client.Client,error){
+func NewFlowClientConnection(cfg types.Config)(*client.Client,context.Context,error){
 	flowClient, err := client.New(cfg.GetRPCConfig().GetAddress(), grpc.WithInsecure())
 	if err != nil {
-		return nil, err
+		return nil,nil, err
 	}
-	return flowClient,nil
+	
+	return flowClient,context.Background(),nil
 
 }
 

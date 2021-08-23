@@ -6,14 +6,12 @@ import (
 	database "github.com/forbole/flowJuno/db"
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
 
-	"github.com/onflow/flow-go-sdk/client"
+	"github.com/forbole/flowJuno/client"
 	tmtypes "github.com/tendermint/tendermint/types"
-
 )
 
 var (
@@ -27,14 +25,14 @@ var (
 type Module struct {
 	messagesParser messages.MessageAddressesParser
 	encodingConfig *params.EncodingConfig
-	flowClient     client.Client
+	flowClient     client.Proxy
 	db             *database.Database
 }
 
 // NewModule builds a new Module instance
 func NewModule(
 	messagesParser messages.MessageAddressesParser,
-	flowClient client.Client,
+	flowClient client.Proxy,
 	encodingConfig *params.EncodingConfig, db *database.Database,
 ) *Module {
 	return &Module{
