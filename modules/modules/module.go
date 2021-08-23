@@ -6,6 +6,7 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/onflow/flow-go-sdk"
 	tmtypes "github.com/tendermint/tendermint/types"
+	
 
 	"github.com/forbole/flowJuno/types"
 )
@@ -86,4 +87,13 @@ type TransactionModule interface {
 	// NOTE. The returned error will be logged using the logging.LogTxError method. All other modules' handlers
 	// will still be called.
 	HandleTx(txs *types.Txs) error
+}
+
+type MessageModule interface {
+	// HandleMsg handles a single message.
+	// For convenience of usa, the index of the message inside the transaction and the transaction itself
+	// are passed as well.
+	// NOTE. The returned error will be logged using the logging.LogMsgError method. All other modules' handlers
+	// will still be called.
+	HandleMsg(index int, msg types.Event, tx *types.Tx) error
 }

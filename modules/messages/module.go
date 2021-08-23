@@ -4,8 +4,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/forbole/flowJuno/module/modules"
 	"github.com/forbole/flowJuno/db"
+	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
 )
 

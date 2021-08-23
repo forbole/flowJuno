@@ -7,11 +7,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/forbole/flowJuno/module/modules"
 	"github.com/forbole/flowJuno/modules/messages"
-	juno "github.com/forbole/flowJuno/types"
+	"github.com/forbole/flowJuno/modules/modules"
+	"github.com/forbole/flowJuno/types"
+
 	"github.com/onflow/flow-go-sdk/client"
 	tmtypes "github.com/tendermint/tendermint/types"
+
 )
 
 var (
@@ -54,6 +56,6 @@ func (m *Module) HandleGenesis(_ *tmtypes.GenesisDoc, appState map[string]json.R
 }
 
 // HandleMsg implements modules.MessageModule
-func (m *Module) HandleMsg(_ int, msg sdk.Msg, tx *juno.Tx) error {
+func (m *Module) HandleMsg(index int, msg types.Event, tx *types.Tx) error {
 	return HandleMsg(msg, m.messagesParser, m.encodingConfig.Marshaler, m.db, int64(tx.Height), m.flowClient)
 }
