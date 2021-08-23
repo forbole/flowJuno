@@ -8,7 +8,6 @@ import (
 
 	"github.com/forbole/bdjuno/database"
 	authutils "github.com/forbole/bdjuno/modules/auth/utils"
-	"github.com/forbole/flowJuno/modules/utils"
 	"github.com/forbole/flowJuno/client"
 
 )

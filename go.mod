@@ -3,10 +3,11 @@ module github.com/forbole/flowJuno
 go 1.13
 
 require (
-	github.com/cosmos/cosmos-sdk v0.42.7
+	github.com/cosmos/cosmos-sdk v0.42.9
+	github.com/forbole/bdjuno v0.0.0-20210823053810-1b7ba77bf8d9
 	github.com/go-co-op/gocron v0.3.3
 	github.com/lib/pq v1.9.0
-	github.com/onflow/cadence v0.18.0 // indirect
+	github.com/onflow/cadence v0.18.0
 	github.com/onflow/flow-go-sdk v0.21.0
 	github.com/pelletier/go-toml v1.8.1
 	github.com/rs/zerolog v1.21.0

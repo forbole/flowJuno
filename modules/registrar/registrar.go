@@ -7,10 +7,8 @@ import (
 
 	"github.com/forbole/flowJuno/types"
 
-	"github.com/forbole/flowJuno/modules/pruning"
-
-	"github.com/forbole/flowJuno/modules"
 	"github.com/forbole/flowJuno/modules/messages"
+	"github.com/forbole/flowJuno/modules/modules"
 
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/db"
@@ -55,7 +53,6 @@ func (r *DefaultRegistrar) BuildModules(
 	cfg types.Config, encodingCfg *params.EncodingConfig, _ *sdk.Config, db db.Database, _ *client.Proxy,
 ) modules.Modules {
 	return modules.Modules{
-		pruning.NewModule(cfg.GetPruningConfig(), db),
 		messages.NewModule(r.parser, encodingCfg.Marshaler, db),
 	}
 }

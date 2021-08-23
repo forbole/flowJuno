@@ -137,6 +137,14 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 	return &nodeOperators, nil
 }
 
+func (cp *Proxy) Client() (*client.Client){
+	return &cp.flowClient
+}
+
+func (cp *Proxy) Ctx() (context.Context){
+	return cp.ctx
+}
+
 /*
 // Genesis returns the genesis state
 func (cp *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {

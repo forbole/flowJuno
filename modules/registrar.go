@@ -9,7 +9,7 @@ import (
 	"github.com/forbole/flowJuno/db"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
-	"github.com/forbole/flowJuno/registrar"
+	"github.com/forbole/flowJuno/modules/registrar"
 	juno "github.com/forbole/flowJuno/types"
 
 	"github.com/forbole/flowJuno/modules/auth"
