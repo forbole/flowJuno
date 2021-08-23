@@ -3,14 +3,15 @@ package postgresql
 import (
 	"fmt"
 
-	"github.com/forbole/bdjuno/types/config"
+	"github.com/forbole/flowJuno/types/config"
 
 	juno "github.com/desmos-labs/juno/types"
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 
 	"github.com/forbole/flowJuno/db"
-	"github.com/forbole/flowJuno/db/postgresql"
+	database "github.com/forbole/flowJuno/db/db"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -19,19 +20,19 @@ var _ db.Database = &Db{}
 // Db represents a PostgreSQL database with expanded features.
 // so that it can properly store custom BigDipper-related data.
 type Db struct {
-	*postgresql.Database
+	*database.Database
 	Sqlx                *sqlx.DB
 	storeHistoricalData bool
 }
 
 // Builder allows to create a new Db instance implementing the db.Builder type
 func Builder(cfg juno.Config, codec *params.EncodingConfig) (db.Database, error) {
-	database, err := postgresql.Builder(cfg.GetDatabaseConfig(), codec)
+	localdb, err := database.Builder(cfg.GetDatabaseConfig(), codec)
 	if err != nil {
 		return nil, err
 	}
 
-	psqlDb, ok := (database).(*postgresql.Database)
+	psqlDb, ok := (localdb).(*database.Database)
 	if !ok {
 		return nil, fmt.Errorf("invalid configuration database, must be PostgreSQL")
 	}
