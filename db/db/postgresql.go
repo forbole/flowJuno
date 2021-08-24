@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/forbole/flowJuno/types/logging"
+
 	"github.com/onflow/flow-go-sdk"
 	"github.com/rs/zerolog/log"
 
@@ -57,6 +59,8 @@ var _ db.Database = &Database{}
 type Database struct {
 	Sql            *sql.DB
 	EncodingConfig *params.EncodingConfig
+	Logger         logging.Logger
+
 }
 
 // LastBlockHeight implements db.Database
