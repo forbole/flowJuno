@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/forbole/flowJuno/types/config"
-
 	juno "github.com/forbole/flowJuno/types"
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
@@ -37,16 +35,16 @@ func Builder(cfg juno.Config, codec *params.EncodingConfig) (db.Database, error)
 	if !ok {
 		return nil, fmt.Errorf("invalid configuration database, must be PostgreSQL")
 	}
-
+/* 
 	dbCfg, ok := cfg.GetDatabaseConfig().(*config.DatabaseConfig)
 	if !ok {
 		return nil, fmt.Errorf("invalid database configuration type")
 	}
-
+ */
 	return &Db{
 		Database:            psqlDb,
 		Sqlx:                sqlx.NewDb(psqlDb.Sql, "postgresql"),
-		storeHistoricalData: dbCfg.ShouldStoreHistoricalData(),
+		storeHistoricalData: true,
 	}, nil
 }
 
