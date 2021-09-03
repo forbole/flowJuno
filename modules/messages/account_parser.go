@@ -3,68 +3,70 @@ package messages
 import (
 	"fmt"
 
-	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
-	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
+	/* 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
+	   	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
+	   	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	   	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
+	   	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types" */
+	"github.com/onflow/flow-go-sdk"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-)
+	/*	sdk "github.com/cosmos/cosmos-sdk/types"
+		banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+		distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+		stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types" */)
 
 // MessageNotSupported returns an error telling that the given message is not supported
-func MessageNotSupported(msg sdk.Msg) error {
-	return fmt.Errorf("message type not supported: %s", msg.Type())
+func MessageNotSupported(tx flow.Transaction) error {
+	return fmt.Errorf("message type not supported: %s", tx.PayloadMessage())
 }
 
 // MessageAddressesParser represents a function that extracts all the
 // involved addresses from a provided message (both accounts and validators)
-type MessageAddressesParser = func(cdc codec.Marshaler, msg sdk.Msg) ([]string, error)
+type MessageAddressesParser = func(cdc codec.Marshaler, tx flow.Transaction) ([]string, error)
 
 // JoinMessageParsers joins together all the given parsers, calling them in order
 func JoinMessageParsers(parsers ...MessageAddressesParser) MessageAddressesParser {
-	return func(cdc codec.Marshaler, msg sdk.Msg) ([]string, error) {
+	return func(cdc codec.Marshaler, tx flow.Transaction) ([]string, error) {
 		for _, parser := range parsers {
 			// Try getting the addresses
-			addresses, _ := parser(cdc, msg)
+			addresses, _ := parser(cdc, tx)
 
 			// If some addresses are found, return them
 			if len(addresses) > 0 {
 				return addresses, nil
 			}
 		}
-		return nil, MessageNotSupported(msg)
+		return nil, MessageNotSupported(tx)
 	}
 }
 
 // CosmosMessageAddressesParser represents a MessageAddressesParser that parses a
 // Cosmos message and returns all the involved addresses (both accounts and validators)
 var CosmosMessageAddressesParser = JoinMessageParsers(
-	BankMessagesParser,
+	/* BankMessagesParser,
 	CrisisMessagesParser,
 	DistributionMessagesParser,
 	EvidenceMessagesParser,
 	GovMessagesParser,
 	IBCTransferMessagesParser,
 	SlashingMessagesParser,
-	StakingMessagesParser,
+	StakingMessagesParser, */
 	DefaultMessagesParser,
 )
 
-// DefaultMessagesParser represents the default messages parser that simply returns the list
-// of all the signers of a message
-func DefaultMessagesParser(_ codec.Marshaler, cosmosMsg sdk.Msg) ([]string, error) {
-	var signers = make([]string, len(cosmosMsg.GetSigners()))
-	for index, signer := range cosmosMsg.GetSigners() {
-		signers[index] = signer.String()
+// DefaultMessagesParser represents the default messages parser that simply returns all account that
+// mutate the state by the transaction
+func DefaultMessagesParser(_ codec.Marshaler, tx flow.Transaction) ([]string, error) {
+	var signers = make([]string, len(tx.Authorizers)+1)
+	signers[0] = tx.Payer.String()
+
+	for index, authorizers := range tx.Authorizers{
+		signers[index] = authorizers.String()
 	}
 	return signers, nil
 }
-
+/* 
 // BankMessagesParser returns the list of all the accounts involved in the given
 // message if it's related to the x/bank module
 func BankMessagesParser(_ codec.Marshaler, cosmosMsg sdk.Msg) ([]string, error) {
@@ -217,3 +219,4 @@ func StakingMessagesParser(_ codec.Marshaler, cosmosMsg sdk.Msg) ([]string, erro
 
 	return nil, MessageNotSupported(cosmosMsg)
 }
+ */

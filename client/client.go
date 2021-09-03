@@ -145,6 +145,7 @@ func (cp *Proxy) Ctx() (context.Context){
 	return cp.ctx
 }
 
+
 /*
 // Genesis returns the genesis state
 func (cp *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {
@@ -250,6 +251,7 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 	return event, nil
 }
 
+// Events get events in from a transaction ID
 func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error) {
 	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.HexToID(transactionID))
 	if err != nil {

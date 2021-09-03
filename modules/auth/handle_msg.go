@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/types"
@@ -14,6 +16,7 @@ import (
 func HandleMsg(msg types.Event, getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, height int64, flowClient client.Proxy) error {
 	address := msg.Value.Fields[0].String()
 	addresses:=[]string{address}
+	fmt.Println("HandleMsg")
 
 	return authutils.UpdateAccounts(addresses, db, height, flowClient)
 

@@ -36,9 +36,7 @@ func (r *Registrar) BuildModules(
 	cfg juno.Config, encodingConfig *params.EncodingConfig, _ *sdk.Config, database db.Database, cp *client.Proxy,
 ) modules.Modules{
 
-	bigDipperBd := postgresql.Cast(database)
-
-	
+	bigDipperBd := postgresql.Cast(database)	
 	return []modules.Module{
 		messages.NewModule(r.parser, encodingConfig.Marshaler, database),
 		auth.NewModule(r.parser, *cp, encodingConfig,bigDipperBd),
