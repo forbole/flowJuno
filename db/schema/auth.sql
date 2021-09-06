@@ -1,3 +1,3 @@
 CREATE TABLE account(
-    address TEXT
+    address TEXT UNIQUE PRIMARY KEY
 )

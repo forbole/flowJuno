@@ -246,8 +246,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 				if messageModule, ok := module.(modules.MessageModule); ok {
 					err = messageModule.HandleMsg(int(tx.Height), event, &tx)
 					if err != nil {
-						return fmt.Errorf("Cannot Parse modules")
-						//w.logger.MsgError(module, tx, event, err)
+						return err
 					}
 				}
 			}

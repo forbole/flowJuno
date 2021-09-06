@@ -46,11 +46,13 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types
 	var accounts []types.Account
 
 	for _, address := range addresses {
-		fmt.Println(address)
+		fmt.Println("GetAccounts:"+address)
+		if address==""{
+			continue
+		}
 		account,err:=client.Client().GetAccount(client.Ctx(),flow.HexToAddress(address))
 		if err != nil {
-			log.Error().Str("module", "auth").Err(err).Int64("height", height).
-				Str("Auth", "Get Account").Msg("error while getting accounts")
+			return nil,err
 		}
 		if account == nil {
 			return nil, fmt.Errorf("address is not valid and cannot get details")
@@ -70,7 +72,6 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 	if err != nil {
 		return err
 	}
-	fmt.Println(accounts)
 
 	return db.SaveAccounts(accounts)
 }

@@ -8,7 +8,8 @@ import (
 	   	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	   	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
 	   	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types" */
-	"github.com/onflow/flow-go-sdk"
+
+	"github.com/forbole/flowJuno/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	/*	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,17 +18,17 @@ import (
 		stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types" */)
 
 // MessageNotSupported returns an error telling that the given message is not supported
-func MessageNotSupported(tx flow.Transaction) error {
-	return fmt.Errorf("message type not supported: %s", tx.PayloadMessage())
+func MessageNotSupported(tx types.Tx) error {
+	return fmt.Errorf("message type not supported: %s", tx.Script)
 }
 
 // MessageAddressesParser represents a function that extracts all the
 // involved addresses from a provided message (both accounts and validators)
-type MessageAddressesParser = func(cdc codec.Marshaler, tx flow.Transaction) ([]string, error)
+type MessageAddressesParser = func(cdc codec.Marshaler, tx types.Tx) ([]string, error)
 
 // JoinMessageParsers joins together all the given parsers, calling them in order
 func JoinMessageParsers(parsers ...MessageAddressesParser) MessageAddressesParser {
-	return func(cdc codec.Marshaler, tx flow.Transaction) ([]string, error) {
+	return func(cdc codec.Marshaler, tx types.Tx) ([]string, error) {
 		for _, parser := range parsers {
 			// Try getting the addresses
 			addresses, _ := parser(cdc, tx)
@@ -57,15 +58,15 @@ var CosmosMessageAddressesParser = JoinMessageParsers(
 
 // DefaultMessagesParser represents the default messages parser that simply returns all account that
 // mutate the state by the transaction
-func DefaultMessagesParser(_ codec.Marshaler, tx flow.Transaction) ([]string, error) {
+func DefaultMessagesParser(_ codec.Marshaler, tx types.Tx) ([]string, error) {
 	var signers = make([]string, len(tx.Authorizers)+1)
-	signers[0] = tx.Payer.Hex()
+	signers[0] = tx.Payer
 	fmt.Println("DefaultMessagesParser")
 	fmt.Println("Signer:"+signers[0])
 
 
 	for index, authorizers := range tx.Authorizers{
-		signers[index] = authorizers.Hex()
+		signers[index] = authorizers
 		fmt.Println("Signer:"+signers[index])
 	}
 	return signers, nil
