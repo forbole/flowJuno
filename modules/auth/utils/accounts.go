@@ -10,7 +10,6 @@ import (
 
 	db "github.com/forbole/flowJuno/db/postgresql"
 
-
 	"github.com/forbole/flowJuno/types"
 )
 
@@ -47,6 +46,7 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types
 	var accounts []types.Account
 
 	for _, address := range addresses {
+		fmt.Println(address)
 		account,err:=client.Client().GetAccount(client.Ctx(),flow.HexToAddress(address))
 		if err != nil {
 			log.Error().Str("module", "auth").Err(err).Int64("height", height).

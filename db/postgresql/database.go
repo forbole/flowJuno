@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"fmt"
-	"reflect"
 
 	juno "github.com/forbole/flowJuno/types"
 
@@ -55,8 +54,6 @@ func (db *Db) IsStoreHistoricDataEnabled() bool {
 
 // Cast allows to cast the given db to a Db instance
 func Cast(db db.Database) *Db {
-	fmt.Println(reflect.TypeOf(db).String())
-
 	bdDatabase, ok := db.(*Db)
 	if !ok {
 		panic(fmt.Errorf("given database instance is not a Db"))

@@ -1,6 +1,9 @@
 package modules
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/forbole/flowJuno/client"
@@ -36,7 +39,10 @@ func (r *Registrar) BuildModules(
 	cfg juno.Config, encodingConfig *params.EncodingConfig, _ *sdk.Config, database db.Database, cp *client.Proxy,
 ) modules.Modules{
 
-	bigDipperBd := postgresql.Cast(database)	
+	bigDipperBd := postgresql.Cast(database)
+	fmt.Println("BuildModules")	
+
+	fmt.Println(reflect.TypeOf(r.parser))
 	return []modules.Module{
 		messages.NewModule(r.parser, encodingConfig.Marshaler, database),
 		auth.NewModule(r.parser, *cp, encodingConfig,bigDipperBd),
