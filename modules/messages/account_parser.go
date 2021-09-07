@@ -59,14 +59,14 @@ var CosmosMessageAddressesParser = JoinMessageParsers(
 // DefaultMessagesParser represents the default messages parser that simply returns all account that
 // mutate the state by the transaction
 func DefaultMessagesParser(_ codec.Marshaler, tx types.Tx) ([]string, error) {
-	var signers = make([]string, len(tx.Authorizers)+1)
-	signers[0] = tx.Payer
+	var signers []string
+	signers=append(signers,tx.Payer)
 	fmt.Println("DefaultMessagesParser")
 	fmt.Println("Signer:"+signers[0])
 
 
 	for index, authorizers := range tx.Authorizers{
-		signers[index] = authorizers
+		signers=append(signers, authorizers)
 		fmt.Println("Signer:"+signers[index])
 	}
 	return signers, nil

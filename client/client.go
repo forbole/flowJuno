@@ -145,6 +145,9 @@ func (cp *Proxy) Ctx() (context.Context){
 	return cp.ctx
 }
 
+func (cp *Proxy) Contract() (Contracts){
+	return cp.contract
+}
 
 /*
 // Genesis returns the genesis state

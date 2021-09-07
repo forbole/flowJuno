@@ -44,7 +44,7 @@ func GetGenesisAccounts(appState map[string]json.RawMessage, cdc codec.Marshaler
 
 // GetAccounts returns the account data for the given addresses
 func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types.Account, error) {
-	log.Debug().Str("module", "auth").Str("operation", "accounts").Msg("getting accounts data")
+	log.Debug().Str("module", "auth").Str("operation", "accounts").Str("Height",string(rune(height))).Msg("getting accounts data")
 	var accounts []types.Account
 
 	for _, address := range addresses {
@@ -80,7 +80,19 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	return db.SaveAccounts(accounts)
+	lockedAccount,err:=GetLockedTokenAccount(addresses, height, client)
+	if err!=nil{
+		return err
+	}
+
+	err = db.SaveAccounts(accounts)
+	if err!=nil{
+		return err
+	}
+
+	return db.SaveLockedTokenAccounts(lockedAccount)
+
+
 }
 
 func GetLockedTokenAccount(addresses []string, height int64, client client.Proxy)([]types.LockedAccount,error){
@@ -104,6 +116,9 @@ func GetLockedTokenAccount(addresses []string, height int64, client client.Proxy
 	var lockedAccount []types.LockedAccount
 
 	for _,address:=range addresses{
+		if address==""{
+			continue
+		}
 		flowAddress:=flow.HexToAddress(address)
 		candanceAddress:=cadence.Address(flowAddress)
 		//val,err:=cadence.NewValue(candanceAddress)
@@ -111,16 +126,17 @@ func GetLockedTokenAccount(addresses []string, height int64, client client.Proxy
 
 		catchError:=`Could not borrow a reference to public LockedAccountInfo`
 		value,err:=client.Client().ExecuteScriptAtLatestBlock(client.Ctx(),[]byte(script),candenceArr)
-		if (strings.Contains(err.Error(),catchError)){
+		if err==nil{
+			fmt.Println("LockedAccountGet!"+value.String())
+
+			lockedAccount=append(lockedAccount,types.NewLockedAccount(address,value.String()))	
+			
+		}else if (strings.Contains(err.Error(),catchError)){
 			//This account don't have a locked account
 			continue
-		}
-		
-		if err!=nil{
+		}else if err!=nil{
 			return nil,err
 		}
-
-		lockedAccount=append(lockedAccount,types.NewLockedAccount(address,value.String()))
 	}
 	return lockedAccount,nil
 }

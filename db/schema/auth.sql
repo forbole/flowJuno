@@ -3,6 +3,6 @@ CREATE TABLE account(
 );
 
 CREATE TABLE locked_account(
-    account_address TEXT UNIQUE PRIMARY KEY NOT NULL REFERENCES address(account),
+    account_address TEXT UNIQUE PRIMARY KEY NOT NULL REFERENCES account(address),
     locked_address TEXT NOT NULL
 );
