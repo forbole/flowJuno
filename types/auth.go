@@ -9,3 +9,15 @@ func NewAccount(address string) Account{
 		Address:address,
 	}
 }
+
+type LockedAccount struct{
+	Address string
+	LockedAddress string
+}
+
+func NewLockedAccount(address string,lockedAccount string) LockedAccount{
+	return LockedAccount{
+		Address:address,
+		LockedAddress:lockedAccount,
+	}
+}

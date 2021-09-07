@@ -50,6 +50,28 @@ func (db *Db) saveAccounts(accounts []types.Account) error {
 	return nil
 }
 
+func (db *Db) saveLockedTokenAccounts(accounts []types.LockedAccount) error {
+	if len(accounts) == 0 {
+		return nil
+	}
+	stmt := `INSERT INTO locked_account (account_address,locked_address) VALUES `
+	var params []interface{}
+
+	for i, account := range accounts {
+		ai := i
+		stmt += fmt.Sprintf("($%d),", ai+1)
+
+		params = append(params, account.Address)
+		stmt = stmt[:len(stmt)-1]
+		stmt += " ON CONFLICT (account_address) DO NOTHING"
+		_, err := db.Sqlx.Exec(stmt, params...)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // GetAccounts returns all the accounts that are currently stored inside the database.
 func (db *Db) GetAccounts() ([]types.Account, error) {
 	var rows []dbtypes.AccountRow
