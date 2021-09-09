@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/forbole/flowJuno/client"
@@ -16,6 +17,7 @@ import (
 )
 
 /*
+//TODO: to replace getGenesisAccounts when genesis function is here
 // GetGenesisAccounts parses the given appState and returns the genesis accounts
 func GetGenesisAccounts(appState map[string]json.RawMessage, cdc codec.Marshaler) ([]types.Account, error) {
 	log.Debug().Str("module", "auth").Msg("parsing genesis")
@@ -80,7 +82,7 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	lockedAccount,err:=GetLockedTokenAccount(addresses, height, client)
+	lockedAccount,err:=GetLockedTokenAccounts(addresses, height, client)
 	if err!=nil{
 		return err
 	}
@@ -91,11 +93,124 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 	}
 
 	return db.SaveLockedTokenAccounts(lockedAccount)
-
-
 }
 
-func GetLockedTokenAccount(addresses []string, height int64, client client.Proxy)([]types.LockedAccount,error){
+// GetLockedTokenAccounts return information of an array of locked token accounts
+// if the account do not have associated locked account, it would ignore the account
+func GetLockedTokenAccounts(addresses []string, height int64, client client.Proxy)([]types.LockedAccount,error){
+	catchError:=`Could not borrow a reference to public LockedAccountInfo`
+	var lockedAccounts []types.LockedAccount
+
+	for _,address:=range addresses{
+		if address==""{
+			continue
+		}
+		
+		lockedAddress,err:=getLockedTokenAccountAddress(address,height,client)
+		if err!=nil{
+			if strings.Contains(err.Error(),catchError){
+				continue
+			}
+			return nil,err
+		}
+
+		balance,err:=getLockedTokenAccountBalance(address,height,client)
+		if err!=nil{
+			if strings.Contains(err.Error(),catchError){
+				continue
+			}
+			return nil,err
+		}
+		
+		unlockLimit,err:=getLockedTokenAccountUnlockLimit(address,height,client)
+		if err!=nil{
+			if strings.Contains(err.Error(),catchError){
+				continue
+			}
+			return nil,err
+		}
+
+		lockedAccounts=append(lockedAccounts, types.NewLockedAccount(address,lockedAddress,balance,unlockLimit))
+
+	}
+	return lockedAccounts,nil
+}
+
+
+// getLockedTokenAccountBalance get the account balance by address 
+func getLockedTokenAccountBalance(address string, height int64, client client.Proxy)(float64,error){
+	script:=fmt.Sprintf(`
+	import LockedTokens from %s
+
+	pub fun main(account: Address): UFix64 {
+	
+		let lockedAccountInfoRef = getAccount(account)
+			.getCapability<&LockedTokens.TokenHolder{LockedTokens.LockedAccountInfo}>(
+				LockedTokens.LockedAccountInfoPublicPath
+			)
+			.borrow()
+			?? panic("Could not borrow a reference to public LockedAccountInfo")
+	
+		return lockedAccountInfoRef.getLockedAccountBalance()
+	}
+	`,client.Contract().LockedTokens)
+
+	flowAddress:=flow.HexToAddress(address)
+	candanceAddress:=cadence.Address(flowAddress)
+		//val,err:=cadence.NewValue(candanceAddress)
+	candenceArr:=[]cadence.Value{candanceAddress}
+
+	var balance float64
+	value,err:=client.Client().ExecuteScriptAtLatestBlock(client.Ctx(),[]byte(script),candenceArr)
+	if err!=nil{
+		return 0,err
+	}
+	fmt.Println("Locked Account Balance!"+value.String())
+	balance,err=strconv.ParseFloat(value.String(),64) 
+	if err!=nil{
+		return 0,err
+	}
+	return balance,nil
+}
+
+// getLockedTokenAccountUnlockLimit get the unlock limit by address 
+func getLockedTokenAccountUnlockLimit(address string, height int64, client client.Proxy)(float64,error){
+	script:=fmt.Sprintf(`
+	import LockedTokens from %s
+
+	pub fun main(account: Address): UFix64 {
+	
+		let lockedAccountInfoRef = getAccount(account)
+			.getCapability<&LockedTokens.TokenHolder{LockedTokens.LockedAccountInfo}>(
+				LockedTokens.LockedAccountInfoPublicPath
+			)
+			.borrow()
+			?? panic("Could not borrow a reference to public LockedAccountInfo")
+	
+		return lockedAccountInfoRef.getUnlockLimit()
+	}
+	`,client.Contract().LockedTokens)
+
+	flowAddress:=flow.HexToAddress(address)
+	candanceAddress:=cadence.Address(flowAddress)
+		//val,err:=cadence.NewValue(candanceAddress)
+	candenceArr:=[]cadence.Value{candanceAddress}
+
+	var limit float64
+	value,err:=client.Client().ExecuteScriptAtLatestBlock(client.Ctx(),[]byte(script),candenceArr)
+	if err!=nil{
+		return 0,err
+	}
+	fmt.Println("Locked Account Unlock Limit!"+value.String())
+	limit,err=strconv.ParseFloat(value.String(),64) 
+	if err!=nil{
+		return 0,err
+	}
+	return limit,nil
+	
+}
+
+func getLockedTokenAccountAddress(address string, height int64, client client.Proxy)(string,error){
 	script:=fmt.Sprintf(`
 	import LockedTokens from %s
 
@@ -110,33 +225,19 @@ func GetLockedTokenAccount(addresses []string, height int64, client client.Proxy
 	
 		return lockedAccountInfoRef.getLockedAccountAddress()
 	}
-
 	`,client.Contract().LockedTokens)
 
-	var lockedAccount []types.LockedAccount
-
-	for _,address:=range addresses{
-		if address==""{
-			continue
-		}
-		flowAddress:=flow.HexToAddress(address)
-		candanceAddress:=cadence.Address(flowAddress)
+	flowAddress:=flow.HexToAddress(address)
+	candanceAddress:=cadence.Address(flowAddress)
 		//val,err:=cadence.NewValue(candanceAddress)
-		candenceArr:=[]cadence.Value{candanceAddress}
+	candenceArr:=[]cadence.Value{candanceAddress}
 
-		catchError:=`Could not borrow a reference to public LockedAccountInfo`
-		value,err:=client.Client().ExecuteScriptAtLatestBlock(client.Ctx(),[]byte(script),candenceArr)
-		if err==nil{
-			fmt.Println("LockedAccountGet!"+value.String())
-
-			lockedAccount=append(lockedAccount,types.NewLockedAccount(address,value.String()))	
-			
-		}else if (strings.Contains(err.Error(),catchError)){
-			//This account don't have a locked account
-			continue
-		}else if err!=nil{
-			return nil,err
-		}
+	value,err:=client.Client().ExecuteScriptAtLatestBlock(client.Ctx(),[]byte(script),candenceArr)
+	if err!=nil{
+		return "",err
 	}
-	return lockedAccount,nil
+
+	fmt.Println("Locked Account"+value.String())
+
+	return value.String(),nil
 }

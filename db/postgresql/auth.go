@@ -55,14 +55,14 @@ func (db *Db) SaveLockedTokenAccounts(accounts []types.LockedAccount) error {
 	if len(accounts) == 0 {
 		return nil
 	}
-	stmt := `INSERT INTO locked_account (account_address,locked_address) VALUES `
+	stmt := `INSERT INTO locked_account (account_address,locked_address,balance,unlock_limit) VALUES `
 	var params []interface{}
 
 	for i, account := range accounts {
-		ai := i*2
-		stmt += fmt.Sprintf("($%d,$%d),", ai+1,ai+2)
+		ai := i*4
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4)
 
-		params = append(params, account.Address,account.LockedAddress)
+		params = append(params, account.Address,account.LockedAddress,account.Balance,account.UnlockLimit)
 		
 	}
 

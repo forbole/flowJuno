@@ -13,11 +13,16 @@ func NewAccount(address string) Account{
 type LockedAccount struct{
 	Address string
 	LockedAddress string
+	Balance float64
+	UnlockLimit float64
 }
 
-func NewLockedAccount(address string,lockedAccount string) LockedAccount{
+func NewLockedAccount(address string,lockedAddress string,balance float64,unlockLimit float64) LockedAccount{
 	return LockedAccount{
 		Address:address,
-		LockedAddress:lockedAccount,
+		LockedAddress:lockedAddress,
+		Balance:balance,
+		UnlockLimit: unlockLimit,
 	}
 }
+
