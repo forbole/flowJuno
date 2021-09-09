@@ -154,6 +154,7 @@ func GetLockedTokenAccounts(addresses []string, height int64, client client.Prox
 // if the account do not have associated locked account, it would ignore the account
 func GetDelegatorAccounts(addresses []string, height int64, client client.Proxy) ([]types.DelegatorAccount, error) {
 	catchError := `Could not borrow a reference to public LockedAccountInfo`
+	catchError2:=`unexpectedly found nil while forcing an Optional value`
 	var delegatorAccount []types.DelegatorAccount
 
 	for _, address := range addresses {
@@ -163,7 +164,7 @@ func GetDelegatorAccounts(addresses []string, height int64, client client.Proxy)
 
 		delegatorId, err := getDelegatorID(address, height, client)
 		if err != nil {
-			if strings.Contains(err.Error(), catchError) {
+			if (strings.Contains(err.Error(), catchError)||strings.Contains(err.Error(), catchError2)){
 				continue
 			}
 			return nil, err
@@ -171,7 +172,7 @@ func GetDelegatorAccounts(addresses []string, height int64, client client.Proxy)
 
 		delegatorNodeId, err := getDelegatorNodeID(address, height, client)
 		if err != nil {
-			if strings.Contains(err.Error(), catchError) {
+			if (strings.Contains(err.Error(), catchError)||strings.Contains(err.Error(), catchError2)) {
 				continue
 			}
 			return nil, err
@@ -179,7 +180,7 @@ func GetDelegatorAccounts(addresses []string, height int64, client client.Proxy)
 
 		delegatorNodeInfo, err := getDelegatorNodeInfo(address, height, client)
 		if err != nil {
-			if strings.Contains(err.Error(), catchError) {
+			if (strings.Contains(err.Error(), catchError)||strings.Contains(err.Error(), catchError2)) {
 				continue
 			}
 			return nil, err
@@ -301,7 +302,7 @@ func getDelegatorID(address string, height int64, client client.Proxy) (int64, e
 	import LockedTokens from %s
 
 	pub fun main(account: Address): UInt32 {
-	
+
 		let lockedAccountInfoRef = getAccount(account)
 			.getCapability<&LockedTokens.TokenHolder{LockedTokens.LockedAccountInfo}>(
 				LockedTokens.LockedAccountInfoPublicPath
