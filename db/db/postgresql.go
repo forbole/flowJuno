@@ -60,7 +60,6 @@ type Database struct {
 	Sql            *sql.DB
 	EncodingConfig *params.EncodingConfig
 	Logger         logging.Logger
-
 }
 
 // LastBlockHeight implements db.Database

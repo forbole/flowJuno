@@ -17,7 +17,6 @@ var (
 	_ modules.Module        = &Module{}
 	_ modules.GenesisModule = &Module{}
 	_ modules.MessageModule = &Module{}
-	
 )
 
 // Module represents the x/auth module
@@ -54,5 +53,5 @@ func (m *Module) HandleGenesis(_ *tmtypes.GenesisDoc, appState map[string]json.R
 
 // HandleMsg implements modules.MessageModule
 func (m *Module) HandleMsg(index int, msg types.Event, tx *types.Tx) error {
-	return HandleMsg(msg, m.messagesParser, m.encodingConfig.Marshaler, m.db, int64(tx.Height), m.flowClient,tx)
+	return HandleMsg(msg, m.messagesParser, m.encodingConfig.Marshaler, m.db, int64(tx.Height), m.flowClient, tx)
 }

@@ -59,11 +59,35 @@ func (db *Db) SaveLockedTokenAccounts(accounts []types.LockedAccount) error {
 	var params []interface{}
 
 	for i, account := range accounts {
-		ai := i*4
-		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4)
+		ai := i * 4
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
 
-		params = append(params, account.Address,account.LockedAddress,account.Balance,account.UnlockLimit)
-		
+		params = append(params, account.Address, account.LockedAddress, account.Balance, account.UnlockLimit)
+
+	}
+
+	stmt = stmt[:len(stmt)-1]
+	stmt += " ON CONFLICT (account_address) DO NOTHING"
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *Db) SaveDelegatorAccount(accounts []types.DelegatorAccount) error {
+	if len(accounts) == 0 {
+		return nil
+	}
+	stmt := `INSERT INTO locked_account (account_address,delegator_id,delegator_node_id ,delegator_node_info) VALUES `
+	var params []interface{}
+
+	for i, account := range accounts {
+		ai := i * 4
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
+
+		params = append(params, account.Address, account.DelegatorId, account.DelegatorNodeId, account.DelegatorNodeInfo)
+
 	}
 
 	stmt = stmt[:len(stmt)-1]

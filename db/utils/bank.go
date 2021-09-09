@@ -21,7 +21,8 @@ func SplitAccounts(accounts []types.Account, paramsNumber int) [][]types.Account
 
 	return slices
 }
-/* 
+
+/*
 func SplitBalances(balances []types.AccountBalance, paramsNumber int) [][]types.AccountBalance {
 	maxBalancesPerSlice := maxPostgreSQLParams / paramsNumber
 	slices := make([][]types.AccountBalance, len(balances)/maxBalancesPerSlice+1)

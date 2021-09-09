@@ -60,18 +60,18 @@ var CosmosMessageAddressesParser = JoinMessageParsers(
 // mutate the state by the transaction
 func DefaultMessagesParser(_ codec.Marshaler, tx types.Tx) ([]string, error) {
 	var signers []string
-	signers=append(signers,tx.Payer)
+	signers = append(signers, tx.Payer)
 	fmt.Println("DefaultMessagesParser")
-	fmt.Println("Signer:"+signers[0])
+	fmt.Println("Signer:" + signers[0])
 
-
-	for index, authorizers := range tx.Authorizers{
-		signers=append(signers, authorizers)
-		fmt.Println("Signer:"+signers[index])
+	for index, authorizers := range tx.Authorizers {
+		signers = append(signers, authorizers)
+		fmt.Println("Signer:" + signers[index])
 	}
 	return signers, nil
 }
-/* 
+
+/*
 // BankMessagesParser returns the list of all the accounts involved in the given
 // message if it's related to the x/bank module
 func BankMessagesParser(_ codec.Marshaler, cosmosMsg sdk.Msg) ([]string, error) {
@@ -224,4 +224,4 @@ func StakingMessagesParser(_ codec.Marshaler, cosmosMsg sdk.Msg) ([]string, erro
 
 	return nil, MessageNotSupported(cosmosMsg)
 }
- */
+*/

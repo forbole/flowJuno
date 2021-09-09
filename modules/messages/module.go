@@ -14,8 +14,8 @@ var _ modules.Module = &Module{}
 // Module represents the module allowing to store messages properly inside a dedicated table
 type Module struct {
 	parser MessageAddressesParser
-	cdc codec.Marshaler
-	db  db.Database
+	cdc    codec.Marshaler
+	db     db.Database
 }
 
 func NewModule(parser MessageAddressesParser, cdc codec.Marshaler, db db.Database) *Module {
