@@ -130,7 +130,7 @@ func GetLockedTokenAccounts(addresses []string, height int64, client client.Prox
 			return nil,err
 		}
 
-		lockedAccounts=append(lockedAccounts, types.NewLockedAccount(address,lockedAddress,balance,unlockLimit))
+		lockedAccounts=append(lockedAccounts, types.NewLockedAccount(address,lockedAddress,balance,unlockLimit,height))
 
 	}
 	return lockedAccounts,nil
@@ -161,7 +161,7 @@ func getLockedTokenAccountBalance(address string, height int64, client client.Pr
 	candenceArr:=[]cadence.Value{candanceAddress}
 
 	var balance float64
-	value,err:=client.Client().ExecuteScriptAtLatestBlock(client.Ctx(),[]byte(script),candenceArr)
+	value,err:=client.Client().ExecuteScriptAtBlockHeight(client.Ctx(),uint64(height),[]byte(script),candenceArr)
 	if err!=nil{
 		return 0,err
 	}
@@ -197,7 +197,7 @@ func getLockedTokenAccountUnlockLimit(address string, height int64, client clien
 	candenceArr:=[]cadence.Value{candanceAddress}
 
 	var limit float64
-	value,err:=client.Client().ExecuteScriptAtLatestBlock(client.Ctx(),[]byte(script),candenceArr)
+	value,err:=client.Client().ExecuteScriptAtBlockHeight(client.Ctx(),uint64(height),[]byte(script),candenceArr)
 	if err!=nil{
 		return 0,err
 	}
