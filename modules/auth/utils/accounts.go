@@ -45,9 +45,9 @@ func GetGenesisAccounts(appState map[string]json.RawMessage, cdc codec.Marshaler
 // --------------------------------------------------------------------------------------------------------------------
 
 // GetAccounts returns the account data for the given addresses
-func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types.Account, error) {
+func GetAccounts(addresses []string, height int64, client client.Proxy) ([]flow.Account, error) {
 	log.Debug().Str("module", "auth").Str("operation", "accounts").Int("height", int(height)).Msg("getting accounts data")
-	var accounts []types.Account
+	var accounts []flow.Account
 
 	for _, address := range addresses {
 		fmt.Println("GetAccounts:" + address)
@@ -67,7 +67,7 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types
 			return nil, fmt.Errorf("address is not valid and cannot get details")
 		}
 
-		accounts = append(accounts, types.NewAccount(account.Address.String()))
+		accounts = append(accounts, *account)
 
 	}
 

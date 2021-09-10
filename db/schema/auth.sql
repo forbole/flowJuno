@@ -1,5 +1,9 @@
 CREATE TABLE account(
-    address TEXT UNIQUE PRIMARY KEY NOT NULL
+    address TEXT UNIQUE PRIMARY KEY NOT NULL,
+    balance NUMERIC UNIQUE NOT NULL,
+    code TEXT NOT NULL,
+    keys_list TEXT,
+    contract_map TEXT
 );
 
 CREATE TABLE locked_account(
