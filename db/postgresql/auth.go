@@ -79,7 +79,7 @@ func (db *Db) SaveDelegatorAccount(accounts []types.DelegatorAccount) error {
 	if len(accounts) == 0 {
 		return nil
 	}
-	stmt := `INSERT INTO locked_account (account_address,delegator_id,delegator_node_id ,delegator_node_info) VALUES `
+	stmt := `INSERT INTO delegator_account (account_address,delegator_id,delegator_node_id ,delegator_node_info) VALUES `
 	var params []interface{}
 
 	for i, account := range accounts {
