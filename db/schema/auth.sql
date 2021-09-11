@@ -1,6 +1,6 @@
 CREATE TABLE account(
     address TEXT UNIQUE PRIMARY KEY NOT NULL,
-    balance NUMERIC UNIQUE NOT NULL,
+    balance NUMERIC NOT NULL,
     code TEXT NOT NULL,
     keys_list TEXT,
     contract_map TEXT
@@ -18,4 +18,10 @@ CREATE TABLE delegator_account(
 	delegator_id    INTEGER NOT NULL,
 	delegator_node_id   TEXT NOT NULL,
 	delegator_node_info TEXT NOT NULL
+);
+
+CREATE TABLE staker_account(
+    account_address TEXT UNIQUE PRIMARY KEY NOT NULL REFERENCES account(address),
+	staker_node_id    TEXT NOT NULL,
+	staker_node_info   TEXT NOT NULL
 )

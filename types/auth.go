@@ -41,3 +41,19 @@ func NewDelegatorAccount(address string, delegatorId int64, delegatorNodeId stri
 		DelegatorNodeInfo: delegatorNodeInfo,
 	}
 }
+
+
+type StakerAccount struct {
+	Address string
+	StakerNodeId string
+	StakerNodeInfo string
+}
+
+func NewStakerAccount(address ,stakerNodeId, stakerNodeInfo string) StakerAccount {
+	return StakerAccount{
+		Address:address,
+		StakerNodeId: stakerNodeId,
+		StakerNodeInfo: stakerNodeInfo,
+	}
+}
+
