@@ -15,16 +15,14 @@ type LockedAccount struct{
 	LockedAddress string
 	Balance float64
 	UnlockLimit float64
-	Height int64
 }
 
-func NewLockedAccount(address string,lockedAddress string,balance float64,unlockLimit float64,height int64) LockedAccount{
+func NewLockedAccount(address string,lockedAddress string,balance float64,unlockLimit float64) LockedAccount{
 	return LockedAccount{
 		Address:address,
 		LockedAddress:lockedAddress,
 		Balance:balance,
 		UnlockLimit: unlockLimit,
-		Height:height,
 	}
 }
 
