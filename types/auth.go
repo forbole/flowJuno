@@ -13,11 +13,11 @@ func NewAccount(address string) Account {
 type LockedAccount struct {
 	Address       string
 	LockedAddress string
-	Balance       float64
-	UnlockLimit   float64
+	Balance       uint64
+	UnlockLimit   uint64
 }
 
-func NewLockedAccount(address string, lockedAddress string, balance float64, unlockLimit float64) LockedAccount {
+func NewLockedAccount(address string, lockedAddress string, balance, unlockLimit uint64) LockedAccount {
 	return LockedAccount{
 		Address:       address,
 		LockedAddress: lockedAddress,
@@ -42,18 +42,16 @@ func NewDelegatorAccount(address string, delegatorId int64, delegatorNodeId stri
 	}
 }
 
-
 type StakerAccount struct {
-	Address string
-	StakerNodeId string
+	Address        string
+	StakerNodeId   string
 	StakerNodeInfo string
 }
 
-func NewStakerAccount(address ,stakerNodeId, stakerNodeInfo string) StakerAccount {
+func NewStakerAccount(address, stakerNodeId, stakerNodeInfo string) StakerAccount {
 	return StakerAccount{
-		Address:address,
-		StakerNodeId: stakerNodeId,
+		Address:        address,
+		StakerNodeId:   stakerNodeId,
 		StakerNodeInfo: stakerNodeInfo,
 	}
 }
-

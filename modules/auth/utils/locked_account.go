@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/forbole/flowJuno/client"
@@ -11,8 +10,6 @@ import (
 
 	"github.com/forbole/flowJuno/types"
 )
-
-
 
 // GetLockedTokenAccounts return information of an array of locked token accounts
 // if the account do not have associated locked account, it would ignore the account
@@ -55,9 +52,8 @@ func GetLockedTokenAccounts(addresses []string, height int64, client client.Prox
 	return lockedAccounts, nil
 }
 
-
 // getLockedTokenAccountBalance get the account balance by address
-func getLockedTokenAccountBalance(address string, height int64, client client.Proxy) (float64, error) {
+func getLockedTokenAccountBalance(address string, height int64, client client.Proxy) (uint64, error) {
 	script := fmt.Sprintf(`
 	import LockedTokens from %s
 
@@ -79,21 +75,22 @@ func getLockedTokenAccountBalance(address string, height int64, client client.Pr
 	//val,err:=cadence.NewValue(candanceAddress)
 	candenceArr := []cadence.Value{candanceAddress}
 
-	var balance float64
+	var balance uint64
 	value, err := client.Client().ExecuteScriptAtLatestBlock(client.Ctx(), []byte(script), candenceArr)
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println("Locked Account Balance!" + value.String())
-	balance, err = strconv.ParseFloat(value.String(), 64)
-	if err != nil {
-		return 0, err
+	balance, ok := value.ToGoValue().(uint64)
+	if !ok {
+		return 0, fmt.Errorf("cadence script does not return a uint64 value")
 	}
+	fmt.Printf("Locked Account Unlock Limit! %d", balance)
+
 	return balance, nil
 }
 
 // getLockedTokenAccountUnlockLimit get the unlock limit by address
-func getLockedTokenAccountUnlockLimit(address string, height int64, client client.Proxy) (float64, error) {
+func getLockedTokenAccountUnlockLimit(address string, height int64, client client.Proxy) (uint64, error) {
 	script := fmt.Sprintf(`
 	import LockedTokens from %s
 
@@ -115,16 +112,17 @@ func getLockedTokenAccountUnlockLimit(address string, height int64, client clien
 	//val,err:=cadence.NewValue(candanceAddress)
 	candenceArr := []cadence.Value{candanceAddress}
 
-	var limit float64
+	var limit uint64
 	value, err := client.Client().ExecuteScriptAtLatestBlock(client.Ctx(), []byte(script), candenceArr)
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println("Locked Account Unlock Limit!" + value.String())
-	limit, err = strconv.ParseFloat(value.String(), 64)
-	if err != nil {
-		return 0, err
+
+	limit, ok := value.ToGoValue().(uint64)
+	if !ok {
+		return 0, fmt.Errorf("cadence script does not return a uint64 value")
 	}
+	fmt.Printf("Locked Account Unlock Limit! %d", limit)
 	return limit, nil
 
 }

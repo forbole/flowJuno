@@ -37,19 +37,19 @@ func (db *Db) saveAccounts(accounts []flow.Account) error {
 	var params []interface{}
 
 	for i, account := range accounts {
-		ai := i*5
-		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4,ai+5)
+		ai := i * 5
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
 
-		keys,err:=json.Marshal(account.Keys)
-		if err!=nil{
+		keys, err := json.Marshal(account.Keys)
+		if err != nil {
 			return err
 		}
 
-		contracts,err:=json.Marshal(account.Contracts)
-		if err!=nil{
+		contracts, err := json.Marshal(account.Contracts)
+		if err != nil {
 			return err
 		}
-		params = append(params, account.Address.String(),account.Balance,account.Code,keys,contracts)
+		params = append(params, account.Address.String(), account.Balance, account.Code, keys, contracts)
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += " ON CONFLICT (address) DO NOTHING "
@@ -108,7 +108,6 @@ func (db *Db) SaveDelegatorAccounts(accounts []types.DelegatorAccount) error {
 	}
 	return nil
 }
-
 
 func (db *Db) SaveStakerAccounts(accounts []types.StakerAccount) error {
 	if len(accounts) == 0 {
