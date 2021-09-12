@@ -60,13 +60,13 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 	}, nil
 }
 
-func NewFlowClientConnection(cfg types.Config)(*client.Client,context.Context,error){
+func NewFlowClientConnection(cfg types.Config) (*client.Client, context.Context, error) {
 	flowClient, err := client.New(cfg.GetRPCConfig().GetAddress(), grpc.WithInsecure())
 	if err != nil {
-		return nil,nil, err
+		return nil, nil, err
 	}
-	
-	return flowClient,context.Background(),nil
+
+	return flowClient, context.Background(), nil
 
 }
 
@@ -137,15 +137,15 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 	return &nodeOperators, nil
 }
 
-func (cp *Proxy) Client() (*client.Client){
+func (cp *Proxy) Client() *client.Client {
 	return &cp.flowClient
 }
 
-func (cp *Proxy) Ctx() (context.Context){
+func (cp *Proxy) Ctx() context.Context {
 	return cp.ctx
 }
 
-func (cp *Proxy) Contract() (Contracts){
+func (cp *Proxy) Contract() Contracts {
 	return cp.contract
 }
 
@@ -210,8 +210,8 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 			return nil, err
 		}
 		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID)
-		if err!=nil{
-			return nil,err
+		if err != nil {
+			return nil, err
 		}
 
 		authoriser := make([]string, len(transaction.Authorizers))
@@ -264,7 +264,7 @@ func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error)
 
 	ev := make([]types.Event, len(transactionResult.Events))
 	for i, event := range transactionResult.Events {
-		fmt.Println("Event TxID:"+event.TransactionID.String())
+		fmt.Println("Event TxID:" + event.TransactionID.String())
 		ev[i] = types.NewEvent(height, event.Type, event.TransactionID.String(), event.TransactionIndex,
 			event.EventIndex, event.Value)
 	}

@@ -15,7 +15,7 @@ import (
 // if the account do not have associated locked account, it would ignore the account
 func GetStakerAccounts(addresses []string, height int64, client client.Proxy) ([]types.StakerAccount, error) {
 	catchError := `Could not borrow a reference to public LockedAccountInfo`
-	catchError2:=`unexpectedly found nil while forcing an Optional value`
+	catchError2 := `unexpectedly found nil while forcing an Optional value`
 
 	var stakerAccounts []types.StakerAccount
 
@@ -26,28 +26,25 @@ func GetStakerAccounts(addresses []string, height int64, client client.Proxy) ([
 
 		stakerNodeId, err := getStakerNodeID(address, height, client)
 		if err != nil {
-			if (strings.Contains(err.Error(), catchError)||strings.Contains(err.Error(), catchError2)){
+			if strings.Contains(err.Error(), catchError) || strings.Contains(err.Error(), catchError2) {
 				continue
 			}
 			return nil, err
 		}
-
 
 		stakerNodeInfo, err := getStakerNodeInfo(address, height, client)
 		if err != nil {
-			if (strings.Contains(err.Error(), catchError)||strings.Contains(err.Error(), catchError2)){
+			if strings.Contains(err.Error(), catchError) || strings.Contains(err.Error(), catchError2) {
 				continue
 			}
 			return nil, err
 		}
 
-
-		stakerAccounts = append(stakerAccounts, types.NewStakerAccount(address,stakerNodeId, stakerNodeInfo))
+		stakerAccounts = append(stakerAccounts, types.NewStakerAccount(address, stakerNodeId, stakerNodeInfo))
 
 	}
 	return stakerAccounts, nil
 }
-
 
 func getStakerNodeID(address string, height int64, client client.Proxy) (string, error) {
 	script := fmt.Sprintf(`
@@ -77,8 +74,6 @@ func getStakerNodeID(address string, height int64, client client.Proxy) (string,
 }
 
 // Danger zone
-
-
 
 func getStakerNodeInfo(address string, height int64, client client.Proxy) (string, error) {
 	script := fmt.Sprintf(`

@@ -13,9 +13,9 @@ import (
 )
 
 // HandleMsg handles any message updating the involved accounts
-func HandleMsg(msg types.Event, getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, height int64, flowClient client.Proxy,tx *types.Tx) error {
-	addresses,err:=getAddresses(cdc,*tx)
-	if err!=nil{
+func HandleMsg(msg types.Event, getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, height int64, flowClient client.Proxy, tx *types.Tx) error {
+	addresses, err := getAddresses(cdc, *tx)
+	if err != nil {
 		return err
 	}
 	fmt.Println("HandleMsg")

@@ -226,34 +226,34 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 		return err
 	}
 
-	for _,tx:=range *txs{
+	for _, tx := range *txs {
 		for _, module := range w.modules {
 			if transactionModule, ok := module.(modules.TransactionModule); ok {
 				err = transactionModule.HandleTx(txs)
 				if err != nil {
 					//w.logger.TxError(module, tx, err)
 					return fmt.Errorf("Cannot Parse Transaction")
+				}
 			}
-		}
 
-		events,err:=w.cp.Events(tx.TransactionID,int(tx.Height))
-		if err!=nil{
-			return err
-		}
+			events, err := w.cp.Events(tx.TransactionID, int(tx.Height))
+			if err != nil {
+				return err
+			}
 
-		for _,event:=range events{
-			for _, module := range w.modules {
-				if messageModule, ok := module.(modules.MessageModule); ok {
-					err = messageModule.HandleMsg(int(tx.Height), event, &tx)
-					if err != nil {
-						return err
+			for _, event := range events {
+				for _, module := range w.modules {
+					if messageModule, ok := module.(modules.MessageModule); ok {
+						err = messageModule.HandleMsg(int(tx.Height), event, &tx)
+						if err != nil {
+							return err
+						}
 					}
 				}
 			}
+
 		}
-		
 	}
-}
 
 	return nil
 }

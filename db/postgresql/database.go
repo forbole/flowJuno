@@ -34,12 +34,12 @@ func Builder(cfg juno.Config, codec *params.EncodingConfig) (db.Database, error)
 	if !ok {
 		return nil, fmt.Errorf("invalid configuration database, must be PostgreSQL")
 	}
-/* 
-	dbCfg, ok := cfg.GetDatabaseConfig().(*config.DatabaseConfig)
-	if !ok {
-		return nil, fmt.Errorf("invalid database configuration type")
-	}
- */
+	/*
+		dbCfg, ok := cfg.GetDatabaseConfig().(*config.DatabaseConfig)
+		if !ok {
+			return nil, fmt.Errorf("invalid database configuration type")
+		}
+	*/
 	return &Db{
 		Database:            psqlDb,
 		Sqlx:                sqlx.NewDb(psqlDb.Sql, "postgresql"),
@@ -60,5 +60,3 @@ func Cast(db db.Database) *Db {
 	}
 	return bdDatabase
 }
-
-

@@ -6,7 +6,6 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/onflow/flow-go-sdk"
 	tmtypes "github.com/tendermint/tendermint/types"
-	
 
 	"github.com/forbole/flowJuno/types"
 )
