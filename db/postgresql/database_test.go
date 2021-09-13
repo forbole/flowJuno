@@ -10,16 +10,12 @@ import (
 	"time"
 
 	"github.com/forbole/flowJuno/types/config"
+	"github.com/onflow/flow-go-sdk"
 
 	database "github.com/forbole/flowJuno/db/postgresql"
 	"github.com/forbole/flowJuno/types"
 
 	juno "github.com/desmos-labs/juno/types"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	tmversion "github.com/tendermint/tendermint/proto/tendermint/version"
-	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
-	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/stretchr/testify/suite"
@@ -95,52 +91,34 @@ func (suite *DbTestSuite) SetupTest() {
 }
 
 // getBlock builds, stores and returns a block for the provided height
-func (suite *DbTestSuite) getBlock(height int64) *types.Block {
-	validator := suite.getValidator(
-		"cosmosvalcons1qqqqrezrl53hujmpdch6d805ac75n220ku09rl",
-		"cosmosvaloper1rcp29q3hpd246n6qak7jluqep4v006cdsc2kkl",
-		"cosmosvalconspub1zcjduepq7mft6gfls57a0a42d7uhx656cckhfvtrlmw744jv4q0mvlv0dypskehfk8",
-	)
-
-	addr, err := sdk.ConsAddressFromBech32(validator.GetConsAddr())
-	suite.Require().NoError(err)
-
-	tmBlock := &tmctypes.ResultBlock{
-		BlockID: tmtypes.BlockID{},
-		Block: &tmtypes.Block{
-			Header: tmtypes.Header{
-				Version:            tmversion.Consensus{},
-				ChainID:            "",
-				Height:             height,
-				Time:               time.Now(),
-				LastBlockID:        tmtypes.BlockID{},
-				LastCommitHash:     nil,
-				DataHash:           nil,
-				ValidatorsHash:     []byte("hash"),
-				NextValidatorsHash: nil,
-				ConsensusHash:      nil,
-				AppHash:            nil,
-				LastResultsHash:    nil,
-				EvidenceHash:       nil,
-				ProposerAddress:    tmtypes.Address(addr.Bytes()),
+func (suite *DbTestSuite) getBlock(height int64) *flow.Block {
+	block := flow.Block{
+		flow.BlockHeader{
+			ID:        flow.HexToID("0x1"),
+			ParentID:  flow.HexToID("0x2"),
+			Height:    10,
+			Timestamp: time.Date(2021, 1, 1, 0, 0, 0, 0, time.Now().UTC().Location()),
+		},
+		flow.BlockPayload{
+			[]*flow.CollectionGuarantee{
+				&flow.CollectionGuarantee{
+					flow.HexToID("0x3"),
+				},
 			},
-			Data:     tmtypes.Data{},
-			Evidence: tmtypes.EvidenceData{},
-			LastCommit: &tmtypes.Commit{
-				Height:     height - 1,
-				Round:      1,
-				BlockID:    tmtypes.BlockID{},
-				Signatures: nil,
+			[]*flow.BlockSeal{
+				&flow.BlockSeal{
+					BlockID:                    flow.HexToID("0x4"),
+					ExecutionReceiptID:         flow.HexToID("0x5"),
+					ExecutionReceiptSignatures: nil,
+				},
 			},
 		},
 	}
-
-	block := juno.NewBlockFromTmBlock(tmBlock, 10000)
-	err = suite.database.SaveBlock(block)
+	err := suite.database.SaveBlock(&block)
 	suite.Require().NoError(err)
-	return block
+	return &block
 }
-
+/* 
 // getValidator stores inside the database a validator having the given
 // consensus address, validator address and validator public key
 func (suite *DbTestSuite) getValidator(consAddr, valAddr, pubkey string) types.Validator {
@@ -174,3 +152,4 @@ func (suite *DbTestSuite) getAccount(addr string) sdk.AccAddress {
 
 	return delegator
 }
+ */
