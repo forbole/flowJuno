@@ -98,22 +98,42 @@ func DelegatorNodeInfoFromCadence(value cadence.Value)(DelegatorNodeInfo,error){
 
 	fields:=arrayValue.Values[0].(cadence.Struct).Fields
 	
-	id:=fields[0].ToGoValue()
-	
-	nodeID:=fields[1].ToGoValue()
-	nodeID,ok:=nodeID.(string)
+	id,ok:=fields[0].ToGoValue().(uint32)
 	if !ok{
-		fmt.Errorf("nodeID is not a string!!")
+		return DelegatorNodeInfo{},fmt.Errorf("id is not a uint32!!")
 	}
-	tokenCommited:=fields[2].ToGoValue()
-	tokenStaked:=fields[3].ToGoValue()
-	tokensUnstaking:=fields[4].ToGoValue()
-	tokenRewarded:=fields[5].ToGoValue()
-	tokenUnstaked:=fields[6].ToGoValue()
-	tokenRequestedToUnstake:=fields[7].ToGoValue()
+	
+	nodeID,ok:=fields[1].ToGoValue().(string)
+	if !ok{
+		return DelegatorNodeInfo{},fmt.Errorf("nodeID is not a string!!")
+	}
+	tokenCommited,ok:=fields[2].ToGoValue().(uint64)
+	if !ok{
+		return DelegatorNodeInfo{},fmt.Errorf("tokenCommited is not a uint64!!")
+	}
+	tokenStaked,ok:=fields[3].ToGoValue().(uint64)
+	if !ok{
+		return DelegatorNodeInfo{},fmt.Errorf("tokenStaked is not a uint64!!")
+	}
+	tokensUnstaking,ok:=fields[4].ToGoValue().(uint64)
+	if !ok{
+		return DelegatorNodeInfo{},fmt.Errorf("tokensUnstaking is not a uint64!!")
+	}
+	tokenRewarded,ok:=fields[5].ToGoValue().(uint64)
+	if !ok{
+		return DelegatorNodeInfo{},fmt.Errorf("tokenRewarded is not a uint64!!")
+	}
+	tokenUnstaked,ok:=fields[6].ToGoValue().(uint64)
+	if !ok{
+		return DelegatorNodeInfo{},fmt.Errorf("tokenUnstaked is not a uint64!!")
+	}
+	tokenRequestedToUnstake,ok:=fields[7].ToGoValue().(uint64)
+	if !ok{
+		return DelegatorNodeInfo{},fmt.Errorf("tokenRequestedToUnstake is not a uint64!!")
+	}
 	
 	return NewDelegatorNodeInfo(id,nodeID,tokenCommited,tokenStaked,tokensUnstaking,
-		tokenRewarded,tokenUnstaked,tokenRequestedToUnstake)
+		tokenRewarded,tokenUnstaked,tokenRequestedToUnstake),nil
 
 
 }
