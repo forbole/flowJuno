@@ -60,16 +60,6 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 	}, nil
 }
 
-func NewFlowClientConnection(cfg types.Config) (*client.Client, context.Context, error) {
-	flowClient, err := client.New(cfg.GetRPCConfig().GetAddress(), grpc.WithInsecure())
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return flowClient, context.Background(), nil
-
-}
-
 // LatestHeight returns the latest block height on the active chain. An error
 // is returned if the query fails.
 func (cp *Proxy) LatestHeight() (int64, error) {
