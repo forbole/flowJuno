@@ -168,6 +168,9 @@ func getDelegatorNodeInfo(address string, height int64, client client.Proxy) (st
 		return "", err
 	}
 
+	nodeInfo,err:=types.DelegatorNodeInfoFromCadence(value)
+	
+
 	fmt.Println("Locked Account" + value.String())
 
 	return value.String(), nil
