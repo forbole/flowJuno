@@ -96,7 +96,11 @@ func (db *Db) SaveDelegatorAccounts(accounts []types.DelegatorAccount) error {
 		ai := i * 4
 		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
 
-		params = append(params, account.Address, account.DelegatorId, account.DelegatorNodeId, account.DelegatorNodeInfo)
+		delegatorNodeInfo,err:=json.Marshal(account.DelegatorNodeInfo)
+		if err!=nil{
+			return err
+		}
+		params = append(params, account.Address, account.DelegatorId, account.DelegatorNodeId, string(delegatorNodeInfo))
 
 	}
 
