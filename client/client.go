@@ -222,6 +222,7 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 		tx := types.NewTx(transactionResult.Status.String(), block.Height, txID.String(), transaction.Script, transaction.Arguments,
 			transaction.ReferenceBlockID.String(), transaction.GasLimit, transaction.ProposalKey.Address.String(), transaction.Payer.String(),
 			authoriser, payloadSignitures, envelopeSigniture)
+
 		txResponses[i] = tx
 	}
 	return txResponses, nil
@@ -232,6 +233,19 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 	if err != nil {
 		return nil, err
 	}
+	var event []types.Event
+	for _, tx := range txs {
+		fmt.Println(tx.TransactionID)
+		ev, err := cp.Events(tx.TransactionID, int(tx.Height))
+		if err != nil {
+			return []types.Event{}, err
+		}
+		event = append(event, ev...)
+	}
+	return event, nil
+}
+
+func (cp *Proxy)EventsInTransactions(txs types.Txs)([]types.Event, error){
 	var event []types.Event
 	for _, tx := range txs {
 		fmt.Println(tx.TransactionID)
