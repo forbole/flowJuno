@@ -104,6 +104,16 @@ func (w Worker) process(height int64) error {
 		return err
 	}
 
+	// Call the block handlers
+	for _, module := range w.modules {
+		if blockModule, ok := module.(modules.BlockModule); ok {
+			err = blockModule.HandleBlock(block, txs)
+			if err != nil {
+				w.logger.BlockError(module, block, err)
+			}
+		}
+	}
+
 
 	return w.ExportBlock(block, &txs)
 }

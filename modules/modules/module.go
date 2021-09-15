@@ -77,7 +77,7 @@ type BlockModule interface {
 	// For each transaction present inside the block, HandleTx will be called as well.
 	// NOTE. The returned error will be logged using the logging.LogBlockError method. All other modules' handlers
 	// will still be called.
-	HandleBlock(block *flow.Block, txs *types.Txs, vals *types.NodeOperators) error
+	HandleBlock(block *flow.Block, txs *types.Txs) error
 }
 
 type TransactionModule interface {
