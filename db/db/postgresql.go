@@ -295,4 +295,3 @@ func (db *Database) SaveEvents(events []types.Event) error {
 	_, err := db.Sql.Exec(stmt, vparams...)
 	return err
 }
-
