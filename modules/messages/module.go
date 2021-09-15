@@ -31,8 +31,8 @@ func (m *Module) Name() string {
 	return "messages"
 }
 
-// HandleMsg implements modules.MessageModule
-func (m *Module) HandleMsg(index int, msg sdk.Msg, tx *types.Txs) error {
-	//return HandleMsg(index, msg, tx, m.parser, m.cdc, m.db)
+// HandleEvent implements modules.MessageModule
+func (m *Module) HandleEvent(index int, msg sdk.Msg, tx *types.Txs) error {
+	//return HandleEvent(index, msg, tx, m.parser, m.cdc, m.db)
 	return nil
 }

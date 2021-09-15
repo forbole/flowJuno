@@ -245,16 +245,15 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 	return event, nil
 }
 
-func (cp *Proxy)EventsInTransactions(txs types.Txs)([]types.Event, error){
+func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 	var event []types.Event
-	for _, tx := range txs {
-		fmt.Println(tx.TransactionID)
+
+	fmt.Println(tx.TransactionID)
 		ev, err := cp.Events(tx.TransactionID, int(tx.Height))
 		if err != nil {
 			return []types.Event{}, err
 		}
 		event = append(event, ev...)
-	}
 	return event, nil
 }
 

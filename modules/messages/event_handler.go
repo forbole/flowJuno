@@ -10,8 +10,8 @@ import (
 	"github.com/forbole/flowJuno/types"
 )
 
-// HandleMsg represents a message handler that stores the given message inside the proper database table
-func HandleMsg(
+// HandleEvent represents a message handler that stores the given message inside the proper database table
+func HandleEvent(
 	index int, msg sdk.Msg, tx *types.Txs,
 	parseAddresses MessageAddressesParser, cdc codec.Marshaler, db db.Database,
 ) error {

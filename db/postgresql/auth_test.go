@@ -10,21 +10,21 @@ import (
 )
 
 func (suite *DbTestSuite) TestSaveAccount() {
-	emptyContracts :=make(map[string][]byte)
-	accountKey:=
-	[]*flow.AccountKey{
-		flow.NewAccountKey().SetWeight(1000).SetSigAlgo(2).SetHashAlgo(1),
-	}
-	address:=flow.HexToAddress("0x1")
-	balance:=uint64(10)
+	emptyContracts := make(map[string][]byte)
+	accountKey :=
+		[]*flow.AccountKey{
+			flow.NewAccountKey().SetWeight(1000).SetSigAlgo(2).SetHashAlgo(1),
+		}
+	address := flow.HexToAddress("0x1")
+	balance := uint64(10)
 
 	accounts := []flow.Account{
 		{
-			Address: address,
-		Balance: balance,
-		Code:    nil,
-		Keys: accountKey,
-		Contracts: emptyContracts,
+			Address:   address,
+			Balance:   balance,
+			Code:      nil,
+			Keys:      accountKey,
+			Contracts: emptyContracts,
 		},
 	}
 
@@ -48,32 +48,32 @@ func (suite *DbTestSuite) TestSaveAccount() {
 	suite.Require().NoError(err)
 	suite.Require().Len(accountRows, 1, "account table should contain only one row")
 
-	expectedAccountKey,err:=json.Marshal(accountKey)
+	expectedAccountKey, err := json.Marshal(accountKey)
 	suite.Require().NoError(err)
-	expectedEmptyContracts,err:=json.Marshal(emptyContracts)
+	expectedEmptyContracts, err := json.Marshal(emptyContracts)
 	suite.Require().NoError(err)
 	expectedAccountRow := dbtypes.NewAccountRow(address.String(), float64(balance), "",
-	string(expectedAccountKey),string(expectedEmptyContracts))
-	
+		string(expectedAccountKey), string(expectedEmptyContracts))
+
 	suite.Require().True(expectedAccountRow.Equal(accountRows[0]))
 }
 
-func (suite *DbTestSuite) SaveAccount() []flow.Account{
-	emptyContracts :=make(map[string][]byte)
-	accountKey:=
-	[]*flow.AccountKey{
-		flow.NewAccountKey().SetWeight(1000).SetSigAlgo(2).SetHashAlgo(1),
-	}
-	address:=flow.HexToAddress("0x1")
-	balance:=uint64(10)
+func (suite *DbTestSuite) SaveAccount() []flow.Account {
+	emptyContracts := make(map[string][]byte)
+	accountKey :=
+		[]*flow.AccountKey{
+			flow.NewAccountKey().SetWeight(1000).SetSigAlgo(2).SetHashAlgo(1),
+		}
+	address := flow.HexToAddress("0x1")
+	balance := uint64(10)
 
 	accounts := []flow.Account{
 		{
-			Address: address,
-		Balance: balance,
-		Code:    nil,
-		Keys: accountKey,
-		Contracts: emptyContracts,
+			Address:   address,
+			Balance:   balance,
+			Code:      nil,
+			Keys:      accountKey,
+			Contracts: emptyContracts,
 		},
 	}
 
@@ -88,16 +88,15 @@ func (suite *DbTestSuite) SaveAccount() []flow.Account{
 }
 
 func (suite *DbTestSuite) TestSaveLockedAccount() {
-	baseAccount:=suite.SaveAccount()
-	address:=baseAccount[0].Address
-	lockedAddress:=flow.HexToAddress("0x2")
-	balance:=uint64(10)
-	unlockLimit:=uint64(20)
+	baseAccount := suite.SaveAccount()
+	address := baseAccount[0].Address
+	lockedAddress := flow.HexToAddress("0x2")
+	balance := uint64(10)
+	unlockLimit := uint64(20)
 
-	accounts:=[]types.LockedAccount{
-		types.NewLockedAccount(address.String(),lockedAddress.String(),balance,unlockLimit),
+	accounts := []types.LockedAccount{
+		types.NewLockedAccount(address.String(), lockedAddress.String(), balance, unlockLimit),
 	}
-	
 
 	// ------------------------------
 	// --- Save the data
@@ -112,7 +111,7 @@ func (suite *DbTestSuite) TestSaveLockedAccount() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedAccountRow:=dbtypes.NewLockedAccountRow(address.String(),lockedAddress.String(),int(balance),int(unlockLimit))
+	expectedAccountRow := dbtypes.NewLockedAccountRow(address.String(), lockedAddress.String(), int(balance), int(unlockLimit))
 
 	var accountRows []dbtypes.LockedAccountRow
 	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM locked_account`)
@@ -122,18 +121,16 @@ func (suite *DbTestSuite) TestSaveLockedAccount() {
 	suite.Require().True(expectedAccountRow.Equal(accountRows[0]))
 }
 
-
 func (suite *DbTestSuite) TestSaveLockedAccount() {
-	baseAccount:=suite.SaveAccount()
-	address:=baseAccount[0].Address
-	lockedAddress:=flow.HexToAddress("0x2")
-	balance:=uint64(10)
-	unlockLimit:=uint64(20)
+	baseAccount := suite.SaveAccount()
+	address := baseAccount[0].Address
+	lockedAddress := flow.HexToAddress("0x2")
+	balance := uint64(10)
+	unlockLimit := uint64(20)
 
-	accounts:=[]types.LockedAccount{
-		types.NewLockedAccount(address.String(),lockedAddress.String(),balance,unlockLimit),
+	accounts := []types.LockedAccount{
+		types.NewLockedAccount(address.String(), lockedAddress.String(), balance, unlockLimit),
 	}
-	
 
 	// ------------------------------
 	// --- Save the data
@@ -148,7 +145,7 @@ func (suite *DbTestSuite) TestSaveLockedAccount() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedAccountRow:=dbtypes.NewLockedAccountRow(address.String(),lockedAddress.String(),int(balance),int(unlockLimit))
+	expectedAccountRow := dbtypes.NewLockedAccountRow(address.String(), lockedAddress.String(), int(balance), int(unlockLimit))
 
 	var accountRows []dbtypes.LockedAccountRow
 	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM locked_account`)
@@ -156,5 +153,5 @@ func (suite *DbTestSuite) TestSaveLockedAccount() {
 	suite.Require().Len(accountRows, 1, "account table should contain only one row")
 
 	suite.Require().True(expectedAccountRow.Equal(accountRows[0]))
-	
+
 }

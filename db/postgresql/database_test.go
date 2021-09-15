@@ -118,7 +118,8 @@ func (suite *DbTestSuite) getBlock(height int64) *flow.Block {
 	suite.Require().NoError(err)
 	return &block
 }
-/* 
+
+/*
 // getValidator stores inside the database a validator having the given
 // consensus address, validator address and validator public key
 func (suite *DbTestSuite) getValidator(consAddr, valAddr, pubkey string) types.Validator {
@@ -152,4 +153,4 @@ func (suite *DbTestSuite) getAccount(addr string) sdk.AccAddress {
 
 	return delegator
 }
- */
+*/

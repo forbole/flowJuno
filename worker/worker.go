@@ -103,15 +103,9 @@ func (w Worker) process(height int64) error {
 		log.Error().Err(err).Int64("height", height).Msg("failed to get transaction Result for block")
 		return err
 	}
-	
 
-	events, err := w.cp.EventsInTransactions(txs)
-	if err != nil {
-		log.Error().Err(err).Int64("height", height).Msg("failed to get events for block")
-		return err
-	}
 
-	return w.ExportBlock(block, &txs, events)
+	return w.ExportBlock(block, &txs)
 }
 
 // getGenesisFromRPC returns the genesis read from the RPC endpoint
@@ -177,7 +171,7 @@ func (w Worker) SaveNodeInfos(vals []*types.NodeInfo) error {
 // ExportBlock accepts a finalized block and a corresponding set of transactions
 // and persists them to the database along with attributable metadata. An error
 // is returned if the write fails.
-func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, events []types.Event) error {
+func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs) error {
 	// Save all validators
 	/* err := w.SaveNodeInfos(vals.NodeInfos)
 	if err != nil {
@@ -191,24 +185,7 @@ func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs, events []types.Event)
 		return err
 	}
 
-	err = w.ExportEvents(events)
-	if err != nil {
-		return err
-	}
-
 	return w.ExportTx(txs)
-}
-
-// ExportEvents accepts a slice of Event and persists then inside the database.
-// An error is returned if the write fails.
-func (w Worker) ExportEvents(events []types.Event) error {
-	err := w.db.SaveEvents(events)
-	if err != nil {
-		log.Error().Err(err).Int64("height", int64(events[0].Height)).Msg("failed to save event in persist block")
-		return err
-	}
-
-	return nil
 }
 
 // ExportTxs accepts a slice of transactions and persists then inside the database.
@@ -221,34 +198,46 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 		return err
 	}
 
-	for _, tx := range *txs {
-		for _, module := range w.modules {
-			if transactionModule, ok := module.(modules.TransactionModule); ok {
-				err = transactionModule.HandleTx(txs)
-				if err != nil {
-					//w.logger.TxError(module, tx, err)
-					return fmt.Errorf("Cannot Parse Transaction")
-				}
-			}
+	//Handle all event
+	var allEventInTx []types.Event
+	for _,tx:=range *txs{
+		events, err := w.cp.EventsInTransaction(tx)
+		if err != nil {
+			log.Error().Err(err).Int64("height",int64(tx.Height)).Msg("failed to get events for block")
+			return err
+		}
+		allEventInTx=append(allEventInTx, events...)
 
-			events, err := w.cp.Events(tx.TransactionID, int(tx.Height))
-			if err != nil {
-				return err
-			}
-
-			for _, event := range events {
-				for _, module := range w.modules {
-					if messageModule, ok := module.(modules.MessageModule); ok {
-						err = messageModule.HandleMsg(int(tx.Height), event, &tx)
-						if err != nil {
-							return err
-						}
+		//Handle event with associated tx
+		for _, event := range events {
+			for _, module := range w.modules {
+				if messageModule, ok := module.(modules.MessageModule); ok {
+					err = messageModule.HandleEvent(int(event.Height), event, &tx)
+					if err != nil {
+						return err
 					}
 				}
 			}
-
 		}
 	}
+
+	err=w.db.SaveEvents(allEventInTx)
+	if err!=nil{
+		return err
+	}
+
+
+	for _,tx:=range *txs{
+	for _, module := range w.modules {
+		if transactionModule, ok := module.(modules.TransactionModule); ok {
+			err = transactionModule.HandleTx(int(tx.Height),&tx)
+			if err != nil {
+				//w.logger.TxError(module, tx, err)
+				return fmt.Errorf("Cannot Parse Transaction")
+			}
+		}
+	}
+}
 
 	return nil
 }

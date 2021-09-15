@@ -83,17 +83,17 @@ type BlockModule interface {
 
 type TransactionModule interface {
 	// HandleTx handles a single transaction.
-	// For each message present inside the transaction, HandleMsg will be called as well.
+	// For each event present inside the transaction, HandleEvent will be called as well.
 	// NOTE. The returned error will be logged using the logging.LogTxError method. All other modules' handlers
 	// will still be called.
 	HandleTx(tx *types.Tx) error
 }
 
 type MessageModule interface {
-	// HandleMsg handles a single message.
+	// HandleEvent handles a single message.
 	// For convenience of usa, the index of the message inside the transaction and the transaction itself
 	// are passed as well.
 	// NOTE. The returned error will be logged using the logging.LogMsgError method. All other modules' handlers
 	// will still be called.
-	HandleMsg(index int, msg sdk.Msg, tx *types.Tx) error
+	HandleEvent(index int, msg sdk.Msg, tx *types.Tx) error
 }

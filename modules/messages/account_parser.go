@@ -60,13 +60,9 @@ var CosmosMessageAddressesParser = JoinMessageParsers(
 // mutate the state by the transaction
 func DefaultMessagesParser(_ codec.Marshaler, tx types.Tx) ([]string, error) {
 	var signers []string
-	signers = append(signers, tx.Payer)
-	fmt.Println("DefaultMessagesParser")
-	fmt.Println("Signer:" + signers[0])
-
 	for index, authorizers := range tx.Authorizers {
 		signers = append(signers, authorizers)
-		fmt.Println("Signer:" + signers[index])
+		fmt.Println("authorisers:" + signers[index])
 	}
 	return signers, nil
 }

@@ -12,13 +12,13 @@ import (
 	authutils "github.com/forbole/flowJuno/modules/auth/utils"
 )
 
-// HandleMsg handles any message updating the involved accounts
-func HandleMsg(msg types.Event, getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, height int64, flowClient client.Proxy, tx *types.Tx) error {
+// HandleEvent handles any message updating the involved accounts
+func HandleTxs(getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, height int64, flowClient client.Proxy, tx *types.Tx) error {
 	addresses, err := getAddresses(cdc, *tx)
 	if err != nil {
 		return err
 	}
-	fmt.Println("HandleMsg")
+	fmt.Println("HandleEvent")
 
 	return authutils.UpdateAccounts(addresses, db, height, flowClient)
 
