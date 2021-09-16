@@ -67,7 +67,7 @@ type GenesisModule interface {
 	// For convenience of use, the already-unmarshalled AppState is provided along with the full GenesisDoc.
 	// NOTE. The returned error will be logged using the logging.LogGenesisError method. All other modules' handlers
 	// will still be called.
-	HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json.RawMessage) error
+	HandleGenesis(height int32) error
 }
 
 type BlockModule interface {

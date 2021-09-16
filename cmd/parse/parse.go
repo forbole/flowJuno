@@ -77,7 +77,6 @@ func StartParsing(data *ParserData) error {
 			go module.RunAsyncOperations()
 		}
 	}
-
 	// Start each blocking worker in a go-routine where the worker consumes jobs
 	// off of the export queue.
 	for i, w := range workers {

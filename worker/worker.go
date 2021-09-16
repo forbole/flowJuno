@@ -1,10 +1,8 @@
 package worker
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"github.com/forbole/flowJuno/types/logging"
 	"github.com/onflow/flow-go-sdk"
 
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -46,6 +44,7 @@ func NewWorker(config *Config) Worker {
 // Start starts a worker by listening for new jobs (block heights) from the
 // given worker queue. Any failed job is logged and re-enqueued.
 func (w Worker) Start() {
+
 	for i := range w.queue {
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
@@ -107,9 +106,9 @@ func (w Worker) process(height int64) error {
 	// Call the block handlers
 	for _, module := range w.modules {
 		if blockModule, ok := module.(modules.BlockModule); ok {
-			err = blockModule.HandleBlock(block, txs)
+			err = blockModule.HandleBlock(block, &txs)
 			if err != nil {
-				w.logger.BlockError(module, block, err)
+				fmt.Println(err)
 			}
 		}
 	}
@@ -148,26 +147,6 @@ func (w Worker) getGenesisFromFilePath(path string) (*tmtypes.GenesisDoc, error)
 	}
 
 	return &genDoc, nil
-}
-
-// HandleGenesis accepts a GenesisDoc and calls all the registered genesis handlers
-// in the order in which they have been registered.
-func (w Worker) HandleGenesis(genesis *tmtypes.GenesisDoc) error {
-	var appState map[string]json.RawMessage
-	if err := json.Unmarshal(genesis.AppState, &appState); err != nil {
-		return fmt.Errorf("error unmarshalling genesis doc %s: %s", appState, err.Error())
-	}
-
-	// Call the genesis handlers
-	for _, module := range w.modules {
-		if genesisModule, ok := module.(modules.GenesisModule); ok {
-			if err := genesisModule.HandleGenesis(genesis, appState); err != nil {
-				logging.LogGenesisError(module, err)
-			}
-		}
-	}
-
-	return nil
 }
 
 func (w Worker) SaveNodeInfos(vals []*types.NodeInfo) error {
@@ -249,5 +228,20 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 	}
 }
 
+	return nil
+}
+
+
+// HandleGenesis accepts a GenesisDoc and calls all the registered genesis handlers
+// in the order in which they have been registered.
+func (w Worker) HandleGenesis(genesisHeight int64) error {
+	// Call the genesis handlers
+	for _, module := range w.modules {
+		if genesisModule, ok := module.(modules.GenesisModule); ok {
+			if err := genesisModule.HandleGenesis(genesisHeight); err != nil {
+				//w.logger.GenesisError(module, err)
+			}
+		}
+	}
 	return nil
 }

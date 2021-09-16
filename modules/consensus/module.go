@@ -5,6 +5,7 @@ import (
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
+	"github.com/go-co-op/gocron"
 	"github.com/onflow/flow-go-sdk"
 
 	"github.com/forbole/flowJuno/client"
@@ -46,4 +47,14 @@ func (m *Module) Name() string {
 // HandleEvent implements modules.MessageModule
 func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs) error {
 	return HandleBlock( block,m.messagesParser, m.db, int64(block.Height), m.flowClient)
+}
+
+// RegisterPeriodicOperations implements modules.Module
+func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
+	return Register(scheduler, m.db)
+}
+
+// HandleGenesis implements modules.Module
+func (m *Module) HandleGenesis(height int32) error {
+	return HandleGenesis(height, m.db, m.flowClient)
 }
