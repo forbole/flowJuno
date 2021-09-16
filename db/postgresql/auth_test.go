@@ -124,9 +124,6 @@ func (suite *DbTestSuite) TestSaveLockedAccount() {
 func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 	baseAccount := suite.SaveAccount()
 	address := baseAccount[0].Address
-	delegatorAddress := flow.HexToAddress("0x2")
-	balance := uint64(10)
-	unlockLimit := uint64(20)
 	delegatorId:=int64(8411)
 	delegatorNodeId:="2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e" 
 	nodeInfo:=types.NewDelegatorNodeInfo(uint32(delegatorId),delegatorNodeId,0,0,0,0,0,0)
@@ -150,10 +147,12 @@ func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedAccountRow := dbtypes.NewdelegatorAccountRow(address.String(), delegatorAddress.String(), int(balance), int(unlockLimit))
+	expectedDelegatorNodeId=`{"Id":8411,"NodeID":"2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e","TokensCommitted":0,"TokensStaked":0,"TokensUnstaking":0,"TokensRewarded":0,"TokensUnstaked":0,"TokensRequestedToUnstake":0}`
+	expectedAccountRow := dbtypes.NewDelegatorAccountRow(address.String(), delegatorId, delegatorNodeId, expectedDelegatorNodeId)
 
-	var accountRows []dbtypes.delegatorAccountRow
+	var accountRows []dbtypes.DelegatorAccountRow
 	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM delegator_account`)
+	
 	suite.Require().NoError(err)
 	suite.Require().Len(accountRows, 1, "account table should contain only one row")
 
