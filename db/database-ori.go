@@ -33,7 +33,7 @@ type Database interface {
 
 	// SaveNodeInfo stores a list of Node Operator Info if they do not already exist.
 	// An error is returned if the operation fails.
-	SaveNodeInfos(vals []*types.NodeInfo) error
+	SaveNodeInfos(vals []*types.StakerNodeInfo) error
 
 	// SaveCommitSignatures stores a  slice of validator commit signatures.
 	// An error is returned if the operation fails.

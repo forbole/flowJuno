@@ -51,10 +51,10 @@ func NewDelegatorAccount(address string, delegatorId int64, delegatorNodeId stri
 type StakerAccount struct {
 	Address        string
 	StakerNodeId   string
-	StakerNodeInfo NodeInfo
+	StakerNodeInfo StakerNodeInfo
 }
 
-func NewStakerAccount(address, stakerNodeId string, stakerNodeInfo NodeInfo) StakerAccount {
+func NewStakerAccount(address, stakerNodeId string, stakerNodeInfo StakerNodeInfo) StakerAccount {
 	return StakerAccount{
 		Address:        address,
 		StakerNodeId:   stakerNodeId,
@@ -137,7 +137,8 @@ func DelegatorNodeInfoFromCadence(value cadence.Value) (DelegatorNodeInfo, error
 
 }
 
-type NodeInfo struct {
+
+type StakerNodeInfo struct {
 	Id                string
 	Role              uint8
 	NetworkingAddress string
@@ -156,84 +157,94 @@ type NodeInfo struct {
 }
 
 // NewNodeOperatorInfoFromInterface create a NodeOperatorInfo from []interface{}
-func NewNodeInfoFromCadence(value cadence.Value) (NodeInfo, error) {
+func NewStakerNodeInfoFromCadence(value cadence.Value) (StakerNodeInfo, error) {
 	arrayValue := value.(cadence.Array)
 
 	fields := arrayValue.Values[0].(cadence.Struct).Fields
+
 	
-	delegators,ok:=fields[10].ToGoValue().([]uint32)
+	d,ok:=fields[10].(cadence.Array)
 	if !ok{
-		return NodeInfo{}, fmt.Errorf("delegators are not uint32 array")
+		fmt.Println("delegator not an cadence array")
 	}
+	delegators:=make([]uint32,len(d.Values))
+	for i,val:=range d.Values{
+		delegators[i],ok=val.ToGoValue().(uint32)
+		if !ok{
+			return StakerNodeInfo{}, fmt.Errorf("id is not type uint32")
+		}
+	}
+	//fmt.Println(d)
+	//delegators:=[]uint32{}
 
 	id, ok := fields[0].ToGoValue().(string)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("id is not type string")
+		return StakerNodeInfo{}, fmt.Errorf("id is not type string")
 	}
 	role, ok := fields[1].ToGoValue().(uint8)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("role is not type uint8")
+		return StakerNodeInfo{}, fmt.Errorf("role is not type uint8")
 	}
 	networkingAddress, ok := fields[2].ToGoValue().(string)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("networkingAddress is not string")
+		return StakerNodeInfo{}, fmt.Errorf("networkingAddress is not string")
 	}
 	networkingKey, ok := fields[3].ToGoValue().(string)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("networkingKey is not string")
+		return StakerNodeInfo{}, fmt.Errorf("networkingKey is not string")
 	}
 	stakingKey, ok := fields[4].ToGoValue().(string)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("stakingKey is not string")
+		return StakerNodeInfo{}, fmt.Errorf("stakingKey is not string")
 	}
 	tokensStaked, ok := fields[5].ToGoValue().(uint64)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("tokensStaked is not uint64")
+		return StakerNodeInfo{}, fmt.Errorf("tokensStaked is not uint64")
 	}
 	tokensCommitted, ok := fields[6].ToGoValue().(uint64)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("tokensCommitted is not uint64")
+		return StakerNodeInfo{}, fmt.Errorf("tokensCommitted is not uint64")
 	}
 	tokensUnstaking, ok := fields[7].ToGoValue().(uint64)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("tokensUnstaking is not uint64")
+		return StakerNodeInfo{}, fmt.Errorf("tokensUnstaking is not uint64")
 	}
 	tokensUnstaked, ok := fields[8].ToGoValue().(uint64)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("tokensUnstaked is not uint64")
+		return StakerNodeInfo{}, fmt.Errorf("tokensUnstaked is not uint64")
 	}
 	tokensRewarded, ok := fields[9].ToGoValue().(uint64)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("tokensRewarded is not uint64")
+		return StakerNodeInfo{}, fmt.Errorf("tokensRewarded is not uint64")
 	}
 
 	delegatorIDCounter, ok := fields[11].ToGoValue().(uint32)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("delegatorIDCounter is not uint32")
+		return StakerNodeInfo{}, fmt.Errorf("delegatorIDCounter is not uint32")
 	}
 	tokensRequestedToUnstake, ok := fields[12].ToGoValue().(uint64)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("tokensRequestedToUnstake is not uint64")
+		return StakerNodeInfo{}, fmt.Errorf("tokensRequestedToUnstake is not uint64")
 	}
 	initialWeight, ok := fields[13].ToGoValue().(uint64)
 	if !ok {
-		return NodeInfo{}, fmt.Errorf("initialWeight is not uint64")
+		return StakerNodeInfo{}, fmt.Errorf("initialWeight is not uint64")
 	}
 
-	nodeInfo := NewNodeInfo(id, role, networkingAddress, networkingKey,
+	stakerNodeInfo := NewStakerNodeInfo(id, role, networkingAddress, networkingKey,
 		stakingKey, tokensStaked, tokensCommitted, tokensUnstaking,
 		tokensUnstaked, tokensRewarded, delegators, delegatorIDCounter,
 		tokensRequestedToUnstake, initialWeight)
 
-	return nodeInfo, nil
+	return stakerNodeInfo, nil
 }
 
-func NewNodeInfo(id string, role uint8, networkingAddress string, networkingKey string,
+func NewStakerNodeInfo(id string, role uint8, networkingAddress string, networkingKey string,
 	stakingKey string, tokensStaked uint64, tokensCommitted uint64,
 	tokensUnstaking uint64, tokensUnstaked uint64, tokensRewarded uint64,
 	delegators []uint32, delegatorIDCounter uint32, tokensRequestedToUnstake uint64,
-	initialWeight uint64) NodeInfo {
-	return NodeInfo{
+	initialWeight uint64) StakerNodeInfo {
+	return StakerNodeInfo{
 		Id:                id,
 		Role:              role,
 		NetworkingAddress: networkingAddress,
