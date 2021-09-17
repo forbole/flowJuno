@@ -16,6 +16,7 @@ import (
 	juno "github.com/forbole/flowJuno/types"
 
 	"github.com/forbole/flowJuno/modules/auth"
+	"github.com/forbole/flowJuno/modules/consensus"
 )
 
 var (
@@ -46,5 +47,6 @@ func (r *Registrar) BuildModules(
 	return []modules.Module{
 		messages.NewModule(r.parser, encodingConfig.Marshaler, database),
 		auth.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
+		consensus.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 	}
 }

@@ -157,5 +157,5 @@ func (db *Db) GetGenesis() (*types.Genesis, error) {
 	}
 
 	row := rows[0]
-	return types.NewGenesis(row.ChainID, row.Time, row.InitialHeight), nil
+	return types.NewGenesis(row.Time, row.InitialHeight), nil
 }

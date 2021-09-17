@@ -29,6 +29,7 @@ type Proxy struct {
 
 	grpConnection   *grpc.ClientConn
 	txServiceClient tx.ServiceClient
+	genesisHeight   int32
 }
 
 // NewClientProxy allows to build a new Proxy instance
@@ -57,7 +58,17 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		grpConnection:   grpcConnection,
 		txServiceClient: tx.NewServiceClient(grpcConnection),
 		contract:        contracts,
+		genesisHeight:   cfg.GetCosmosConfig().GetGenesisHeight(),
 	}, nil
+}
+
+// GetGeneisisBlock parse the specific block as genesis block
+func (cp *Proxy) GetGenesisBlock() (*flow.Block, error) {
+	block, err := cp.flowClient.GetBlockByHeight(cp.ctx, uint64(cp.genesisHeight))
+	if err != nil {
+		return nil, err
+	}
+	return block, nil
 }
 
 // LatestHeight returns the latest block height on the active chain. An error
@@ -249,11 +260,11 @@ func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 	var event []types.Event
 
 	fmt.Println(tx.TransactionID)
-		ev, err := cp.Events(tx.TransactionID, int(tx.Height))
-		if err != nil {
-			return []types.Event{}, err
-		}
-		event = append(event, ev...)
+	ev, err := cp.Events(tx.TransactionID, int(tx.Height))
+	if err != nil {
+		return []types.Event{}, err
+	}
+	event = append(event, ev...)
 	return event, nil
 }
 

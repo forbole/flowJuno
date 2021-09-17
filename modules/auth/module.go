@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"encoding/json"
-
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
@@ -10,12 +8,10 @@ import (
 
 	"github.com/forbole/flowJuno/client"
 	db "github.com/forbole/flowJuno/db/postgresql"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 var (
-	_ modules.Module        = &Module{}
-	_ modules.GenesisModule = &Module{}
+	_ modules.Module            = &Module{}
 	_ modules.TransactionModule = &Module{}
 )
 
@@ -46,12 +42,7 @@ func (m *Module) Name() string {
 	return "auth"
 }
 
-// HandleGenesis implements modules.GenesisModule
-func (m *Module) HandleGenesis(_ *tmtypes.GenesisDoc, appState map[string]json.RawMessage) error {
-	return Handler(appState, m.encodingConfig.Marshaler, m.db)
-}
-
 // HandleEvent implements modules.MessageModule
 func (m *Module) HandleTx(index int, tx *types.Tx) error {
-	return HandleTxs( m.messagesParser, m.encodingConfig.Marshaler, m.db, int64(tx.Height), m.flowClient, tx)
+	return HandleTxs(m.messagesParser, m.encodingConfig.Marshaler, m.db, int64(tx.Height), m.flowClient, tx)
 }

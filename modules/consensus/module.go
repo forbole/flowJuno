@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	_ modules.Module        = &Module{}
+	_ modules.Module      = &Module{}
 	_ modules.BlockModule = &Module{}
 )
 
@@ -46,7 +46,7 @@ func (m *Module) Name() string {
 
 // HandleEvent implements modules.MessageModule
 func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs) error {
-	return HandleBlock( block,m.messagesParser, m.db, int64(block.Height), m.flowClient)
+	return HandleBlock(block, m.messagesParser, m.db, int64(block.Height), m.flowClient)
 }
 
 // RegisterPeriodicOperations implements modules.Module
@@ -55,6 +55,6 @@ func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
 }
 
 // HandleGenesis implements modules.Module
-func (m *Module) HandleGenesis(height int32) error {
-	return HandleGenesis(height, m.db, m.flowClient)
+func (m *Module) HandleGenesis(block *flow.Block) error {
+	return HandleGenesis(block, m.db, m.flowClient)
 }

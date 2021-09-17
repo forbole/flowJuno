@@ -1,11 +1,8 @@
 package modules
 
 import (
-	"encoding/json"
-
 	"github.com/go-co-op/gocron"
 	"github.com/onflow/flow-go-sdk"
-	tmtypes "github.com/tendermint/tendermint/types"
 
 	"github.com/forbole/flowJuno/types"
 )
@@ -67,7 +64,7 @@ type GenesisModule interface {
 	// For convenience of use, the already-unmarshalled AppState is provided along with the full GenesisDoc.
 	// NOTE. The returned error will be logged using the logging.LogGenesisError method. All other modules' handlers
 	// will still be called.
-	HandleGenesis(height int32) error
+	HandleGenesis(block *flow.Block) error
 }
 
 type BlockModule interface {
@@ -85,7 +82,7 @@ type TransactionModule interface {
 	// For each message present inside the transaction, HandleEvent will be called as well.
 	// NOTE. The returned error will be logged using the logging.LogTxError method. All other modules' handlers
 	// will still be called.
-	HandleTx(index int,tx *types.Tx) error
+	HandleTx(index int, tx *types.Tx) error
 }
 
 type MessageModule interface {

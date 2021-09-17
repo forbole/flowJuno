@@ -32,6 +32,7 @@ func DefaultConfigCreator(cmd *cobra.Command) types.Config {
 
 	cosmosPrefix, _ := cmd.Flags().GetString(flagCosmosPrefix)
 	cosmosModules, _ := cmd.Flags().GetStringSlice(flagCosmosModules)
+	cosmosGenesisHeight, _ := cmd.Flags().GetInt32(flagCosmosModules)
 
 	dbName, _ := cmd.Flags().GetString(flagDatabaseName)
 	dbHost, _ := cmd.Flags().GetString(flagDatabaseHost)
@@ -61,7 +62,7 @@ func DefaultConfigCreator(cmd *cobra.Command) types.Config {
 	return types.NewConfig(
 		types.NewRPCConfig(rpcClientName, rpcAddr, rpcContract),
 		types.NewGrpcConfig(grpcAddr, grpcInsecure),
-		types.NewCosmosConfig(cosmosPrefix, cosmosModules),
+		types.NewCosmosConfig(cosmosPrefix, cosmosModules, cosmosGenesisHeight),
 		types.NewDatabaseConfig(
 			dbName,
 			dbHost,

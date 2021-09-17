@@ -9,7 +9,7 @@ type Genesis struct {
 }
 
 // NewGenesis allows to build a new Genesis instance
-func NewGenesis( startTime time.Time, initialHeight int64) *Genesis {
+func NewGenesis(startTime time.Time, initialHeight int64) *Genesis {
 	return &Genesis{
 		Time:          startTime,
 		InitialHeight: initialHeight,

@@ -1,7 +1,6 @@
 CREATE TABLE genesis
 (
     one_row_id     BOOL      NOT NULL DEFAULT TRUE PRIMARY KEY,
-    chain_id       TEXT      NOT NULL,
     time           TIMESTAMP NOT NULL,
     initial_height BIGINT    NOT NULL,
     CHECK (one_row_id)

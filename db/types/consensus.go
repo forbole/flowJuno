@@ -1,7 +1,7 @@
 package types
 
 import (
-	"database/sql"
+	"reflect"
 	"time"
 )
 
@@ -11,7 +11,7 @@ type GenesisRow struct {
 	InitialHeight int64     `db:"initial_height"`
 }
 
-func NewGenesisRow( time time.Time, initialHeight int64) GenesisRow {
+func NewGenesisRow(time time.Time, initialHeight int64) GenesisRow {
 	return GenesisRow{
 		OneRowID:      true,
 		Time:          time,
@@ -50,11 +50,34 @@ func (r AverageTimeRow) Equal(s AverageTimeRow) bool {
 
 // BlockRow represents a single block row stored inside the database
 type BlockRow struct {
-	Height          int64          `db:"height"`
-	Hash            string         `db:"hash"`
-	TxNum           int64          `db:"num_txs"`
-	TotalGas        int64          `db:"total_gas"`
-	ProposerAddress sql.NullString `db:"proposer_address"`
-	PreCommitsNum   int64          `db:"pre_commits"`
-	Timestamp       time.Time      `db:"timestamp"`
+	Height               int64     `db:"height"`
+	Id                   string    `db:"id"`
+	ParentId             string    `db:"parent_id"`
+	CollectionGuarantees []string  `db:"collection_guarantees"`
+	Timestamp            time.Time `db:"timestamp"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v BlockRow) Equal(w BlockRow) bool {
+	return v.Height == w.Height &&
+		v.Id == w.Id &&
+		v.ParentId == w.ParentId &&
+		reflect.DeepEqual(v.CollectionGuarantees, w.CollectionGuarantees) &&
+		v.Timestamp.Equal(w.Timestamp)
+}
+
+// BlockRow allows to build a new BlockRow
+func NewBlockRow(
+	height int64,
+	id string,
+	parentId string,
+	collectionGuarantees []string,
+	timestamp time.Time) BlockRow {
+	return BlockRow{
+		Height:               height,
+		Id:                   id,
+		ParentId:             parentId,
+		CollectionGuarantees: collectionGuarantees,
+		Timestamp:            timestamp,
+	}
 }

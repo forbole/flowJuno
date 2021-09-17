@@ -70,25 +70,11 @@ func (w Worker) process(height int64) error {
 		log.Debug().Int64("height", height).Msg("skipping already exported block")
 		return nil
 	}
-	/*
-		if height == 0 {
-			cfg := types.Cfg.GetParsingConfig()
-			var genesis *tmtypes.GenesisDoc
-			if strings.TrimSpace(cfg.GetGenesisFilePath()) != "" {
-				genesis, err = w.getGenesisFromFilePath(cfg.GetGenesisFilePath())
-				if err != nil {
-					return err
-				}
-			} else {
-				genesis, err = w.getGenesisFromRPC()
-				if err != nil {
-					return err
-				}
-			}
 
-			return w.HandleGenesis(genesis)
-		}
-	*/
+	if height == 0 {
+		return w.HandleGenesis()
+	}
+
 	//log.Debug().Int64("height", height).Msg("processing block")
 
 	block, err := w.cp.Block(height)
@@ -112,7 +98,6 @@ func (w Worker) process(height int64) error {
 			}
 		}
 	}
-
 
 	return w.ExportBlock(block, &txs)
 }
@@ -189,13 +174,13 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 
 	//Handle all event
 	var allEventInTx []types.Event
-	for _,tx:=range *txs{
+	for _, tx := range *txs {
 		events, err := w.cp.EventsInTransaction(tx)
 		if err != nil {
-			log.Error().Err(err).Int64("height",int64(tx.Height)).Msg("failed to get events for block")
+			log.Error().Err(err).Int64("height", int64(tx.Height)).Msg("failed to get events for block")
 			return err
 		}
-		allEventInTx=append(allEventInTx, events...)
+		allEventInTx = append(allEventInTx, events...)
 
 		//Handle event with associated tx
 		for _, event := range events {
@@ -210,35 +195,37 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 		}
 	}
 
-	err=w.db.SaveEvents(allEventInTx)
-	if err!=nil{
+	err = w.db.SaveEvents(allEventInTx)
+	if err != nil {
 		return err
 	}
 
-
-	for _,tx:=range *txs{
-	for _, module := range w.modules {
-		if transactionModule, ok := module.(modules.TransactionModule); ok {
-			err = transactionModule.HandleTx(int(tx.Height),&tx)
-			if err != nil {
-				//w.logger.TxError(module, tx, err)
-				return fmt.Errorf("Cannot Parse Transaction")
+	for _, tx := range *txs {
+		for _, module := range w.modules {
+			if transactionModule, ok := module.(modules.TransactionModule); ok {
+				err = transactionModule.HandleTx(int(tx.Height), &tx)
+				if err != nil {
+					//w.logger.TxError(module, tx, err)
+					return fmt.Errorf("Cannot Parse Transaction")
+				}
 			}
 		}
 	}
-}
 
 	return nil
 }
 
-
 // HandleGenesis accepts a GenesisDoc and calls all the registered genesis handlers
 // in the order in which they have been registered.
-func (w Worker) HandleGenesis(genesisHeight int64) error {
+func (w Worker) HandleGenesis() error {
+	block, err := w.cp.GetGenesisBlock()
+	if err != nil {
+		return err
+	}
 	// Call the genesis handlers
 	for _, module := range w.modules {
 		if genesisModule, ok := module.(modules.GenesisModule); ok {
-			if err := genesisModule.HandleGenesis(genesisHeight); err != nil {
+			if err := genesisModule.HandleGenesis(block); err != nil {
 				//w.logger.GenesisError(module, err)
 			}
 		}
