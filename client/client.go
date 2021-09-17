@@ -102,7 +102,7 @@ func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
 
 	return transaction, nil
 }
-
+/* 
 // NodeOperators returns all the known flow node operators for a given block
 // height. An error is returned if the query fails.
 func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
@@ -136,7 +136,7 @@ func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
 
 	nodeOperators := types.NewNodeOperators(height, nodeInfos)
 	return &nodeOperators, nil
-}
+} */
 
 func (cp *Proxy) Client() *client.Client {
 	return &cp.flowClient
@@ -283,7 +283,6 @@ func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error)
 			event.EventIndex, event.Value)
 	}
 	return ev, nil
-
 }
 
 // Stop defers the node stop execution to the RPC client.

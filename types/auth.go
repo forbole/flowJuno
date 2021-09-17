@@ -51,10 +51,10 @@ func NewDelegatorAccount(address string, delegatorId int64, delegatorNodeId stri
 type StakerAccount struct {
 	Address        string
 	StakerNodeId   string
-	StakerNodeInfo string
+	StakerNodeInfo NodeInfo
 }
 
-func NewStakerAccount(address, stakerNodeId, stakerNodeInfo string) StakerAccount {
+func NewStakerAccount(address, stakerNodeId string, stakerNodeInfo NodeInfo) StakerAccount {
 	return StakerAccount{
 		Address:        address,
 		StakerNodeId:   stakerNodeId,
@@ -135,4 +135,119 @@ func DelegatorNodeInfoFromCadence(value cadence.Value) (DelegatorNodeInfo, error
 	return NewDelegatorNodeInfo(id, nodeID, tokenCommited, tokenStaked, tokensUnstaking,
 		tokenRewarded, tokenUnstaked, tokenRequestedToUnstake), nil
 
+}
+
+type NodeInfo struct {
+	Id                string
+	Role              uint8
+	NetworkingAddress string
+	NetworkingKey     string
+	StakingKey        string
+	TokensStaked      uint64
+	TokensCommitted   uint64
+	TokensUnstaking   uint64
+	TokensUnstaked    uint64
+	TokensRewarded    uint64
+
+	Delegators               []uint32
+	DelegatorIDCounter       uint32
+	TokensRequestedToUnstake uint64
+	InitialWeight            uint64
+}
+
+// NewNodeOperatorInfoFromInterface create a NodeOperatorInfo from []interface{}
+func NewNodeInfoFromCadence(value cadence.Value) (NodeInfo, error) {
+	arrayValue := value.(cadence.Array)
+
+	fields := arrayValue.Values[0].(cadence.Struct).Fields
+	
+	delegators,ok:=fields[10].ToGoValue().([]uint32)
+	if !ok{
+		return NodeInfo{}, fmt.Errorf("delegators are not uint32 array")
+	}
+
+	id, ok := fields[0].ToGoValue().(string)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("id is not type string")
+	}
+	role, ok := fields[1].ToGoValue().(uint8)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("role is not type uint8")
+	}
+	networkingAddress, ok := fields[2].ToGoValue().(string)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("networkingAddress is not string")
+	}
+	networkingKey, ok := fields[3].ToGoValue().(string)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("networkingKey is not string")
+	}
+	stakingKey, ok := fields[4].ToGoValue().(string)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("stakingKey is not string")
+	}
+	tokensStaked, ok := fields[5].ToGoValue().(uint64)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("tokensStaked is not uint64")
+	}
+	tokensCommitted, ok := fields[6].ToGoValue().(uint64)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("tokensCommitted is not uint64")
+	}
+	tokensUnstaking, ok := fields[7].ToGoValue().(uint64)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("tokensUnstaking is not uint64")
+	}
+	tokensUnstaked, ok := fields[8].ToGoValue().(uint64)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("tokensUnstaked is not uint64")
+	}
+	tokensRewarded, ok := fields[9].ToGoValue().(uint64)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("tokensRewarded is not uint64")
+	}
+
+	delegatorIDCounter, ok := fields[11].ToGoValue().(uint32)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("delegatorIDCounter is not uint32")
+	}
+	tokensRequestedToUnstake, ok := fields[12].ToGoValue().(uint64)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("tokensRequestedToUnstake is not uint64")
+	}
+	initialWeight, ok := fields[13].ToGoValue().(uint64)
+	if !ok {
+		return NodeInfo{}, fmt.Errorf("initialWeight is not uint64")
+	}
+
+	nodeInfo := NewNodeInfo(id, role, networkingAddress, networkingKey,
+		stakingKey, tokensStaked, tokensCommitted, tokensUnstaking,
+		tokensUnstaked, tokensRewarded, delegators, delegatorIDCounter,
+		tokensRequestedToUnstake, initialWeight)
+
+	return nodeInfo, nil
+}
+
+func NewNodeInfo(id string, role uint8, networkingAddress string, networkingKey string,
+	stakingKey string, tokensStaked uint64, tokensCommitted uint64,
+	tokensUnstaking uint64, tokensUnstaked uint64, tokensRewarded uint64,
+	delegators []uint32, delegatorIDCounter uint32, tokensRequestedToUnstake uint64,
+	initialWeight uint64) NodeInfo {
+	return NodeInfo{
+		Id:                id,
+		Role:              role,
+		NetworkingAddress: networkingAddress,
+		NetworkingKey:     networkingKey,
+		StakingKey:        stakingKey,
+		TokensStaked:      tokensStaked,
+		TokensCommitted:   tokensCommitted,
+		TokensUnstaking:   tokensUnstaking,
+		TokensUnstaked:    tokensUnstaked,
+		TokensRewarded:    tokensRewarded,
+
+		Delegators:               delegators,
+		DelegatorIDCounter:       delegatorIDCounter,
+		TokensRequestedToUnstake: tokensRequestedToUnstake,
+		InitialWeight:            initialWeight,
+	}
 }
