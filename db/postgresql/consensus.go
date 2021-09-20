@@ -151,10 +151,16 @@ VALUES ($1, $2) ON CONFLICT (one_row_id) DO UPDATE
 func (db *Db) GetGenesis() (*types.Genesis, error) {
 	var rows []*dbtypes.GenesisRow
 	err := db.Sqlx.Select(&rows, `SELECT * FROM genesis;`)
-	if err != nil || len(rows) == 0 {
+	if err != nil {
 		return nil, err
 	}
 
+	if len(rows) == 0{
+		return nil, fmt.Errorf("Genesis table is empty")
+	}
+
 	row := rows[0]
+
+
 	return types.NewGenesis(row.Time, row.InitialHeight), nil
 }
