@@ -100,7 +100,7 @@ func InitCmd(cfg *Config) *cobra.Command {
 
 	command.Flags().String(flagCosmosPrefix, "cosmos", "Bech32 prefix to use for addresses")
 	command.Flags().StringSlice(flagCosmosModules, []string{}, "List of modules to use")
-	command.Flags().Int32(flagCosmosGenesisHeight, 0, "Genesis height of the chain")
+	command.Flags().Uint64(flagCosmosGenesisHeight, 0, "Genesis height of the chain")
 
 	command.Flags().String(flagDatabaseName, "database-name", "Name of the database to use")
 	command.Flags().String(flagDatabaseHost, "localhost", "Database host")

@@ -29,7 +29,7 @@ type Proxy struct {
 
 	grpConnection   *grpc.ClientConn
 	txServiceClient tx.ServiceClient
-	genesisHeight   int32
+	genesisHeight   uint64
 }
 
 // NewClientProxy allows to build a new Proxy instance
@@ -63,12 +63,8 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 }
 
 // GetGeneisisBlock parse the specific block as genesis block
-func (cp *Proxy) GetGenesisBlock() (*flow.Block, error) {
-	block, err := cp.flowClient.GetBlockByHeight(cp.ctx, uint64(cp.genesisHeight))
-	if err != nil {
-		return nil, err
-	}
-	return block, nil
+func (cp *Proxy) GetGenesisHeight() uint64 {
+	return cp.genesisHeight
 }
 
 // LatestHeight returns the latest block height on the active chain. An error

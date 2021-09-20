@@ -195,7 +195,7 @@ func (r *rpcConfig) GetContracts() string {
 type CosmosConfig interface {
 	GetPrefix() string
 	GetModules() []string
-	GetGenesisHeight() int32
+	GetGenesisHeight() uint64
 }
 
 var _ CosmosConfig = &cosmosConfig{}
@@ -203,11 +203,11 @@ var _ CosmosConfig = &cosmosConfig{}
 type cosmosConfig struct {
 	Prefix        string   `toml:"prefix"`
 	Modules       []string `toml:"modules"`
-	GenesisHeight int32    `toml:"genesis_height"`
+	GenesisHeight uint64    `toml:"genesis_height"`
 }
 
 // NewCosmosConfig returns a new CosmosConfig instance
-func NewCosmosConfig(prefix string, modules []string, genesisHeight int32) CosmosConfig {
+func NewCosmosConfig(prefix string, modules []string, genesisHeight uint64) CosmosConfig {
 	return &cosmosConfig{
 		Prefix:        prefix,
 		Modules:       modules,
@@ -225,7 +225,7 @@ func (c *cosmosConfig) GetModules() []string {
 	return c.Modules
 }
 
-func (c *cosmosConfig) GetGenesisHeight() int32 {
+func (c *cosmosConfig) GetGenesisHeight() uint64 {
 	return c.GenesisHeight
 }
 

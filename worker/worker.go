@@ -70,17 +70,17 @@ func (w Worker) process(height int64) error {
 		log.Debug().Int64("height", height).Msg("skipping already exported block")
 		return nil
 	}
-
-	if height == 0 {
-		return w.HandleGenesis()
-	}
-
+	
 	//log.Debug().Int64("height", height).Msg("processing block")
 
 	block, err := w.cp.Block(height)
 	if err != nil {
 		log.Error().Err(err).Int64("height", height).Msg("failed to get block")
 		return err
+	}
+
+	if height == int64(w.cp.GetGenesisHeight()) {
+		return w.HandleGenesis(block)
 	}
 
 	txs, err := w.cp.Txs(block)
@@ -206,7 +206,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 				err = transactionModule.HandleTx(int(tx.Height), &tx)
 				if err != nil {
 					//w.logger.TxError(module, tx, err)
-					return fmt.Errorf("Cannot Parse Transaction")
+					return err
 				}
 			}
 		}
@@ -217,11 +217,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 
 // HandleGenesis accepts a GenesisDoc and calls all the registered genesis handlers
 // in the order in which they have been registered.
-func (w Worker) HandleGenesis() error {
-	block, err := w.cp.GetGenesisBlock()
-	if err != nil {
-		return err
-	}
+func (w Worker) HandleGenesis(block *flow.Block) error {
 	// Call the genesis handlers
 	for _, module := range w.modules {
 		if genesisModule, ok := module.(modules.GenesisModule); ok {

@@ -32,7 +32,7 @@ func DefaultConfigCreator(cmd *cobra.Command) types.Config {
 
 	cosmosPrefix, _ := cmd.Flags().GetString(flagCosmosPrefix)
 	cosmosModules, _ := cmd.Flags().GetStringSlice(flagCosmosModules)
-	cosmosGenesisHeight, _ := cmd.Flags().GetInt32(flagCosmosModules)
+	cosmosGenesisHeight, _ := cmd.Flags().GetUint64(flagCosmosModules)
 
 	dbName, _ := cmd.Flags().GetString(flagDatabaseName)
 	dbHost, _ := cmd.Flags().GetString(flagDatabaseHost)
