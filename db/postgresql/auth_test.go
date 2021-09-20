@@ -159,3 +159,30 @@ func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 	suite.Require().True(expectedAccountRow.Equal(accountRows[0]))
 
 }
+
+func (suite *DbTestSuite) TestSaveStakerAccount() {
+	baseAccount := suite.SaveAccount()
+	address := baseAccount[0].Address
+	id:="e7df1454826425251716a703e907981672a43208ef3eabfc95d593673da778f6"
+	stakerNodeInfo:=types.NewStakerNodeInfo(id,5,"34.211.45.12:3569",
+	"3fa19db960a86a1722a2d8ffa9563bd1e7d905c91536860c64f9e808ef88862639112a1e872d7eef93dd91207d07dd7c043e2a1e80077b109290682250429f1f",
+      "87d827de3e1b3541c394dcbbb6d76d98e3a7710d6740d28122c468b83f41002625e7a5788cabfcd6ce76b188f7f60de614364d4ab2932dfe0ed6f2d602bd551606ea31045ca2ccde9658a175ccd73da859ab17e56ad81ca4f6ef982c5968a7cb",
+	0,20000000,0,0,0,[]uint32{},0,0,0)
+	expectedStakerNodeInfo:=`{"Id":"e7df1454826425251716a703e907981672a43208ef3eabfc95d593673da778f6","Role":5,"NetworkingAddress":"34.211.45.12:3569","NetworkingKey":"3fa19db960a86a1722a2d8ffa9563bd1e7d905c91536860c64f9e808ef88862639112a1e872d7eef93dd91207d07dd7c043e2a1e80077b109290682250429f1f","StakingKey":"87d827de3e1b3541c394dcbbb6d76d98e3a7710d6740d28122c468b83f41002625e7a5788cabfcd6ce76b188f7f60de614364d4ab2932dfe0ed6f2d602bd551606ea31045ca2ccde9658a175ccd73da859ab17e56ad81ca4f6ef982c5968a7cb","TokensStaked":0,"TokensCommitted":20000000,"TokensUnstaking":0,"TokensUnstaked":0,"TokensRewarded":0,"Delegators":[],"DelegatorIDCounter":0,"TokensRequestedToUnstake":0,"InitialWeight":0}`
+
+	stakerAccount:=types.NewStakerAccount(address.String(),"e7df1454826425251716a703e907981672a43208ef3eabfc95d593673da778f6" ,stakerNodeInfo)
+	err := suite.database.SaveStakerAccounts([]types.StakerAccount{stakerAccount})
+	suite.Require().NoError(err)
+
+	expectedAccountRow:=dbtypes.NewStakerAccountRow(address.String(),"e7df1454826425251716a703e907981672a43208ef3eabfc95d593673da778f6",expectedStakerNodeInfo)
+
+	var accountRows []dbtypes.StakerAccountRow
+	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM staker_account`)
+
+
+	suite.Require().NoError(err)
+	suite.Require().Len(accountRows, 1, "account table should contain only one row")
+
+	suite.Require().True(expectedAccountRow.Equal(accountRows[0]))
+
+}

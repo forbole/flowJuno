@@ -75,7 +75,7 @@ func getStakerNodeID(address string, height int64, client client.Proxy) (string,
 
 // Danger zone
 
-func getStakerNodeInfo(address string, height int64, client client.Proxy) (types.NodeInfo, error) {
+func getStakerNodeInfo(address string, height int64, client client.Proxy) (types.StakerNodeInfo, error) {
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	import LockedTokens from %s
@@ -125,15 +125,15 @@ func getStakerNodeInfo(address string, height int64, client client.Proxy) (types
 
 	value, err := client.Client().ExecuteScriptAtLatestBlock(client.Ctx(), []byte(script), candenceArr)
 	if err != nil {
-		return types.NodeInfo{}, err
+		return types.StakerNodeInfo{}, err
 	}
 
-	nodeInfo,err:=types.NewNodeInfoFromCadence(value)
+	stakerNodeInfo,err:=types.NewStakerNodeInfoFromCadence(value)
 	if err!=nil{
-		return types.NodeInfo{},err
+		return types.StakerNodeInfo{},err
 	}
 
 	fmt.Println("Locked Account" + value.String())
 
-	return nodeInfo, nil
+	return stakerNodeInfo, nil
 }

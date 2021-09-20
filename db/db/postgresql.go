@@ -167,7 +167,7 @@ func (db *Database) SaveValidators(validators []*types.Validator) error {
 	return err
 }
 
-func (db *Database) SaveNodeInfos(infos []*types.NodeInfo) error {
+func (db *Database) SaveNodeInfos(infos []*types.StakerNodeInfo) error {
 	if len(infos) == 0 {
 		return nil
 	}

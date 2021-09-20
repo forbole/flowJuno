@@ -134,14 +134,6 @@ func (w Worker) getGenesisFromFilePath(path string) (*tmtypes.GenesisDoc, error)
 	return &genDoc, nil
 }
 
-func (w Worker) SaveNodeInfos(vals []*types.NodeInfo) error {
-	err := w.db.SaveNodeInfos(vals)
-	if err != nil {
-		return fmt.Errorf("error while saving node infos: %s", err)
-	}
-	return nil
-}
-
 // ExportBlock accepts a finalized block and a corresponding set of transactions
 // and persists them to the database along with attributable metadata. An error
 // is returned if the write fails.
