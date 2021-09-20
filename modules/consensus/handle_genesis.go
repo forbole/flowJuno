@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func HandleGenesis(block *flow.Block, db *db.Db, flowClient client.Proxy) error {
+func HandleGenesis(block *flow.Block,chainID string, db *db.Db, flowClient client.Proxy) error {
 	log.Debug().Str("module", "consensus").Msg("parsing genesis")
 	// Save the genesis time
 	err := db.SaveGenesis(types.NewGenesis(block.Timestamp, int64(block.Height)))

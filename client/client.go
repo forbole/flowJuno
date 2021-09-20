@@ -146,6 +146,11 @@ func (cp *Proxy) Contract() Contracts {
 	return cp.contract
 }
 
+func (cp *Proxy) GetChainID() string{
+	// There is GetNetworkParameters rpc method that not implenment yet in flow-go-sdk.
+	return "Mainnet"
+}
+
 /*
 // Genesis returns the genesis state
 func (cp *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {

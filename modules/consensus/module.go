@@ -55,6 +55,6 @@ func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
 }
 
 // HandleGenesis implements modules.Module
-func (m *Module) HandleGenesis(block *flow.Block) error {
-	return HandleGenesis(block, m.db, m.flowClient)
+func (m *Module) HandleGenesis(block *flow.Block,chainID string) error {
+	return HandleGenesis(block, chainID,m.db, m.flowClient)
 }

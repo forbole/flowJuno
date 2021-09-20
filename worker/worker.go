@@ -214,7 +214,7 @@ func (w Worker) HandleGenesis(block *flow.Block) error {
 	fmt.Println("Parsing Handle Geneis")
 	for _, module := range w.modules {
 		if genesisModule, ok := module.(modules.GenesisModule); ok {
-			if err := genesisModule.HandleGenesis(block); err != nil {
+			if err := genesisModule.HandleGenesis(block,w.cp.GetChainID()); err != nil {
 				//w.logger.GenesisError(module, err)
 			}
 		}
