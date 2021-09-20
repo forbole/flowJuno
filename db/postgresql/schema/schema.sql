@@ -22,7 +22,7 @@ CREATE TABLE block
     height           BIGINT UNIQUE PRIMARY KEY,
     id               TEXT NOT NULL,
     parent_id        TEXT NOT NULL,
-    collection_guarantees TEXT[] NOT NULL,
+    collection_guarantees TEXT NOT NULL,
     timestamp        TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 

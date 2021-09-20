@@ -46,12 +46,12 @@ func (m *Module) Name() string {
 
 // HandleEvent implements modules.MessageModule
 func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs) error {
-	return HandleBlock(block, m.messagesParser, m.db, int64(block.Height), m.flowClient)
+	return nil//HandleBlock(block, m.messagesParser, m.db, int64(block.Height), m.flowClient)
 }
 
 // RegisterPeriodicOperations implements modules.Module
 func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
-	return Register(scheduler, m.db)
+	return nil//Register(scheduler, m.db)
 }
 
 // HandleGenesis implements modules.Module

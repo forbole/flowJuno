@@ -141,8 +141,7 @@ func (db *Db) SaveGenesis(genesis *types.Genesis) error {
 INSERT INTO genesis(time, initial_height) 
 VALUES ($1, $2) ON CONFLICT (one_row_id) DO UPDATE 
     SET time = excluded.time,
-        initial_height = excluded.initial_height,
-        chain_id = excluded.chain_id`
+        initial_height = excluded.initial_height`
 
 	_, err := db.Sqlx.Exec(stmt, genesis.Time, genesis.InitialHeight)
 	return err

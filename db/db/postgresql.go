@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/forbole/flowJuno/types/logging"
@@ -85,8 +86,13 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 		grauntees[i] = collectionGuarantee.CollectionID.String()
 	}
 
-	_, err := db.Sql.Exec(stmt,
-		block.Height, block.ID.String(), block.ParentID.String(), pq.StringArray(grauntees), block.Timestamp,
+	collectionGuarantees,err:=json.Marshal(grauntees)
+	if err!=nil{
+		return err
+	}
+
+	_, err = db.Sql.Exec(stmt,
+		block.Height, block.ID.String(), block.ParentID.String(), collectionGuarantees, block.Timestamp,
 	)
 	if err != nil {
 		return err

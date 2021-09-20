@@ -1,7 +1,6 @@
 package types
 
 import (
-	"reflect"
 	"time"
 )
 
@@ -53,7 +52,7 @@ type BlockRow struct {
 	Height               int64     `db:"height"`
 	Id                   string    `db:"id"`
 	ParentId             string    `db:"parent_id"`
-	CollectionGuarantees []string  `db:"collection_guarantees"`
+	CollectionGuarantees string  `db:"collection_guarantees"`
 	Timestamp            time.Time `db:"timestamp"`
 }
 
@@ -62,7 +61,7 @@ func (v BlockRow) Equal(w BlockRow) bool {
 	return v.Height == w.Height &&
 		v.Id == w.Id &&
 		v.ParentId == w.ParentId &&
-		reflect.DeepEqual(v.CollectionGuarantees, w.CollectionGuarantees) &&
+		v.CollectionGuarantees==w.CollectionGuarantees &&
 		v.Timestamp.Equal(w.Timestamp)
 }
 
@@ -71,7 +70,7 @@ func NewBlockRow(
 	height int64,
 	id string,
 	parentId string,
-	collectionGuarantees []string,
+	collectionGuarantees string,
 	timestamp time.Time) BlockRow {
 	return BlockRow{
 		Height:               height,
