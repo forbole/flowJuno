@@ -8,19 +8,22 @@ type GenesisRow struct {
 	OneRowID      bool      `db:"one_row_id"`
 	Time          time.Time `db:"time"`
 	InitialHeight int64     `db:"initial_height"`
+	ChainId string `db:"chain_id"`
 }
 
-func NewGenesisRow(time time.Time, initialHeight int64) GenesisRow {
+func NewGenesisRow(time time.Time, initialHeight int64,chainId string) GenesisRow {
 	return GenesisRow{
 		OneRowID:      true,
 		Time:          time,
 		InitialHeight: initialHeight,
+		ChainId:chainId,
 	}
 }
 
 func (r GenesisRow) Equal(s GenesisRow) bool {
 	return r.Time.Equal(s.Time) &&
-		r.InitialHeight == s.InitialHeight
+		r.InitialHeight == s.InitialHeight&&
+		r.ChainId==s.ChainId
 }
 
 // -------------------------------------------------------------------------------------------------------------------

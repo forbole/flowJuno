@@ -296,24 +296,26 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimeGenesis() {
 func (suite *DbTestSuite) TestSaveConsensus_SaveGenesisData() {
 	err := suite.database.SaveGenesis(types.NewGenesis(
 		time.Date(2020, 1, 02, 15, 00, 00, 000, time.UTC),
-		0,
+		0,		"testnet-2",
+
 	))
 	suite.Require().NoError(err)
 
 	// Should have only one row
 	err = suite.database.SaveGenesis(types.NewGenesis(
-		"testnet-2",
 		time.Date(2020, 1, 1, 15, 00, 00, 000, time.UTC),
 		0,
+		"testnet-2",
+
 	))
 
 	var rows []*dbtypes.GenesisRow
 	err = suite.database.Sqlx.Select(&rows, "SELECT * FROM genesis")
 	suite.Require().Len(rows, 1)
 	suite.Require().True(rows[0].Equal(dbtypes.NewGenesisRow(
-		"testnet-2",
 		time.Date(2020, 1, 1, 15, 00, 00, 000, time.UTC),
 		0,
+		"testnet-2",
 	)))
 }
 
@@ -328,8 +330,8 @@ func (suite *DbTestSuite) TestSaveConsensus_GetGenesis() {
 	genesis, err := suite.database.GetGenesis()
 	suite.Require().NoError(err)
 	suite.Require().True(genesis.Equal(types.NewGenesis(
-		"testnet-1",
 		time.Date(2020, 1, 1, 15, 00, 00, 000, time.UTC),
 		0,
+		"testnet-1",
 	)))
 }

@@ -138,12 +138,13 @@ WHERE average_block_time_from_genesis.height <= excluded.height`
 // SaveGenesis save the given genesis data
 func (db *Db) SaveGenesis(genesis *types.Genesis) error {
 	stmt := `
-INSERT INTO genesis(time, initial_height) 
-VALUES ($1, $2) ON CONFLICT (one_row_id) DO UPDATE 
+INSERT INTO genesis(time, initial_height,chain_id) 
+VALUES ($1, $2, $3) ON CONFLICT (one_row_id) DO UPDATE 
     SET time = excluded.time,
-        initial_height = excluded.initial_height`
+        initial_height = excluded.initial_height,
+		chain_id = excluded.chain_id`
 
-	_, err := db.Sqlx.Exec(stmt, genesis.Time, genesis.InitialHeight)
+	_, err := db.Sqlx.Exec(stmt, genesis.Time, genesis.InitialHeight,genesis.ChainId)
 	return err
 }
 
@@ -162,5 +163,5 @@ func (db *Db) GetGenesis() (*types.Genesis, error) {
 	row := rows[0]
 
 
-	return types.NewGenesis(row.Time, row.InitialHeight), nil
+	return types.NewGenesis(row.Time, row.InitialHeight,row.ChainId), nil
 }
