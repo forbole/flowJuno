@@ -1,4 +1,4 @@
-CREATE TABLE total_stake
+CREATE TABLE total_stake_by_type
   (  height BIGINT  NOT NULL ,
 	role TEXT NOT NULL ,
 	total_stake TEXT NOT NULL ,

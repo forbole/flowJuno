@@ -79,7 +79,7 @@ func getTotalStake(block *flow.Block, db *database.Db, flowClient client.Proxy) 
 		return fmt.Errorf("totalStake is not a uint64 value")
 	}
 
-	return db.SavegetTotalStake(block.Height, totalStake)
+	return db.SaveTotalStake(block.Height, totalStake)
 }
 
 func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
@@ -101,7 +101,7 @@ func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.P
 	  return staked[role]!
 	}`, flowClient.Contract().StakingTable)
 
-	totalStakeArr := make([]types.TotalStake, 5)
+	totalStakeArr := make([]types.TotalStakeByType, 5)
 	for role := 1; role <= 5; role++ {
 		arg := []cadence.Value{cadence.NewUInt8(uint8(role))}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), arg)
@@ -114,7 +114,7 @@ func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.P
 			return fmt.Errorf("totalStake is not a uint64 value")
 		}
 
-		totalStakeArr[role-1] = types.NewTotalStake(int64(block.Height), int8(role), totalStake, block.Timestamp)
+		totalStakeArr[role-1] = types.NewTotalStakeByType(int64(block.Height), int8(role), totalStake, block.Timestamp)
 	}
 
 	return db.SaveTotalStakeByType(totalStakeArr)

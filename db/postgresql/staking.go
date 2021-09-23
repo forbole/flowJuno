@@ -31,8 +31,8 @@ func (db *Db) SaveStakeRequirements(stakeRequirements []types.StakeRequirements)
 	return nil
 }
 
-func (db *Db) SaveTotalStake(totalStake []types.TotalStake) error {
-	stmt := `INSERT INTO total_stake(height,role,total_stake,timestamp) VALUES `
+func (db *Db) SaveTotalStakeByType(totalStake []types.TotalStakeByType) error {
+	stmt := `INSERT INTO total_stake_by_type(height,role,total_stake,timestamp) VALUES `
 
 	var params []interface{}
 

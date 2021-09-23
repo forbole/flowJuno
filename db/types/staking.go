@@ -5,7 +5,7 @@ import (
 )
 
 // TotalStakeRow represents a single row of the total_stake table
-type TotalStakeRow struct {
+type TotalStakeByTypeRow struct {
 	Height     int64     `db:"height"`
 	Role       int8      `db:"role"`
 	TotalStake uint64    `db:"total_stake"`
@@ -13,7 +13,7 @@ type TotalStakeRow struct {
 }
 
 // Equal tells whether v and w represent the same rows
-func (v TotalStakeRow) Equal(w TotalStakeRow) bool {
+func (v TotalStakeByTypeRow) Equal(w TotalStakeByTypeRow) bool {
 	return v.Height == w.Height &&
 		v.Role == w.Role &&
 		v.TotalStake == w.TotalStake &&
@@ -21,12 +21,12 @@ func (v TotalStakeRow) Equal(w TotalStakeRow) bool {
 }
 
 // TotalStakeRow allows to build a new TotalStakeRow
-func NewTotalStakeRow(
+func NewTotalStakeByTypeRow(
 	height int64,
 	role int8,
 	totalStake uint64,
-	timestamp time.Time) TotalStakeRow {
-	return TotalStakeRow{
+	timestamp time.Time) TotalStakeByTypeRow {
+	return TotalStakeByTypeRow{
 		Height:     height,
 		Role:       role,
 		TotalStake: totalStake,

@@ -33,7 +33,7 @@ func NewStakeRequirements(
 	}
 }
 
-type TotalStake struct {
+type TotalStakeByType struct {
 	Height     int64
 	Role       int8
 	TotalStake uint64
@@ -41,7 +41,7 @@ type TotalStake struct {
 }
 
 // Equal tells whether v and w represent the same rows
-func (v TotalStake) Equal(w TotalStake) bool {
+func (v TotalStakeByType) Equal(w TotalStakeByType) bool {
 	return v.Height == w.Height &&
 		v.Role == w.Role &&
 		v.TotalStake == w.TotalStake &&
@@ -49,12 +49,12 @@ func (v TotalStake) Equal(w TotalStake) bool {
 }
 
 // TotalStake allows to build a new TotalStake
-func NewTotalStake(
+func NewTotalStakeByType(
 	height int64,
 	role int8,
 	totalStake uint64,
-	timestamp time.Time) TotalStake {
-	return TotalStake{
+	timestamp time.Time) TotalStakeByType {
+	return TotalStakeByType{
 		Height:     height,
 		Role:       role,
 		TotalStake: totalStake,
