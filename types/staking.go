@@ -5,10 +5,10 @@ import (
 )
 
 type StakeRequirements struct {
-	Height     int64
-	Role       uint8
+	Height      int64
+	Role        uint8
 	Requirement uint64
-	Timestamp  time.Time
+	Timestamp   time.Time
 }
 
 // Equal tells whether v and w represent the same rows
@@ -26,10 +26,10 @@ func NewStakeRequirements(
 	requirement uint64,
 	timestamp time.Time) StakeRequirements {
 	return StakeRequirements{
-		Height:     height,
-		Role:       role,
+		Height:      height,
+		Role:        role,
 		Requirement: requirement,
-		Timestamp:  timestamp,
+		Timestamp:   timestamp,
 	}
 }
 

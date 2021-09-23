@@ -6,28 +6,51 @@ import (
 	"github.com/forbole/flowJuno/types"
 )
 
+// SaveStakeRequirements save the stake requirement from cadence call
+func (db *Db) SaveStakeRequirements(stakeRequirements []types.StakeRequirements) error {
+	stmt := `INSERT INTO stake_requirements(height,role,requirements,timestamp) VALUES `
 
-func (db Db) SaveStakeRequirements(stakeRequirements []types.StakeRequirements) error {
-    stmt:= `INSERT INTO stake_requirements(height,role,requirements,timestamp) VALUES `
+	var params []interface{}
 
-    var params []interface{}
+	for i, rows := range stakeRequirements {
+		ai := i * 4
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d)", ai+1, ai+2, ai+3, ai+4)
 
-	  for i, rows := range stakeRequirements{
-      ai := i * 4
-      stmt += fmt.Sprintf("($%d,$%d,$%d,$%d)", ai+1,ai+2,ai+3,ai+4)
-      
-      params = append(params,rows.Height,rows.Role,rows.Requirement,rows.Timestamp)
+		params = append(params, rows.Height, rows.Role, rows.Requirement, rows.Timestamp)
 
-    }
-	  stmt = stmt[:len(stmt)-1]
+	}
+	stmt = stmt[:len(stmt)-1]
 
-    stmt += ` ON CONFLICT DO NOTHING` 
+	stmt += ` ON CONFLICT DO NOTHING`
 
-    _, err := db.Sqlx.Exec(stmt, params...)
-    if err != nil {
-      return err
-    }
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
 
-    return nil 
+	return nil
 }
-    
+
+func (db *Db) SaveTotalStake(totalStake []types.TotalStake) error {
+	stmt := `INSERT INTO total_stake(height,role,total_stake,timestamp) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range totalStake {
+		ai := i * 4
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d)", ai+1, ai+2, ai+3, ai+4)
+
+		params = append(params, rows.Height, rows.Role, rows.TotalStake, rows.Timestamp)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
