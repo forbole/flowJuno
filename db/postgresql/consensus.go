@@ -144,7 +144,7 @@ VALUES ($1, $2, $3) ON CONFLICT (one_row_id) DO UPDATE
         initial_height = excluded.initial_height,
 		chain_id = excluded.chain_id`
 
-	_, err := db.Sqlx.Exec(stmt, genesis.Time, genesis.InitialHeight,genesis.ChainId)
+	_, err := db.Sqlx.Exec(stmt, genesis.Time, genesis.InitialHeight, genesis.ChainId)
 	return err
 }
 
@@ -156,12 +156,11 @@ func (db *Db) GetGenesis() (*types.Genesis, error) {
 		return nil, err
 	}
 
-	if len(rows) == 0{
+	if len(rows) == 0 {
 		return nil, fmt.Errorf("Genesis table is empty")
 	}
 
 	row := rows[0]
 
-
-	return types.NewGenesis(row.Time, row.InitialHeight,row.ChainId), nil
+	return types.NewGenesis(row.Time, row.InitialHeight, row.ChainId), nil
 }

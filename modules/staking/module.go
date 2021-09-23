@@ -41,7 +41,7 @@ func NewModule(
 
 // Name implements modules.Module
 func (m *Module) Name() string {
-	return "consensus"
+	return "staking"
 }
 
 // HandleEvent implements modules.MessageModule

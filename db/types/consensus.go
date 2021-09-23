@@ -8,22 +8,22 @@ type GenesisRow struct {
 	OneRowID      bool      `db:"one_row_id"`
 	Time          time.Time `db:"time"`
 	InitialHeight int64     `db:"initial_height"`
-	ChainId string `db:"chain_id"`
+	ChainId       string    `db:"chain_id"`
 }
 
-func NewGenesisRow(time time.Time, initialHeight int64,chainId string) GenesisRow {
+func NewGenesisRow(time time.Time, initialHeight int64, chainId string) GenesisRow {
 	return GenesisRow{
 		OneRowID:      true,
 		Time:          time,
 		InitialHeight: initialHeight,
-		ChainId:chainId,
+		ChainId:       chainId,
 	}
 }
 
 func (r GenesisRow) Equal(s GenesisRow) bool {
 	return r.Time.Equal(s.Time) &&
-		r.InitialHeight == s.InitialHeight&&
-		r.ChainId==s.ChainId
+		r.InitialHeight == s.InitialHeight &&
+		r.ChainId == s.ChainId
 }
 
 // -------------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ type BlockRow struct {
 	Height               int64     `db:"height"`
 	Id                   string    `db:"id"`
 	ParentId             string    `db:"parent_id"`
-	CollectionGuarantees string  `db:"collection_guarantees"`
+	CollectionGuarantees string    `db:"collection_guarantees"`
 	Timestamp            time.Time `db:"timestamp"`
 }
 
@@ -64,7 +64,7 @@ func (v BlockRow) Equal(w BlockRow) bool {
 	return v.Height == w.Height &&
 		v.Id == w.Id &&
 		v.ParentId == w.ParentId &&
-		v.CollectionGuarantees==w.CollectionGuarantees &&
+		v.CollectionGuarantees == w.CollectionGuarantees &&
 		v.Timestamp.Equal(w.Timestamp)
 }
 

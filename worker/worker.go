@@ -70,7 +70,7 @@ func (w Worker) process(height int64) error {
 		log.Debug().Int64("height", height).Msg("skipping already exported block")
 		return nil
 	}
-	
+
 	//log.Debug().Int64("height", height).Msg("processing block")
 
 	block, err := w.cp.Block(height)
@@ -214,7 +214,7 @@ func (w Worker) HandleGenesis(block *flow.Block) error {
 	fmt.Println("Parsing Handle Geneis")
 	for _, module := range w.modules {
 		if genesisModule, ok := module.(modules.GenesisModule); ok {
-			if err := genesisModule.HandleGenesis(block,w.cp.GetChainID()); err != nil {
+			if err := genesisModule.HandleGenesis(block, w.cp.GetChainID()); err != nil {
 				//w.logger.GenesisError(module, err)
 			}
 		}

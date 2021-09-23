@@ -203,7 +203,7 @@ var _ CosmosConfig = &cosmosConfig{}
 type cosmosConfig struct {
 	Prefix        string   `toml:"prefix"`
 	Modules       []string `toml:"modules"`
-	GenesisHeight uint64    `toml:"genesis_height"`
+	GenesisHeight uint64   `toml:"genesis_height"`
 }
 
 // NewCosmosConfig returns a new CosmosConfig instance

@@ -128,9 +128,9 @@ func getStakerNodeInfo(address string, height int64, client client.Proxy) (types
 		return types.StakerNodeInfo{}, err
 	}
 
-	stakerNodeInfo,err:=types.NewStakerNodeInfoFromCadence(value)
-	if err!=nil{
-		return types.StakerNodeInfo{},err
+	stakerNodeInfo, err := types.NewStakerNodeInfoFromCadence(value)
+	if err != nil {
+		return types.StakerNodeInfo{}, err
 	}
 
 	fmt.Println("Locked Account" + value.String())

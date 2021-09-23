@@ -137,7 +137,6 @@ func DelegatorNodeInfoFromCadence(value cadence.Value) (DelegatorNodeInfo, error
 
 }
 
-
 type StakerNodeInfo struct {
 	Id                string
 	Role              uint8
@@ -162,15 +161,14 @@ func NewStakerNodeInfoFromCadence(value cadence.Value) (StakerNodeInfo, error) {
 
 	fields := arrayValue.Values[0].(cadence.Struct).Fields
 
-	
-	d,ok:=fields[10].(cadence.Array)
-	if !ok{
+	d, ok := fields[10].(cadence.Array)
+	if !ok {
 		fmt.Println("delegator not an cadence array")
 	}
-	delegators:=make([]uint32,len(d.Values))
-	for i,val:=range d.Values{
-		delegators[i],ok=val.ToGoValue().(uint32)
-		if !ok{
+	delegators := make([]uint32, len(d.Values))
+	for i, val := range d.Values {
+		delegators[i], ok = val.ToGoValue().(uint32)
+		if !ok {
 			return StakerNodeInfo{}, fmt.Errorf("id is not type uint32")
 		}
 	}

@@ -86,8 +86,8 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 		grauntees[i] = collectionGuarantee.CollectionID.String()
 	}
 
-	collectionGuarantees,err:=json.Marshal(grauntees)
-	if err!=nil{
+	collectionGuarantees, err := json.Marshal(grauntees)
+	if err != nil {
 		return err
 	}
 

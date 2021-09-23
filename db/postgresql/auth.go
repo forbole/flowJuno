@@ -124,8 +124,8 @@ func (db *Db) SaveStakerAccounts(accounts []types.StakerAccount) error {
 		ai := i * 3
 		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
-		nodeInfo,err:=json.Marshal(account.StakerNodeInfo)
-		if err!=nil{
+		nodeInfo, err := json.Marshal(account.StakerNodeInfo)
+		if err != nil {
 			return err
 		}
 		params = append(params, account.Address, account.StakerNodeId, nodeInfo)

@@ -64,7 +64,7 @@ type GenesisModule interface {
 	// For convenience of use, the already-unmarshalled AppState is provided along with the full GenesisDoc.
 	// NOTE. The returned error will be logged using the logging.LogGenesisError method. All other modules' handlers
 	// will still be called.
-	HandleGenesis(block *flow.Block,chainID string) error
+	HandleGenesis(block *flow.Block, chainID string) error
 }
 
 type BlockModule interface {

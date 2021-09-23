@@ -98,7 +98,8 @@ func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
 
 	return transaction, nil
 }
-/* 
+
+/*
 // NodeOperators returns all the known flow node operators for a given block
 // height. An error is returned if the query fails.
 func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
@@ -146,7 +147,7 @@ func (cp *Proxy) Contract() Contracts {
 	return cp.contract
 }
 
-func (cp *Proxy) GetChainID() string{
+func (cp *Proxy) GetChainID() string {
 	// There is GetNetworkParameters rpc method that not implenment yet in flow-go-sdk.
 	return "Mainnet"
 }
