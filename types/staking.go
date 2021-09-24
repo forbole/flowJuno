@@ -10,7 +10,7 @@ type StakeRequirements struct {
 func (v StakeRequirements) Equal(w StakeRequirements) bool {
 	return v.Height == w.Height &&
 		v.Role == w.Role &&
-		v.Requirement == w.Requirement 
+		v.Requirement == w.Requirement
 }
 
 // StakeRequirements allows to build a new StakeRequirements
@@ -35,7 +35,7 @@ type TotalStakeByType struct {
 func (v TotalStakeByType) Equal(w TotalStakeByType) bool {
 	return v.Height == w.Height &&
 		v.Role == w.Role &&
-		v.TotalStake == w.TotalStake 
+		v.TotalStake == w.TotalStake
 }
 
 // TotalStake allows to build a new TotalStake
@@ -50,22 +50,23 @@ func NewTotalStakeByType(
 	}
 }
 
-type WeeklyPayout struct { 
+type WeeklyPayout struct {
 	Height int64
 	Payout uint64
-  }
-  
-  // Equal tells whether v and w represent the same rows
-  func (v WeeklyPayout) Equal(w WeeklyPayout)bool{
-	return v.Height==w.Height && 
-  v.Payout==w.Payout }
-  
-   // WeeklyPayout allows to build a new WeeklyPayout
-  func NewWeeklyPayout( 
+}
+
+// Equal tells whether v and w represent the same rows
+func (v WeeklyPayout) Equal(w WeeklyPayout) bool {
+	return v.Height == w.Height &&
+		v.Payout == w.Payout
+}
+
+// WeeklyPayout allows to build a new WeeklyPayout
+func NewWeeklyPayout(
 	height int64,
-	payout uint64) WeeklyPayout{
-   return WeeklyPayout{
-   Height:height,
-   Payout:payout,
-  }
-  }
+	payout uint64) WeeklyPayout {
+	return WeeklyPayout{
+		Height: height,
+		Payout: payout,
+	}
+}

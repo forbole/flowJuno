@@ -56,9 +56,8 @@ func (db *Db) SaveTotalStakeByType(totalStake []types.TotalStakeByType) error {
 }
 
 func (db *Db) SaveWeeklyPayout(weeklyPayout types.WeeklyPayout) error {
-	stmt:= `INSERT INTO weekly_payout(height,payout) VALUES ($1,$2) ON CONFLICT DO NOTHING` 
-	_, err := db.Sql.Exec(stmt,weeklyPayout.Height,
-	weeklyPayout.Payout)
+	stmt := `INSERT INTO weekly_payout(height,payout) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, weeklyPayout.Height,
+		weeklyPayout.Payout)
 	return err
 }
-	

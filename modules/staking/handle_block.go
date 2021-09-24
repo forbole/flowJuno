@@ -45,7 +45,7 @@ func getWeeklyPayout(block *flow.Block, db *database.Db, flowClient client.Proxy
 		return fmt.Errorf("Payout is not a uint64 value")
 	}
 
-	return db.SaveWeeklyPayout(types.NewWeeklyPayout(int64(block.Height),payout))
+	return db.SaveWeeklyPayout(types.NewWeeklyPayout(int64(block.Height), payout))
 }
 
 func getTotalStake(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
