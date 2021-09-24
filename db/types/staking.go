@@ -73,3 +73,25 @@ func NewWeeklyPayoutRow(
 		Payout: payout,
 	}
 }
+
+// TotalStakeRow represents a single row of the total_stake table
+type TotalStakeRow struct {
+	Height     int64  `db:"height"`
+	TotalStake uint64 `db:"total_stake"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v TotalStakeRow) Equal(w TotalStakeRow) bool {
+	return v.Height == w.Height &&
+		v.TotalStake == w.TotalStake
+}
+
+// TotalStakeRow allows to build a new TotalStakeRow
+func NewTotalStakeRow(
+	height int64,
+	totalStake uint64) TotalStakeRow {
+	return TotalStakeRow{
+		Height:     height,
+		TotalStake: totalStake,
+	}
+}

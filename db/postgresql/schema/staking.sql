@@ -10,7 +10,12 @@ CREATE TABLE stake_requirements
   requirements TEXT NOT NULL 
 );
 
-  CREATE TABLE weekly_payout
+CREATE TABLE weekly_payout
 (  height BIGINT  NOT NULL ,
   payout TEXT NOT NULL
+);
+
+CREATE TABLE total_stake
+(  height BIGINT  NOT NULL ,
+  total_stake TEXT NOT NULL
 );

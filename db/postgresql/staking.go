@@ -61,3 +61,10 @@ func (db *Db) SaveWeeklyPayout(weeklyPayout types.WeeklyPayout) error {
 		weeklyPayout.Payout)
 	return err
 }
+
+func (db *Db) SaveTotalStake(totalStake types.TotalStake) error {
+	stmt := `INSERT INTO total_stake(height,total_stake) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, totalStake.Height,
+		totalStake.TotalStake)
+	return err
+}

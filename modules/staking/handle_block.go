@@ -21,6 +21,11 @@ func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db
 		return err
 	}
 
+	err = getTotalStake(block, db, flowClient)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

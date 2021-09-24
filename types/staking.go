@@ -70,3 +70,24 @@ func NewWeeklyPayout(
 		Payout: payout,
 	}
 }
+
+type TotalStake struct {
+	Height     int64
+	TotalStake uint64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v TotalStake) Equal(w TotalStake) bool {
+	return v.Height == w.Height &&
+		v.TotalStake == w.TotalStake
+}
+
+// TotalStake allows to build a new TotalStake
+func NewTotalStake(
+	height int64,
+	totalStake uint64) TotalStake {
+	return TotalStake{
+		Height:     height,
+		TotalStake: totalStake,
+	}
+}
