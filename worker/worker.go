@@ -94,7 +94,8 @@ func (w Worker) process(height int64) error {
 		if blockModule, ok := module.(modules.BlockModule); ok {
 			err = blockModule.HandleBlock(block, &txs)
 			if err != nil {
-				fmt.Println(err)
+				log.Error().Err(err).Int64("height", height).Msg("failed to handle block")
+				return err
 			}
 		}
 	}

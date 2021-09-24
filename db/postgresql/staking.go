@@ -14,7 +14,7 @@ func (db *Db) SaveStakeRequirements(stakeRequirements []types.StakeRequirements)
 	var params []interface{}
 
 	for i, rows := range stakeRequirements {
-		ai := i * 4
+		ai := i * 3
 		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
 		params = append(params, rows.Height, rows.Role, rows.Requirement)
