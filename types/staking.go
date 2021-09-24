@@ -91,3 +91,18 @@ func NewTotalStake(
 		TotalStake: totalStake,
 	}
 }
+
+type StakingTable struct {
+	Height       int64
+	StakingTable []string
+}
+
+// StakingTable allows to build a new StakingTable
+func NewStakingTable(
+	height int64,
+	stakingTable []string) StakingTable {
+	return StakingTable{
+		Height:       height,
+		StakingTable: stakingTable,
+	}
+}

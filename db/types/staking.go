@@ -95,3 +95,25 @@ func NewTotalStakeRow(
 		TotalStake: totalStake,
 	}
 }
+
+// StakingTableRow represents a single row of the staking_table table
+type StakingTableRow struct {
+	Height       int64  `db:"height"`
+	StakingTable string `db:"staking_table"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v StakingTableRow) Equal(w StakingTableRow) bool {
+	return v.Height == w.Height &&
+		v.StakingTable == w.StakingTable
+}
+
+// StakingTableRow allows to build a new StakingTableRow
+func NewStakingTableRow(
+	height int64,
+	stakingTable string) StakingTableRow {
+	return StakingTableRow{
+		Height:       height,
+		StakingTable: stakingTable,
+	}
+}

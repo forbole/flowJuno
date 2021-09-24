@@ -1,4 +1,4 @@
-package consensus
+package staking
 
 import (
 	"fmt"
@@ -25,6 +25,28 @@ func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db
 	if err != nil {
 		return err
 	}
+
+	err = getTotalStakeByType(block, db, flowClient)
+	if err != nil {
+		return err
+	}
+
+	err = getTable(block, db, flowClient)
+	if err != nil {
+		return err
+	}
+
+	err = getStakeRequirements(block, db, flowClient)
+	if err != nil {
+		return err
+	}
+
+	err = getStakeRequirements(block, db, flowClient)
+	if err != nil {
+		return err
+	}
+
+
 
 	return nil
 }
@@ -84,7 +106,7 @@ func getTotalStake(block *flow.Block, db *database.Db, flowClient client.Proxy) 
 		return fmt.Errorf("totalStake is not a uint64 value")
 	}
 
-	return db.SaveTotalStake(block.Height, totalStake)
+	return db.SaveTotalStake(types.NewTotalStake(int64(block.Height), totalStake))
 }
 
 func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
@@ -119,7 +141,7 @@ func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.P
 			return fmt.Errorf("totalStake is not a uint64 value")
 		}
 
-		totalStakeArr[role-1] = types.NewTotalStakeByType(int64(block.Height), int8(role), totalStake, block.Timestamp)
+		totalStakeArr[role-1] = types.NewTotalStakeByType(int64(block.Height), int8(role), totalStake)
 	}
 
 	return db.SaveTotalStakeByType(totalStakeArr)
@@ -150,7 +172,7 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error
 		table[i] = val.String()
 	}
 
-	return db.SaveTable(block.Height, table)
+	return db.SaveStakingTable(types.NewStakingTable(int64(block.Height),table))
 
 }
 
@@ -185,7 +207,7 @@ func getStakeRequirements(block *flow.Block, db *database.Db, flowClient client.
 		if !ok {
 			return fmt.Errorf("totalStake is not a uint64 value")
 		}
-		stakeRequirements[role-1] = types.NewStakeRequirements(int64(block.Height), role, totalStake, block.Timestamp)
+		stakeRequirements[role-1] = types.NewStakeRequirements(int64(block.Height), uint8(role), totalStake)
 	}
 
 	return db.SaveStakeRequirements(stakeRequirements)

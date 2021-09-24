@@ -1,6 +1,7 @@
 package postgresql
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/forbole/flowJuno/types"
@@ -66,5 +67,17 @@ func (db *Db) SaveTotalStake(totalStake types.TotalStake) error {
 	stmt := `INSERT INTO total_stake(height,total_stake) VALUES ($1,$2) ON CONFLICT DO NOTHING`
 	_, err := db.Sql.Exec(stmt, totalStake.Height,
 		totalStake.TotalStake)
+	return err
+}
+
+func (db *Db) SaveStakingTable(stakingTable types.StakingTable) error {
+	stmt := `INSERT INTO staking_table(height,staking_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+
+	nodeInfoList, err := json.Marshal(stakingTable.StakingTable)
+	if err != nil {
+		return err
+	}
+	_, err = db.Sql.Exec(stmt, stakingTable.Height,
+		string(nodeInfoList))
 	return err
 }

@@ -1,4 +1,4 @@
-package consensus
+package staking
 
 import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
@@ -51,10 +51,10 @@ func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs) error {
 
 // RegisterPeriodicOperations implements modules.Module
 func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
-	return Register(scheduler, m.db)
+	return nil/* Register(scheduler, m.db) */
 }
 
 // HandleGenesis implements modules.Module
 func (m *Module) HandleGenesis(block *flow.Block, chainID string) error {
-	return HandleGenesis(block, chainID, m.db, m.flowClient)
+	return nil/* HandleGenesis(block, chainID, m.db, m.flowClient) */
 }

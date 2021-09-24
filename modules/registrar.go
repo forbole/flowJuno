@@ -17,6 +17,7 @@ import (
 
 	"github.com/forbole/flowJuno/modules/auth"
 	"github.com/forbole/flowJuno/modules/consensus"
+	"github.com/forbole/flowJuno/modules/staking"
 )
 
 var (
@@ -48,5 +49,7 @@ func (r *Registrar) BuildModules(
 		messages.NewModule(r.parser, encodingConfig.Marshaler, database),
 		auth.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		consensus.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
+		staking.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
+
 	}
 }

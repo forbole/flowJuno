@@ -19,3 +19,9 @@ CREATE TABLE total_stake
 (  height BIGINT  NOT NULL ,
   total_stake TEXT NOT NULL
 );
+
+CREATE TABLE staking_table
+(  height BIGINT  NOT NULL ,
+  staking_table TEXT NOT NULL
+);
+
