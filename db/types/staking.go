@@ -117,3 +117,24 @@ func NewStakingTableRow(
 		StakingTable: stakingTable,
 	}
 }
+
+// ProposedTableRow represents a single row of the proposed_table table
+type ProposedTableRow struct { 
+	Height int64 `db:"height"`
+	ProposedTable string `db:"proposed_table"`
+  }
+  
+	 // Equal tells whether v and w represent the same rows
+  func (v ProposedTableRow) Equal(w ProposedTableRow)bool{
+	return v.Height==w.Height && 
+  v.ProposedTable==w.ProposedTable }
+  
+	  // ProposedTableRow allows to build a new ProposedTableRow
+  func NewProposedTableRow( 
+	height int64,
+	proposedTable string) ProposedTableRow{
+   return ProposedTableRow{
+   Height:height,
+   ProposedTable:proposedTable,
+  }
+  }

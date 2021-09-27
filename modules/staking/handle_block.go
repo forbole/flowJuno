@@ -10,6 +10,8 @@ import (
 	"github.com/onflow/flow-go-sdk"
 
 	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/modules/utils"
+
 	database "github.com/forbole/flowJuno/db/postgresql"
 	db "github.com/forbole/flowJuno/db/postgresql"
 	"github.com/onflow/cadence"
@@ -41,13 +43,18 @@ func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db
 		return err
 	}
 
+	err = getProposedTable(block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
 	return nil
 }
 
 // getStakedNodeId get staked node id from cadence script
 func getWeeklyPayout(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get Staked Node id per block")
+		Msg("updating get weekly epoch payout")
 
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
@@ -60,17 +67,17 @@ func getWeeklyPayout(block *flow.Block, db *database.Db, flowClient client.Proxy
 		return err
 	}
 
-	payout, ok := value.ToGoValue().(uint64)
-	if !ok {
-		return fmt.Errorf("Payout is not a uint64 value")
-	}
+	payout, err := utils.CadenceConvertUint64(value)
+		if err!=nil{
+			return err
+		}
 
 	return db.SaveWeeklyPayout(types.NewWeeklyPayout(int64(block.Height), payout))
 }
 
 func getTotalStake(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get Staked Node id per block")
+		Msg("updating get total stake by type")
 
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
@@ -94,10 +101,10 @@ func getTotalStake(block *flow.Block, db *database.Db, flowClient client.Proxy) 
 		return err
 	}
 
-	totalStake, ok := value.ToGoValue().(uint64)
-	if !ok {
-		return fmt.Errorf("totalStake is not a uint64 value")
-	}
+	totalStake, err := utils.CadenceConvertUint64(value)
+		if err!=nil{
+			return err
+		}
 
 	return db.SaveTotalStake(types.NewTotalStake(int64(block.Height), totalStake))
 }
@@ -129,9 +136,9 @@ func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.P
 			return err
 		}
 
-		totalStake, ok := value.ToGoValue().(uint64)
-		if !ok {
-			return fmt.Errorf("totalStake is not a uint64 value")
+		totalStake, err := utils.CadenceConvertUint64(value)
+		if err!=nil{
+			return err
 		}
 
 		totalStakeArr[role-1] = types.NewTotalStakeByType(int64(block.Height), int8(role), totalStake)
@@ -155,14 +162,9 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error
 		return err
 	}
 
-	valueArray, ok := value.(cadence.Array)
-	if !ok {
-		return fmt.Errorf("table is not an array")
-	}
-
-	table := make([]string, len(valueArray.Values))
-	for i, val := range valueArray.Values {
-		table[i] = val.String()
+	table,err:=utils.CadenceConvertStringArray(value)
+	if err!=nil{
+		return err
 	}
 
 	return db.SaveStakingTable(types.NewStakingTable(int64(block.Height),table))
@@ -171,7 +173,7 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error
 
 func getStakeRequirements(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating getTotalStakeByType")
+		Msg("updating get stake requirement")
 
 		// https://github.com/onflow/flow-core-contracts/blob/301206b27090fa9116c1aba35cd8bade8a26857c/contracts/FlowIDTableStaking.cdc#L101
 		//
@@ -196,12 +198,35 @@ func getStakeRequirements(block *flow.Block, db *database.Db, flowClient client.
 			return err
 		}
 
-		totalStake, ok := value.ToGoValue().(uint64)
-		if !ok {
-			return fmt.Errorf("totalStake is not a uint64 value")
+		totalStake, err := utils.CadenceConvertUint64(value)
+		if err!=nil{
+			return err
 		}
 		stakeRequirements[role-1] = types.NewStakeRequirements(int64(block.Height), uint8(role), totalStake)
 	}
 
 	return db.SaveStakeRequirements(stakeRequirements)
+}
+
+func getProposedTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating get ProposedTable")
+
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+          pub fun main(): [String] {
+            return FlowIDTableStaking.getProposedNodeIDs()
+        }`, flowClient.Contract().StakingTable)
+
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
+	if err != nil {
+		return err
+	}
+
+	table,err:=utils.CadenceConvertStringArray(value)
+	if err!=nil{
+		return err
+	}
+
+	return db.SaveProposedTable(types.NewProposedTable(int64(block.Height),table))
 }

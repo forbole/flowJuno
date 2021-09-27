@@ -106,3 +106,18 @@ func NewStakingTable(
 		StakingTable: stakingTable,
 	}
 }
+
+type ProposedTable struct { 
+	Height int64
+	ProposedTable []string
+  }
+  
+   // ProposedTable allows to build a new ProposedTable
+  func NewProposedTable( 
+	height int64,
+	proposedTable []string) ProposedTable{
+   return ProposedTable{
+   Height:height,
+   ProposedTable:proposedTable,
+  }
+  }

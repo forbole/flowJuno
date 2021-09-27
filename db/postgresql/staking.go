@@ -81,3 +81,16 @@ func (db *Db) SaveStakingTable(stakingTable types.StakingTable) error {
 		string(nodeInfoList))
 	return err
 }
+
+func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
+	stmt:= `INSERT INTO proposed_table(height,proposed_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+	
+	table, err := json.Marshal(proposedTable.ProposedTable)
+	if err != nil {
+		return err
+	}
+	_, err = db.Sql.Exec(stmt,proposedTable.Height,
+		table)
+		return err 
+	 }
+	

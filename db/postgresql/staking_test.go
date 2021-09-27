@@ -151,3 +151,30 @@ func (suite *DbTestSuite) TestBigDipperDb_StakingTable() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
+
+func (suite *DbTestSuite) TestBigDipperDb_ProposedTable() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	input := types.NewProposedTable(10, []string{"abc","efg"})
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveProposedTable(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewProposedTableRow(10, `["abc","efg"]`)
+	var outputs []dbtypes.ProposedTableRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM proposed_table`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}

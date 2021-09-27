@@ -25,3 +25,7 @@ CREATE TABLE staking_table
   staking_table TEXT NOT NULL
 );
 
+CREATE TABLE proposed_table
+(  height BIGINT  NOT NULL ,
+  proposed_table TEXT NOT NULL
+);
