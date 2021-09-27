@@ -51,10 +51,9 @@ func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs) error {
 
 // RegisterPeriodicOperations implements modules.Module
 func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
-	return nil/* Register(scheduler, m.db) */
+	return nil /* Register(scheduler, m.db) */
 }
 
-// HandleGenesis implements modules.Module
 func (m *Module) HandleGenesis(block *flow.Block, chainID string) error {
-	return nil/* HandleGenesis(block, chainID, m.db, m.flowClient) */
+	return nil /* HandleGenesis(block, chainID, m.db, m.flowClient) */
 }

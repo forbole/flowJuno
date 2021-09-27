@@ -119,22 +119,45 @@ func NewStakingTableRow(
 }
 
 // ProposedTableRow represents a single row of the proposed_table table
-type ProposedTableRow struct { 
-	Height int64 `db:"height"`
+type ProposedTableRow struct {
+	Height        int64  `db:"height"`
 	ProposedTable string `db:"proposed_table"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v ProposedTableRow) Equal(w ProposedTableRow)bool{
-	return v.Height==w.Height && 
-  v.ProposedTable==w.ProposedTable }
-  
-	  // ProposedTableRow allows to build a new ProposedTableRow
-  func NewProposedTableRow( 
+}
+
+// Equal tells whether v and w represent the same rows
+func (v ProposedTableRow) Equal(w ProposedTableRow) bool {
+	return v.Height == w.Height &&
+		v.ProposedTable == w.ProposedTable
+}
+
+// ProposedTableRow allows to build a new ProposedTableRow
+func NewProposedTableRow(
 	height int64,
-	proposedTable string) ProposedTableRow{
-   return ProposedTableRow{
-   Height:height,
-   ProposedTable:proposedTable,
-  }
-  }
+	proposedTable string) ProposedTableRow {
+	return ProposedTableRow{
+		Height:        height,
+		ProposedTable: proposedTable,
+	}
+}
+
+// CurrentTableRow represents a single row of the current_table table
+type CurrentTableRow struct {
+	Height int64  `db:"height"`
+	Table  string `db:"current_table"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v CurrentTableRow) Equal(w CurrentTableRow) bool {
+	return v.Height == w.Height &&
+		v.Table == w.Table
+}
+
+// CurrentTableRow allows to build a new CurrentTableRow
+func NewCurrentTableRow(
+	height int64,
+	table string) CurrentTableRow {
+	return CurrentTableRow{
+		Height: height,
+		Table:  table,
+	}
+}

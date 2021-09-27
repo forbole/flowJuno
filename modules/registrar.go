@@ -50,6 +50,5 @@ func (r *Registrar) BuildModules(
 		auth.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		consensus.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		staking.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
-
 	}
 }

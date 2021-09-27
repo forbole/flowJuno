@@ -107,17 +107,32 @@ func NewStakingTable(
 	}
 }
 
-type ProposedTable struct { 
-	Height int64
+type ProposedTable struct {
+	Height        int64
 	ProposedTable []string
-  }
-  
-   // ProposedTable allows to build a new ProposedTable
-  func NewProposedTable( 
+}
+
+// ProposedTable allows to build a new ProposedTable
+func NewProposedTable(
 	height int64,
-	proposedTable []string) ProposedTable{
-   return ProposedTable{
-   Height:height,
-   ProposedTable:proposedTable,
-  }
-  }
+	proposedTable []string) ProposedTable {
+	return ProposedTable{
+		Height:        height,
+		ProposedTable: proposedTable,
+	}
+}
+
+type CurrentTable struct {
+	Height int64
+	Table  []string
+}
+
+// CurrentTable allows to build a new CurrentTable
+func NewCurrentTable(
+	height int64,
+	table []string) CurrentTable {
+	return CurrentTable{
+		Height: height,
+		Table:  table,
+	}
+}

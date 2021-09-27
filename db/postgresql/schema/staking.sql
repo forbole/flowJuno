@@ -29,3 +29,9 @@ CREATE TABLE proposed_table
 (  height BIGINT  NOT NULL ,
   proposed_table TEXT NOT NULL
 );
+
+CREATE TABLE current_table
+(  height BIGINT  NOT NULL ,
+  current_table TEXT NOT NULL
+);
+

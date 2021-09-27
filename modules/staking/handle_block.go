@@ -44,7 +44,12 @@ func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db
 	}
 
 	err = getProposedTable(block, db, flowClient)
-	if err!=nil{
+	if err != nil {
+		return err
+	}
+
+	err = getCurrentTable(block, db, flowClient)
+	if err != nil {
 		return err
 	}
 
@@ -68,9 +73,9 @@ func getWeeklyPayout(block *flow.Block, db *database.Db, flowClient client.Proxy
 	}
 
 	payout, err := utils.CadenceConvertUint64(value)
-		if err!=nil{
-			return err
-		}
+	if err != nil {
+		return err
+	}
 
 	return db.SaveWeeklyPayout(types.NewWeeklyPayout(int64(block.Height), payout))
 }
@@ -102,9 +107,9 @@ func getTotalStake(block *flow.Block, db *database.Db, flowClient client.Proxy) 
 	}
 
 	totalStake, err := utils.CadenceConvertUint64(value)
-		if err!=nil{
-			return err
-		}
+	if err != nil {
+		return err
+	}
 
 	return db.SaveTotalStake(types.NewTotalStake(int64(block.Height), totalStake))
 }
@@ -137,7 +142,7 @@ func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.P
 		}
 
 		totalStake, err := utils.CadenceConvertUint64(value)
-		if err!=nil{
+		if err != nil {
 			return err
 		}
 
@@ -162,12 +167,12 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error
 		return err
 	}
 
-	table,err:=utils.CadenceConvertStringArray(value)
-	if err!=nil{
+	table, err := utils.CadenceConvertStringArray(value)
+	if err != nil {
 		return err
 	}
 
-	return db.SaveStakingTable(types.NewStakingTable(int64(block.Height),table))
+	return db.SaveStakingTable(types.NewStakingTable(int64(block.Height), table))
 
 }
 
@@ -199,7 +204,7 @@ func getStakeRequirements(block *flow.Block, db *database.Db, flowClient client.
 		}
 
 		totalStake, err := utils.CadenceConvertUint64(value)
-		if err!=nil{
+		if err != nil {
 			return err
 		}
 		stakeRequirements[role-1] = types.NewStakeRequirements(int64(block.Height), uint8(role), totalStake)
@@ -223,10 +228,33 @@ func getProposedTable(block *flow.Block, db *database.Db, flowClient client.Prox
 		return err
 	}
 
-	table,err:=utils.CadenceConvertStringArray(value)
-	if err!=nil{
+	table, err := utils.CadenceConvertStringArray(value)
+	if err != nil {
 		return err
 	}
 
-	return db.SaveProposedTable(types.NewProposedTable(int64(block.Height),table))
+	return db.SaveProposedTable(types.NewProposedTable(int64(block.Height), table))
+}
+
+func getCurrentTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating get current staking table")
+
+	script := fmt.Sprintf(`
+		import FlowIDTableStaking from %s
+		pub fun main(): [String] {
+		  return FlowIDTableStaking.getStakedNodeIDs()
+	  }`, flowClient.Contract().StakingTable)
+
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
+	if err != nil {
+		return err
+	}
+
+	table, err := utils.CadenceConvertStringArray(value)
+	if err != nil {
+		return err
+	}
+
+	return db.SaveCurrentTable(types.NewCurrentTable(int64(block.Height), table))
 }

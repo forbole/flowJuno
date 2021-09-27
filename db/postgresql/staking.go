@@ -83,14 +83,26 @@ func (db *Db) SaveStakingTable(stakingTable types.StakingTable) error {
 }
 
 func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
-	stmt:= `INSERT INTO proposed_table(height,proposed_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
-	
+	stmt := `INSERT INTO proposed_table(height,proposed_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+
 	table, err := json.Marshal(proposedTable.ProposedTable)
 	if err != nil {
 		return err
 	}
-	_, err = db.Sql.Exec(stmt,proposedTable.Height,
+	_, err = db.Sql.Exec(stmt, proposedTable.Height,
 		table)
-		return err 
-	 }
-	
+	return err
+}
+
+func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
+	stmt := `INSERT INTO current_table(height,current_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+
+	table, err := json.Marshal(currentTable.Table)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Sql.Exec(stmt, currentTable.Height,
+		table)
+	return err
+}
