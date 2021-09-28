@@ -136,3 +136,27 @@ func NewCurrentTable(
 		Table:  table,
 	}
 }
+
+type NodeUnstakingTokens struct { 
+	NodeId string
+	TokenUnstaking uint64
+	Height int64
+  }
+  
+  // Equal tells whether v and w represent the same rows
+  func (v NodeUnstakingTokens) Equal(w NodeUnstakingTokens)bool{
+	return v.NodeId==w.NodeId && 
+  v.TokenUnstaking==w.TokenUnstaking && 
+  v.Height==w.Height }
+  
+   // NodeUnstakingTokens allows to build a new NodeUnstakingTokens
+  func NewNodeUnstakingTokens( 
+	nodeId string,
+	tokenUnstaking uint64,
+	height int64) NodeUnstakingTokens{
+   return NodeUnstakingTokens{
+   NodeId:nodeId,
+   TokenUnstaking:tokenUnstaking,
+   Height:height,
+  }
+  }

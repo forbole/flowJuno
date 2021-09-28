@@ -1,0 +1,90 @@
+package staking
+
+import (
+	"fmt"
+
+	"github.com/rs/zerolog/log"
+
+	"github.com/forbole/flowJuno/types"
+	"github.com/onflow/cadence"
+	"github.com/onflow/flow-go-sdk"
+
+	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/modules/utils"
+
+	database "github.com/forbole/flowJuno/db/postgresql"
+)
+
+
+func getStakedNodeInfos(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("getting staked node infos")
+
+	ids,err:=getStakedNodes(block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+
+
+}
+
+func getStakedNodes(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]string,error) {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("Getting staked node ids")
+
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(): UFix64 {
+	  return FlowIDTableStaking.getStakedNodeIDs()
+  }`, flowClient.Contract().StakingTable)
+
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
+	if err != nil {
+		return nil,err
+	}
+
+	ids, err := utils.CadenceConvertStringArray(value)
+	if err != nil {
+		return nil,err
+	}
+
+	return ids,nil
+}
+
+func getNodeUnstakingTokens(nodeIds []string,block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating getTotalStakeByType")
+
+		// https://github.com/onflow/flow-core-contracts/blob/301206b27090fa9116c1aba35cd8bade8a26857c/contracts/FlowIDTableStaking.cdc#L101
+		//
+		// 1 = collection
+		// 2 = consensus
+		// 3 = execution
+		// 4 = verification
+		// 5 = access
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(nodeID: String): UFix64 {
+	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
+	  return nodeInfo.tokensUnstaking
+  }`, flowClient.Contract().StakingTable)
+
+	totalStakeArr := make([]types.NodeUnstakingTokens, len(nodeIds))
+	for i,id:=range nodeIds{
+		nodeId:=[]cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script),nodeId )
+		if err != nil {
+			return err
+		}
+
+		tokensUnstaking, err := utils.CadenceConvertUint64(value)
+		if err != nil {
+			return err
+		}
+
+		totalStakeArr[i] = types.NewNodeUnstakingTokens(nodeIds[i], tokensUnstaking, int64(block.Height))
+	}
+
+	return db.SaveNodeUnstakingTokens(totalStakeArr)
+}

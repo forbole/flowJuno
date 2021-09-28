@@ -35,3 +35,8 @@ CREATE TABLE current_table
   current_table TEXT NOT NULL
 );
 
+CREATE TABLE node_unstaking_tokens
+(  node_id TEXT NOT NULL ,
+  token_unstaking TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

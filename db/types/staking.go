@@ -161,3 +161,29 @@ func NewCurrentTableRow(
 		Table:  table,
 	}
 }
+
+// NodeUnstakingTokensRow represents a single row of the node_unstaking_tokens table
+type NodeUnstakingTokensRow struct { 
+	NodeId string `db:"node_id"`
+	TokenUnstaking uint64 `db:"token_unstaking"`
+	Height int64 `db:"height"`
+  }
+  
+	 // Equal tells whether v and w represent the same rows
+  func (v NodeUnstakingTokensRow) Equal(w NodeUnstakingTokensRow)bool{
+	return v.NodeId==w.NodeId && 
+  v.TokenUnstaking==w.TokenUnstaking && 
+  v.Height==w.Height }
+  
+	  // NodeUnstakingTokensRow allows to build a new NodeUnstakingTokensRow
+  func NewNodeUnstakingTokensRow( 
+	nodeId string,
+	tokenUnstaking uint64,
+	height int64) NodeUnstakingTokensRow{
+   return NodeUnstakingTokensRow{
+   NodeId:nodeId,
+   TokenUnstaking:tokenUnstaking,
+   Height:height,
+  }
+  }
+  
