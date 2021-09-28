@@ -54,6 +54,6 @@ func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
 	return nil /* Register(scheduler, m.db) */
 }
 
-func (m *Module) HandleGenesis(block *flow.Block, chainID string) error {
-	return nil /* HandleGenesis(block, chainID, m.db, m.flowClient) */
+func (m *Module) HandleEvent(index int, event types.Event, tx *types.Tx) error {
+	return HandleEvent(m.messagesParser, m.db, event, tx , m.flowClient)
 }

@@ -3,12 +3,11 @@ package modules
 import (
 	"encoding/json"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/go-co-op/gocron"
 	"github.com/onflow/flow-go-sdk"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	"github.com/desmos-labs/juno/types"
+	"github.com/forbole/flowJuno/types"
 )
 
 // Module represents a generic module without any particular handling of data
@@ -95,5 +94,5 @@ type MessageModule interface {
 	// are passed as well.
 	// NOTE. The returned error will be logged using the logging.LogMsgError method. All other modules' handlers
 	// will still be called.
-	HandleEvent(index int, msg sdk.Msg, tx *types.Tx) error
+	HandleEvent(index int, msg types.Event, tx *types.Tx) error
 }
