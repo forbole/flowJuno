@@ -52,3 +52,9 @@ CREATE TABLE node_total_commitment_without_delegators
   total_commitment_without_delegators TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_staking_key
+(  node_id TEXT NOT NULL ,
+  node_staking_key TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

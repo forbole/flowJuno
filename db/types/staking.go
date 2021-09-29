@@ -239,3 +239,29 @@ func NewNodeTotalCommitmentWithoutDelegatorsRow(
 		Height:                           height,
 	}
 }
+
+// NodeStakingKeyRow represents a single row of the node_staking_key table
+type NodeStakingKeyRow struct {
+	NodeId         string `db:"node_id"`
+	NodeStakingKey string `db:"node_staking_key"`
+	Height         int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeStakingKeyRow) Equal(w NodeStakingKeyRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.NodeStakingKey == w.NodeStakingKey &&
+		v.Height == w.Height
+}
+
+// NodeStakingKeyRow allows to build a new NodeStakingKeyRow
+func NewNodeStakingKeyRow(
+	nodeId string,
+	nodeStakingKey string,
+	height int64) NodeStakingKeyRow {
+	return NodeStakingKeyRow{
+		NodeId:         nodeId,
+		NodeStakingKey: nodeStakingKey,
+		Height:         height,
+	}
+}

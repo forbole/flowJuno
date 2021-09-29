@@ -175,3 +175,26 @@ func (db *Db) SaveNodeTotalCommitmentWithoutDelegators(nodeTotalCommitmentWithou
 
 	return nil
 }
+
+func (db *Db) SaveNodeStakingKey(nodeStakingKey []types.NodeStakingKey) error {
+	stmt := `INSERT INTO node_staking_key(node_id,node_staking_key,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range nodeStakingKey {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.NodeStakingKey, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

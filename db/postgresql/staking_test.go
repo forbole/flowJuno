@@ -292,7 +292,38 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitmentWithoutDelegators()
 	// ------------------------------
 	expectedRow := dbtypes.NewNodeTotalCommitmentWithoutDelegatorsRow("0x1", 100000008, 1)
 	var outputs []dbtypes.NodeTotalCommitmentWithoutDelegatorsRow
-	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_total_commitment`)
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_total_commitment_without_delegators`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}
+
+func (suite *DbTestSuite) TestBigDipperDb_NodeStakingKey() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := []types.NodeStakingKey{
+		types.NewNodeStakingKey("0x1", "0x2", 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveNodeStakingKey(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeStakingKeyRow("0x1", "0x2", 1)
+	var outputs []dbtypes.NodeStakingKeyRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_staking_key`)
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
 	suite.Require().True(expectedRow.Equal(outputs[0]))

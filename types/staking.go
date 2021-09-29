@@ -211,3 +211,28 @@ func NewNodeTotalCommitmentWithoutDelegators(
 		Height:                           height,
 	}
 }
+
+type NodeStakingKey struct {
+	NodeId         string
+	NodeStakingKey string
+	Height         int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeStakingKey) Equal(w NodeStakingKey) bool {
+	return v.NodeId == w.NodeId &&
+		v.NodeStakingKey == w.NodeStakingKey &&
+		v.Height == w.Height
+}
+
+// NodeStakingKey allows to build a new NodeStakingKey
+func NewNodeStakingKey(
+	nodeId string,
+	nodeStakingKey string,
+	height int64) NodeStakingKey {
+	return NodeStakingKey{
+		NodeId:         nodeId,
+		NodeStakingKey: nodeStakingKey,
+		Height:         height,
+	}
+}
