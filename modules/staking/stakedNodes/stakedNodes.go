@@ -94,7 +94,7 @@ func getNodeTotalCommitment(nodeIds []string, block *flow.Block, db *database.Db
 	  return nodeInfo.totalCommittedWithDelegators()
   }`, flowClient.Contract().StakingTable)
 
-	totalStakeArr := make([]types.NodeUnstakingTokens, len(nodeIds))
+	totalStakeArr := make([]types.NodeTotalCommitment, len(nodeIds))
 	for i, id := range nodeIds {
 		nodeId := []cadence.Value{cadence.NewString(id)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
@@ -107,8 +107,9 @@ func getNodeTotalCommitment(nodeIds []string, block *flow.Block, db *database.Db
 			return err
 		}
 
-		totalStakeArr[i] = types.NewNodeUnstakingTokens(nodeIds[i], tokensUnstaking, int64(block.Height))
+		totalStakeArr[i] = types.NewNodeTotalCommitment(nodeIds[i], tokensUnstaking, int64(block.Height))
 	}
 
-	return db.SaveNodeUnstakingTokens(totalStakeArr)
+	return db.SaveNodeTotalCommitment(totalStakeArr)
 }
+
