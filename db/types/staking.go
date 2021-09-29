@@ -163,27 +163,53 @@ func NewCurrentTableRow(
 }
 
 // NodeUnstakingTokensRow represents a single row of the node_unstaking_tokens table
-type NodeUnstakingTokensRow struct { 
-	NodeId string `db:"node_id"`
+type NodeUnstakingTokensRow struct {
+	NodeId         string `db:"node_id"`
 	TokenUnstaking uint64 `db:"token_unstaking"`
-	Height int64 `db:"height"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v NodeUnstakingTokensRow) Equal(w NodeUnstakingTokensRow)bool{
-	return v.NodeId==w.NodeId && 
-  v.TokenUnstaking==w.TokenUnstaking && 
-  v.Height==w.Height }
-  
-	  // NodeUnstakingTokensRow allows to build a new NodeUnstakingTokensRow
-  func NewNodeUnstakingTokensRow( 
+	Height         int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeUnstakingTokensRow) Equal(w NodeUnstakingTokensRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.TokenUnstaking == w.TokenUnstaking &&
+		v.Height == w.Height
+}
+
+// NodeUnstakingTokensRow allows to build a new NodeUnstakingTokensRow
+func NewNodeUnstakingTokensRow(
 	nodeId string,
 	tokenUnstaking uint64,
-	height int64) NodeUnstakingTokensRow{
-   return NodeUnstakingTokensRow{
-   NodeId:nodeId,
-   TokenUnstaking:tokenUnstaking,
-   Height:height,
-  }
-  }
-  
+	height int64) NodeUnstakingTokensRow {
+	return NodeUnstakingTokensRow{
+		NodeId:         nodeId,
+		TokenUnstaking: tokenUnstaking,
+		Height:         height,
+	}
+}
+
+// NodeTotalCommitmentRow represents a single row of the node_total_commitment table
+type NodeTotalCommitmentRow struct {
+	NodeId          string `db:"node_id"`
+	TotalCommitment uint64 `db:"total_commitment"`
+	Height          int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeTotalCommitmentRow) Equal(w NodeTotalCommitmentRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.TotalCommitment == w.TotalCommitment &&
+		v.Height == w.Height
+}
+
+// NodeTotalCommitmentRow allows to build a new NodeTotalCommitmentRow
+func NewNodeTotalCommitmentRow(
+	nodeId string,
+	totalCommitment uint64,
+	height int64) NodeTotalCommitmentRow {
+	return NodeTotalCommitmentRow{
+		NodeId:          nodeId,
+		TotalCommitment: totalCommitment,
+		Height:          height,
+	}
+}

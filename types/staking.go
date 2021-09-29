@@ -137,26 +137,52 @@ func NewCurrentTable(
 	}
 }
 
-type NodeUnstakingTokens struct { 
-	NodeId string
+type NodeUnstakingTokens struct {
+	NodeId         string
 	TokenUnstaking uint64
-	Height int64
-  }
-  
-  // Equal tells whether v and w represent the same rows
-  func (v NodeUnstakingTokens) Equal(w NodeUnstakingTokens)bool{
-	return v.NodeId==w.NodeId && 
-  v.TokenUnstaking==w.TokenUnstaking && 
-  v.Height==w.Height }
-  
-   // NodeUnstakingTokens allows to build a new NodeUnstakingTokens
-  func NewNodeUnstakingTokens( 
+	Height         int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeUnstakingTokens) Equal(w NodeUnstakingTokens) bool {
+	return v.NodeId == w.NodeId &&
+		v.TokenUnstaking == w.TokenUnstaking &&
+		v.Height == w.Height
+}
+
+// NodeUnstakingTokens allows to build a new NodeUnstakingTokens
+func NewNodeUnstakingTokens(
 	nodeId string,
 	tokenUnstaking uint64,
-	height int64) NodeUnstakingTokens{
-   return NodeUnstakingTokens{
-   NodeId:nodeId,
-   TokenUnstaking:tokenUnstaking,
-   Height:height,
-  }
-  }
+	height int64) NodeUnstakingTokens {
+	return NodeUnstakingTokens{
+		NodeId:         nodeId,
+		TokenUnstaking: tokenUnstaking,
+		Height:         height,
+	}
+}
+
+type NodeTotalCommitment struct {
+	NodeId          string
+	TotalCommitment uint64
+	Height          int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeTotalCommitment) Equal(w NodeTotalCommitment) bool {
+	return v.NodeId == w.NodeId &&
+		v.TotalCommitment == w.TotalCommitment &&
+		v.Height == w.Height
+}
+
+// NodeTotalCommitment allows to build a new NodeTotalCommitment
+func NewNodeTotalCommitment(
+	nodeId string,
+	totalCommitment uint64,
+	height int64) NodeTotalCommitment {
+	return NodeTotalCommitment{
+		NodeId:          nodeId,
+		TotalCommitment: totalCommitment,
+		Height:          height,
+	}
+}

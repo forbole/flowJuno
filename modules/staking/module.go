@@ -55,5 +55,5 @@ func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
 }
 
 func (m *Module) HandleEvent(index int, event types.Event, tx *types.Tx) error {
-	return nil/* HandleEvent(m.messagesParser, m.db, event, tx , m.flowClient) */
+	return nil /* HandleEvent(m.messagesParser, m.db, event, tx , m.flowClient) */
 }

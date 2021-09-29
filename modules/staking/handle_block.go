@@ -56,7 +56,6 @@ func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db
 	return nil
 }
 
-
 // getStakedNodeId get staked node id from cadence script
 func getWeeklyPayout(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).

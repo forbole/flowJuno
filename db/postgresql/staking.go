@@ -108,24 +108,47 @@ func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
 }
 
 func (db *Db) SaveNodeUnstakingTokens(nodeUnstakingTokens []types.NodeUnstakingTokens) error {
-    stmt:= `INSERT INTO node_unstaking_tokens(node_id,token_unstaking,height) VALUES `
+	stmt := `INSERT INTO node_unstaking_tokens(node_id,token_unstaking,height) VALUES `
 
-    var params []interface{}
+	var params []interface{}
 
-	  for i, rows := range nodeUnstakingTokens{
-      ai := i * 3
-      stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1,ai+2,ai+3)
-      
-      params = append(params,rows.NodeId,rows.TokenUnstaking,rows.Height)
+	for i, rows := range nodeUnstakingTokens {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
-    }
-	  stmt = stmt[:len(stmt)-1]
-    stmt += ` ON CONFLICT DO NOTHING` 
+		params = append(params, rows.NodeId, rows.TokenUnstaking, rows.Height)
 
-    _, err := db.Sqlx.Exec(stmt, params...)
-    if err != nil {
-      return err
-    }
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
 
-    return nil 
-    }
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Db) SaveNodeTotalCommitment(nodeTotalCommitment []types.NodeTotalCommitment) error {
+	stmt := `INSERT INTO node_total_commitment(node_id,total_commitment,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range nodeTotalCommitment {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.TotalCommitment, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

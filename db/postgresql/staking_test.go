@@ -179,7 +179,6 @@ func (suite *DbTestSuite) TestBigDipperDb_ProposedTable() {
 
 }
 
-
 func (suite *DbTestSuite) TestBigDipperDb_CurrentTable() {
 
 	// ------------------------------
@@ -207,34 +206,64 @@ func (suite *DbTestSuite) TestBigDipperDb_CurrentTable() {
 
 }
 
-func (suite *DbTestSuite) TestBigDipperDb_NodeUnstakingTokens(){
+func (suite *DbTestSuite) TestBigDipperDb_NodeUnstakingTokens() {
 
 	// ------------------------------
-	  // --- Prepare the data
-	  // ------------------------------
-  
+	// --- Prepare the data
+	// ------------------------------
+
 	/*  TODO: Prepare parameter    */
-  
-	input:=[]types.NodeUnstakingTokens{
-		  types.NewNodeUnstakingTokens("0x1",100000008,1),
-	  }
-  
-  
-	  // ------------------------------
-	  // --- Save the data
-	  // ------------------------------
-  
+
+	input := []types.NodeUnstakingTokens{
+		types.NewNodeUnstakingTokens("0x1", 100000008, 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
 	err := suite.database.SaveNodeUnstakingTokens(input)
 	suite.Require().NoError(err)
-  
+
 	// ------------------------------
-	  // --- Verify the data
-	  // ------------------------------
-	  expectedRow := dbtypes.NewNodeUnstakingTokensRow("0x1",100000008,1)
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeUnstakingTokensRow("0x1", 100000008, 1)
 	var outputs []dbtypes.NodeUnstakingTokensRow
-	  err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_unstaking_tokens`)
-	  suite.Require().NoError(err)
-	  suite.Require().Len(outputs, 1, "should contain only one row")
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_unstaking_tokens`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
 	suite.Require().True(expectedRow.Equal(outputs[0]))
-  
-  }
+
+}
+
+func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitment() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := []types.NodeTotalCommitment{
+		types.NewNodeTotalCommitment("0x1", 100000008, 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveNodeTotalCommitment(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeTotalCommitmentRow("0x1", 100000008, 1)
+	var outputs []dbtypes.NodeTotalCommitmentRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_total_commitment`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}

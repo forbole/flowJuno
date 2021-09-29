@@ -15,21 +15,24 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-
 func getStakedNodeInfos(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("getting staked node infos")
 
-	ids,err:=getStakedNodes(block, db, flowClient)
-	if err!=nil{
+	ids, err := getStakedNodes(block, db, flowClient)
+	if err != nil {
 		return err
 	}
 
+	err = getNodeUnstakingTokens(ids, block, db, flowClient)
+	if err != nil {
+		return err
+	}
 
-
+	return nil
 }
 
-func getStakedNodes(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]string,error) {
+func getStakedNodes(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]string, error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("Getting staked node ids")
 
@@ -41,28 +44,20 @@ func getStakedNodes(block *flow.Block, db *database.Db, flowClient client.Proxy)
 
 	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	ids, err := utils.CadenceConvertStringArray(value)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
-	return ids,nil
+	return ids, nil
 }
 
-func getNodeUnstakingTokens(nodeIds []string,block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeUnstakingTokens(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating getTotalStakeByType")
-
-		// https://github.com/onflow/flow-core-contracts/blob/301206b27090fa9116c1aba35cd8bade8a26857c/contracts/FlowIDTableStaking.cdc#L101
-		//
-		// 1 = collection
-		// 2 = consensus
-		// 3 = execution
-		// 4 = verification
-		// 5 = access
+		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(nodeID: String): UFix64 {
@@ -71,9 +66,38 @@ func getNodeUnstakingTokens(nodeIds []string,block *flow.Block, db *database.Db,
   }`, flowClient.Contract().StakingTable)
 
 	totalStakeArr := make([]types.NodeUnstakingTokens, len(nodeIds))
-	for i,id:=range nodeIds{
-		nodeId:=[]cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script),nodeId )
+	for i, id := range nodeIds {
+		nodeId := []cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
+		if err != nil {
+			return err
+		}
+
+		tokensUnstaking, err := utils.CadenceConvertUint64(value)
+		if err != nil {
+			return err
+		}
+
+		totalStakeArr[i] = types.NewNodeUnstakingTokens(nodeIds[i], tokensUnstaking, int64(block.Height))
+	}
+
+	return db.SaveNodeUnstakingTokens(totalStakeArr)
+}
+
+func getNodeTotalCommitment(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating node unstaking tokens")
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(nodeID: String): UFix64 {
+	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
+	  return nodeInfo.totalCommittedWithDelegators()
+  }`, flowClient.Contract().StakingTable)
+
+	totalStakeArr := make([]types.NodeUnstakingTokens, len(nodeIds))
+	for i, id := range nodeIds {
+		nodeId := []cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
 			return err
 		}

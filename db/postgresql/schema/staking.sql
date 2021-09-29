@@ -40,3 +40,9 @@ CREATE TABLE node_unstaking_tokens
   token_unstaking TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_total_commitment
+(  node_id TEXT NOT NULL ,
+  total_commitment TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);
