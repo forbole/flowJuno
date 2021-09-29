@@ -113,3 +113,31 @@ func getNodeTotalCommitment(nodeIds []string, block *flow.Block, db *database.Db
 	return db.SaveNodeTotalCommitment(totalStakeArr)
 }
 
+func getNodeTotalCommitmentWithoutDelegators(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating node unstaking tokens")
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from ${global.contracts.StakingTable}
+	pub fun main(nodeID: String): UFix64 {
+	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
+	  return nodeInfo.totalCommittedWithoutDelegators()
+  }`, flowClient.Contract().StakingTable)
+
+	totalStakeArr := make([]types.NodeTotalCommitmentWithoutDelegators, len(nodeIds))
+	for i, id := range nodeIds {
+		nodeId := []cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
+		if err != nil {
+			return err
+		}
+
+		tokensUnstaking, err := utils.CadenceConvertUint64(value)
+		if err != nil {
+			return err
+		}
+
+		totalStakeArr[i] = types.NewNodeTotalCommitmentWithoutDelegators(nodeIds[i], tokensUnstaking, int64(block.Height))
+	}
+
+	return db.SaveNodeTotalCommitmentWithoutDelegators(totalStakeArr)
+}

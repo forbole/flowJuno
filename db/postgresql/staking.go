@@ -152,3 +152,26 @@ func (db *Db) SaveNodeTotalCommitment(nodeTotalCommitment []types.NodeTotalCommi
 
 	return nil
 }
+
+func (db *Db) SaveNodeTotalCommitmentWithoutDelegators(nodeTotalCommitmentWithoutDelegators []types.NodeTotalCommitmentWithoutDelegators) error {
+	stmt := `INSERT INTO node_total_commitment_without_delegators(node_id,total_commitment_without_delegators,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range nodeTotalCommitmentWithoutDelegators {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.TotalCommitmentWithoutDelegators, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

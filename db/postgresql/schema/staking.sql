@@ -46,3 +46,9 @@ CREATE TABLE node_total_commitment
   total_commitment TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_total_commitment_without_delegators
+(  node_id TEXT NOT NULL ,
+  total_commitment_without_delegators TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

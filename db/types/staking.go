@@ -213,3 +213,29 @@ func NewNodeTotalCommitmentRow(
 		Height:          height,
 	}
 }
+
+// NodeTotalCommitmentWithoutDelegatorsRow represents a single row of the node_total_commitment_without_delegators table
+type NodeTotalCommitmentWithoutDelegatorsRow struct {
+	NodeId                           string `db:"node_id"`
+	TotalCommitmentWithoutDelegators uint64 `db:"total_commitment_without_delegators"`
+	Height                           int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeTotalCommitmentWithoutDelegatorsRow) Equal(w NodeTotalCommitmentWithoutDelegatorsRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.TotalCommitmentWithoutDelegators == w.TotalCommitmentWithoutDelegators &&
+		v.Height == w.Height
+}
+
+// NodeTotalCommitmentWithoutDelegatorsRow allows to build a new NodeTotalCommitmentWithoutDelegatorsRow
+func NewNodeTotalCommitmentWithoutDelegatorsRow(
+	nodeId string,
+	totalCommitmentWithoutDelegators uint64,
+	height int64) NodeTotalCommitmentWithoutDelegatorsRow {
+	return NodeTotalCommitmentWithoutDelegatorsRow{
+		NodeId:                           nodeId,
+		TotalCommitmentWithoutDelegators: totalCommitmentWithoutDelegators,
+		Height:                           height,
+	}
+}

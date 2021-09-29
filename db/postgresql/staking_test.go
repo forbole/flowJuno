@@ -267,3 +267,34 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitment() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
+
+func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitmentWithoutDelegators() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := []types.NodeTotalCommitmentWithoutDelegators{
+		types.NewNodeTotalCommitmentWithoutDelegators("0x1", 100000008, 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveNodeTotalCommitmentWithoutDelegators(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeTotalCommitmentWithoutDelegatorsRow("0x1", 100000008, 1)
+	var outputs []dbtypes.NodeTotalCommitmentWithoutDelegatorsRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_total_commitment`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}
