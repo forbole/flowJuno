@@ -236,3 +236,28 @@ func NewNodeStakingKey(
 		Height:         height,
 	}
 }
+
+type NodeStakedTokens struct {
+	NodeId           string
+	NodeStakedTokens uint64
+	Height           int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeStakedTokens) Equal(w NodeStakedTokens) bool {
+	return v.NodeId == w.NodeId &&
+		v.NodeStakedTokens == w.NodeStakedTokens &&
+		v.Height == w.Height
+}
+
+// NodeStakedTokens allows to build a new NodeStakedTokens
+func NewNodeStakedTokens(
+	nodeId string,
+	nodeStakedTokens uint64,
+	height int64) NodeStakedTokens {
+	return NodeStakedTokens{
+		NodeId:           nodeId,
+		NodeStakedTokens: nodeStakedTokens,
+		Height:           height,
+	}
+}

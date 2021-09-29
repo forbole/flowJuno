@@ -198,3 +198,26 @@ func (db *Db) SaveNodeStakingKey(nodeStakingKey []types.NodeStakingKey) error {
 
 	return nil
 }
+
+func (db *Db) SaveNodeStakedTokens(nodeStakedTokens []types.NodeStakedTokens) error {
+	stmt := `INSERT INTO node_staked_tokens(node_id,node_staked_tokens,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range nodeStakedTokens {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.NodeStakedTokens, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

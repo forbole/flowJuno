@@ -329,3 +329,34 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeStakingKey() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
+
+func (suite *DbTestSuite) TestBigDipperDb_NodeStakedTokens() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := []types.NodeStakedTokens{
+		types.NewNodeStakedTokens("0x1", 2, 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveNodeStakedTokens(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeStakedTokensRow("0x1", 2, 1)
+	var outputs []dbtypes.NodeStakedTokensRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_staked_tokens`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}

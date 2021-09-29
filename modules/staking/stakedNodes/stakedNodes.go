@@ -167,3 +167,32 @@ func getNodeStakingKey(nodeIds []string, block *flow.Block, db *database.Db, flo
 
 	return db.SaveNodeStakingKey(totalStakeArr)
 }
+
+func getNodeStakedTokens(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating node unstaking tokens")
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(nodeID: String): UFix64 {
+	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
+	  return nodeInfo.tokensStaked
+  }`, flowClient.Contract().StakingTable)
+
+	totalStakeArr := make([]types.NodeStakedTokens, len(nodeIds))
+	for i, id := range nodeIds {
+		nodeId := []cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
+		if err != nil {
+			return err
+		}
+
+		stakingKey, err := utils.CadenceConvertUint64(value)
+		if err != nil {
+			return err
+		}
+
+		totalStakeArr[i] = types.NewNodeStakedTokens(nodeIds[i], stakingKey, int64(block.Height))
+	}
+
+	return db.SaveNodeStakedTokens(totalStakeArr)
+}

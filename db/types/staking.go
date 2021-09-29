@@ -265,3 +265,29 @@ func NewNodeStakingKeyRow(
 		Height:         height,
 	}
 }
+
+// NodeStakedTokensRow represents a single row of the node_staked_tokens table
+type NodeStakedTokensRow struct {
+	NodeId           string `db:"node_id"`
+	NodeStakedTokens uint64 `db:"node_staked_tokens"`
+	Height           int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeStakedTokensRow) Equal(w NodeStakedTokensRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.NodeStakedTokens == w.NodeStakedTokens &&
+		v.Height == w.Height
+}
+
+// NodeStakedTokensRow allows to build a new NodeStakedTokensRow
+func NewNodeStakedTokensRow(
+	nodeId string,
+	nodeStakedTokens uint64,
+	height int64) NodeStakedTokensRow {
+	return NodeStakedTokensRow{
+		NodeId:           nodeId,
+		NodeStakedTokens: nodeStakedTokens,
+		Height:           height,
+	}
+}

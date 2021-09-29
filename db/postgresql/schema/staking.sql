@@ -58,3 +58,9 @@ CREATE TABLE node_staking_key
   node_staking_key TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_staked_tokens
+(  node_id TEXT NOT NULL ,
+  node_staked_tokens TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);
