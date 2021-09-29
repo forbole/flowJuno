@@ -286,3 +286,28 @@ func NewNodeRole(
 		Height: height,
 	}
 }
+
+type NodeRewardedTokens struct {
+	NodeId             string
+	NodeRewardedTokens uint64
+	Height             int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeRewardedTokens) Equal(w NodeRewardedTokens) bool {
+	return v.NodeId == w.NodeId &&
+		v.NodeRewardedTokens == w.NodeRewardedTokens &&
+		v.Height == w.Height
+}
+
+// NodeRewardedTokens allows to build a new NodeRewardedTokens
+func NewNodeRewardedTokens(
+	nodeId string,
+	nodeRewardedTokens uint64,
+	height int64) NodeRewardedTokens {
+	return NodeRewardedTokens{
+		NodeId:             nodeId,
+		NodeRewardedTokens: nodeRewardedTokens,
+		Height:             height,
+	}
+}

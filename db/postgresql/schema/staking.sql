@@ -70,3 +70,9 @@ CREATE TABLE node_role
   role TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_rewarded_tokens
+(  node_id TEXT NOT NULL ,
+  node_rewarded_tokens TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

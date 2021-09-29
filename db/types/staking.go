@@ -317,3 +317,29 @@ func NewNodeRoleRow(
 		Height: height,
 	}
 }
+
+// NodeRewardedTokensRow represents a single row of the node_rewarded_tokens table
+type NodeRewardedTokensRow struct {
+	NodeId             string `db:"node_id"`
+	NodeRewardedTokens uint64 `db:"node_rewarded_tokens"`
+	Height             int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeRewardedTokensRow) Equal(w NodeRewardedTokensRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.NodeRewardedTokens == w.NodeRewardedTokens &&
+		v.Height == w.Height
+}
+
+// NodeRewardedTokensRow allows to build a new NodeRewardedTokensRow
+func NewNodeRewardedTokensRow(
+	nodeId string,
+	nodeRewardedTokens uint64,
+	height int64) NodeRewardedTokensRow {
+	return NodeRewardedTokensRow{
+		NodeId:             nodeId,
+		NodeRewardedTokens: nodeRewardedTokens,
+		Height:             height,
+	}
+}

@@ -391,3 +391,34 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeRole() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
+
+func (suite *DbTestSuite) TestBigDipperDb_NodeRewardedTokens() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := []types.NodeRewardedTokens{
+		types.NewNodeRewardedTokens("0x1", 2, 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveNodeRewardedTokens(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeRewardedTokensRow("0x1", 2, 1)
+	var outputs []dbtypes.NodeRewardedTokensRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_rewarded_tokens`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}

@@ -48,11 +48,6 @@ func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db
 		return err
 	}
 
-	err = getCurrentTable(block, db, flowClient)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -234,27 +229,4 @@ func getProposedTable(block *flow.Block, db *database.Db, flowClient client.Prox
 	}
 
 	return db.SaveProposedTable(types.NewProposedTable(int64(block.Height), table))
-}
-
-func getCurrentTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get current staking table")
-
-	script := fmt.Sprintf(`
-		import FlowIDTableStaking from %s
-		pub fun main(): [String] {
-		  return FlowIDTableStaking.getStakedNodeIDs()
-	  }`, flowClient.Contract().StakingTable)
-
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-	if err != nil {
-		return err
-	}
-
-	table, err := utils.CadenceConvertStringArray(value)
-	if err != nil {
-		return err
-	}
-
-	return db.SaveCurrentTable(types.NewCurrentTable(int64(block.Height), table))
 }
