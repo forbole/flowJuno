@@ -221,3 +221,26 @@ func (db *Db) SaveNodeStakedTokens(nodeStakedTokens []types.NodeStakedTokens) er
 
 	return nil
 }
+
+func (db *Db) SaveNodeRole(nodeRole []types.NodeRole) error {
+	stmt := `INSERT INTO node_role(node_id,role,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range nodeRole {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.Role, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

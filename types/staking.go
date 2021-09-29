@@ -261,3 +261,28 @@ func NewNodeStakedTokens(
 		Height:           height,
 	}
 }
+
+type NodeRole struct {
+	NodeId string
+	Role   uint8
+	Height int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeRole) Equal(w NodeRole) bool {
+	return v.NodeId == w.NodeId &&
+		v.Role == w.Role &&
+		v.Height == w.Height
+}
+
+// NodeRole allows to build a new NodeRole
+func NewNodeRole(
+	nodeId string,
+	role uint8,
+	height int64) NodeRole {
+	return NodeRole{
+		NodeId: nodeId,
+		Role:   role,
+		Height: height,
+	}
+}

@@ -27,3 +27,12 @@ func CadenceConvertUint64(value cadence.Value) (uint64, error) {
 
 	return val, nil
 }
+
+func CadenceConvertUint8(value cadence.Value) (uint8, error) {
+	val, ok := value.ToGoValue().(uint8)
+	if !ok {
+		return 0, fmt.Errorf("the cadance value is not a uint64 value")
+	}
+
+	return val, nil
+}

@@ -196,3 +196,32 @@ func getNodeStakedTokens(nodeIds []string, block *flow.Block, db *database.Db, f
 
 	return db.SaveNodeStakedTokens(totalStakeArr)
 }
+
+func getNodeRole(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating node unstaking tokens")
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(nodeID: String): UInt8 {
+	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
+	  return nodeInfo.role
+  }`, flowClient.Contract().StakingTable)
+
+	totalStakeArr := make([]types.NodeRole, len(nodeIds))
+	for i, id := range nodeIds {
+		nodeId := []cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
+		if err != nil {
+			return err
+		}
+
+		stakingKey, err := utils.CadenceConvertUint8(value)
+		if err != nil {
+			return err
+		}
+
+		totalStakeArr[i] = types.NewNodeRole(nodeIds[i], stakingKey, int64(block.Height))
+	}
+
+	return db.SaveNodeRole(totalStakeArr)
+}

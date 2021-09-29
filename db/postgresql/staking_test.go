@@ -360,3 +360,34 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeStakedTokens() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
+
+func (suite *DbTestSuite) TestBigDipperDb_NodeRole() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := []types.NodeRole{
+		types.NewNodeRole("0x1", 2, 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveNodeRole(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeRoleRow("0x1", 2, 1)
+	var outputs []dbtypes.NodeRoleRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_role`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}

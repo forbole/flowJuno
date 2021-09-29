@@ -291,3 +291,29 @@ func NewNodeStakedTokensRow(
 		Height:           height,
 	}
 }
+
+// NodeRoleRow represents a single row of the node_role table
+type NodeRoleRow struct {
+	NodeId string `db:"node_id"`
+	Role   uint8  `db:"role"`
+	Height int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeRoleRow) Equal(w NodeRoleRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.Role == w.Role &&
+		v.Height == w.Height
+}
+
+// NodeRoleRow allows to build a new NodeRoleRow
+func NewNodeRoleRow(
+	nodeId string,
+	role uint8,
+	height int64) NodeRoleRow {
+	return NodeRoleRow{
+		NodeId: nodeId,
+		Role:   role,
+		Height: height,
+	}
+}
