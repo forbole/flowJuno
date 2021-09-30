@@ -88,3 +88,9 @@ CREATE TABLE node_networking_address
   networking_address TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_initial_weight
+(  node_id TEXT NOT NULL ,
+  initial_weight TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

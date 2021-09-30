@@ -361,3 +361,28 @@ func NewNodeNetworkingAddress(
 		Height:            height,
 	}
 }
+
+type NodeInitialWeight struct {
+	NodeId        string
+	InitialWeight uint64
+	Height        int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeInitialWeight) Equal(w NodeInitialWeight) bool {
+	return v.NodeId == w.NodeId &&
+		v.InitialWeight == w.InitialWeight &&
+		v.Height == w.Height
+}
+
+// NodeInitialWeight allows to build a new NodeInitialWeight
+func NewNodeInitialWeight(
+	nodeId string,
+	initialWeight uint64,
+	height int64) NodeInitialWeight {
+	return NodeInitialWeight{
+		NodeId:        nodeId,
+		InitialWeight: initialWeight,
+		Height:        height,
+	}
+}

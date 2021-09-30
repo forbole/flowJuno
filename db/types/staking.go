@@ -395,3 +395,29 @@ func NewNodeNetworkingAddressRow(
 		Height:            height,
 	}
 }
+
+// NodeInitialWeightRow represents a single row of the node_initial_weight table
+type NodeInitialWeightRow struct {
+	NodeId        string `db:"node_id"`
+	InitialWeight uint64 `db:"initial_weight"`
+	Height        int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeInitialWeightRow) Equal(w NodeInitialWeightRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.InitialWeight == w.InitialWeight &&
+		v.Height == w.Height
+}
+
+// NodeInitialWeightRow allows to build a new NodeInitialWeightRow
+func NewNodeInitialWeightRow(
+	nodeId string,
+	initialWeight uint64,
+	height int64) NodeInitialWeightRow {
+	return NodeInitialWeightRow{
+		NodeId:        nodeId,
+		InitialWeight: initialWeight,
+		Height:        height,
+	}
+}

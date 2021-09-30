@@ -484,3 +484,34 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeNetworkingAddress() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
+
+func (suite *DbTestSuite) TestBigDipperDb_NodeInitialWeight() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := []types.NodeInitialWeight{
+		types.NewNodeInitialWeight("0x1", 2, 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveNodeInitialWeight(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeInitialWeightRow("0x1", 2, 1)
+	var outputs []dbtypes.NodeInitialWeightRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_initial_weight`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}

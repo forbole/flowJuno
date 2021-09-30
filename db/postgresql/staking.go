@@ -313,3 +313,26 @@ func (db *Db) SaveNodeNetworkingAddress(nodeNetworkingAddress []types.NodeNetwor
 
 	return nil
 }
+
+func (db *Db) SaveNodeInitialWeight(nodeInitialWeight []types.NodeInitialWeight) error {
+	stmt := `INSERT INTO node_initial_weight(node_id,initial_weight,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range nodeInitialWeight {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.InitialWeight, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

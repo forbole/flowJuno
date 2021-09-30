@@ -241,7 +241,7 @@ func getNodeRewardedTokens(nodeIds []string, block *flow.Block, db *database.Db,
 	  return nodeInfo.tokensRewarded
   }`, flowClient.Contract().StakingTable)
 
-	totalStakeArr := make([]types.NodeRole, len(nodeIds))
+	totalStakeArr := make([]types.NodeRewardedTokens, len(nodeIds))
 	for i, id := range nodeIds {
 		nodeId := []cadence.Value{cadence.NewString(id)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
@@ -254,10 +254,10 @@ func getNodeRewardedTokens(nodeIds []string, block *flow.Block, db *database.Db,
 			return err
 		}
 
-		totalStakeArr[i] = types.NewNodeRole(nodeIds[i], stakingKey, int64(block.Height))
+		totalStakeArr[i] = types.NewNodeRewardedTokens(nodeIds[i], stakingKey, int64(block.Height))
 	}
 
-	return db.SaveNodeRole(totalStakeArr)
+	return db.SaveNodeRewardedTokens(totalStakeArr)
 }
 
 func getNodeNetworkingKey(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
@@ -316,4 +316,32 @@ func getNodeNetworkingAddress(nodeIds []string, block *flow.Block, db *database.
 	}
 
 	return db.SaveNodeNetworkingAddress(totalStakeArr)
+}
+func getNodeInitialWeight(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating get node networking address")
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(nodeID: String): uFix64 {
+	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
+	  return nodeInfo.initialWeight
+  }`, flowClient.Contract().StakingTable)
+
+	totalStakeArr := make([]types.NodeInitialWeight, len(nodeIds))
+	for i, id := range nodeIds {
+		nodeId := []cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
+		if err != nil {
+			return err
+		}
+
+		stakingKey, err := utils.CadenceConvertUint64(value)
+		if err != nil {
+			return err
+		}
+
+		totalStakeArr[i] = types.NewNodeInitialWeight(nodeIds[i], stakingKey, int64(block.Height))
+	}
+
+	return db.SaveNodeInitialWeight(totalStakeArr)
 }
