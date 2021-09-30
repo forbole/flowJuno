@@ -343,3 +343,29 @@ func NewNodeRewardedTokensRow(
 		Height:             height,
 	}
 }
+
+// NodeNetworkingKeyRow represents a single row of the node_networking_key table
+type NodeNetworkingKeyRow struct {
+	NodeId        string `db:"node_id"`
+	NetworkingKey string `db:"networking_key"`
+	Height        int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeNetworkingKeyRow) Equal(w NodeNetworkingKeyRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.NetworkingKey == w.NetworkingKey &&
+		v.Height == w.Height
+}
+
+// NodeNetworkingKeyRow allows to build a new NodeNetworkingKeyRow
+func NewNodeNetworkingKeyRow(
+	nodeId string,
+	networkingKey string,
+	height int64) NodeNetworkingKeyRow {
+	return NodeNetworkingKeyRow{
+		NodeId:        nodeId,
+		NetworkingKey: networkingKey,
+		Height:        height,
+	}
+}

@@ -422,3 +422,34 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeRewardedTokens() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
+
+func (suite *DbTestSuite) TestBigDipperDb_NodeNetworkingKey() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := []types.NodeNetworkingKey{
+		types.NewNodeNetworkingKey("0x1", "0x2", 1),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveNodeNetworkingKey(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewNodeNetworkingKeyRow("0x1", "0x2", 1)
+	var outputs []dbtypes.NodeNetworkingKeyRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_networking_key`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}

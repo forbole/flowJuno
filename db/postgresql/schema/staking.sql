@@ -76,3 +76,9 @@ CREATE TABLE node_rewarded_tokens
   node_rewarded_tokens TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_networking_key
+(  node_id TEXT NOT NULL ,
+  networking_key TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

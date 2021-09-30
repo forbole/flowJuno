@@ -311,3 +311,28 @@ func NewNodeRewardedTokens(
 		Height:             height,
 	}
 }
+
+type NodeNetworkingKey struct {
+	NodeId        string
+	NetworkingKey string
+	Height        int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeNetworkingKey) Equal(w NodeNetworkingKey) bool {
+	return v.NodeId == w.NodeId &&
+		v.NetworkingKey == w.NetworkingKey &&
+		v.Height == w.Height
+}
+
+// NodeNetworkingKey allows to build a new NodeNetworkingKey
+func NewNodeNetworkingKey(
+	nodeId string,
+	networkingKey string,
+	height int64) NodeNetworkingKey {
+	return NodeNetworkingKey{
+		NodeId:        nodeId,
+		NetworkingKey: networkingKey,
+		Height:        height,
+	}
+}
