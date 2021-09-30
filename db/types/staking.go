@@ -369,3 +369,29 @@ func NewNodeNetworkingKeyRow(
 		Height:        height,
 	}
 }
+
+// NodeNetworkingAddressRow represents a single row of the node_networking_address table
+type NodeNetworkingAddressRow struct {
+	NodeId            string `db:"node_id"`
+	NetworkingAddress string `db:"networking_address"`
+	Height            int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeNetworkingAddressRow) Equal(w NodeNetworkingAddressRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.NetworkingAddress == w.NetworkingAddress &&
+		v.Height == w.Height
+}
+
+// NodeNetworkingAddressRow allows to build a new NodeNetworkingAddressRow
+func NewNodeNetworkingAddressRow(
+	nodeId string,
+	networkingAddress string,
+	height int64) NodeNetworkingAddressRow {
+	return NodeNetworkingAddressRow{
+		NodeId:            nodeId,
+		NetworkingAddress: networkingAddress,
+		Height:            height,
+	}
+}

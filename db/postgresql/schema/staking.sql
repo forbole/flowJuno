@@ -82,3 +82,9 @@ CREATE TABLE node_networking_key
   networking_key TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_networking_address
+(  node_id TEXT NOT NULL ,
+  networking_address TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

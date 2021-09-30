@@ -336,3 +336,28 @@ func NewNodeNetworkingKey(
 		Height:        height,
 	}
 }
+
+type NodeNetworkingAddress struct {
+	NodeId            string
+	NetworkingAddress string
+	Height            int64
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeNetworkingAddress) Equal(w NodeNetworkingAddress) bool {
+	return v.NodeId == w.NodeId &&
+		v.NetworkingAddress == w.NetworkingAddress &&
+		v.Height == w.Height
+}
+
+// NodeNetworkingAddress allows to build a new NodeNetworkingAddress
+func NewNodeNetworkingAddress(
+	nodeId string,
+	networkingAddress string,
+	height int64) NodeNetworkingAddress {
+	return NodeNetworkingAddress{
+		NodeId:            nodeId,
+		NetworkingAddress: networkingAddress,
+		Height:            height,
+	}
+}

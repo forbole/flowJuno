@@ -278,7 +278,7 @@ func getNodeNetworkingKey(nodeIds []string, block *flow.Block, db *database.Db, 
 			return err
 		}
 
-		stakingKey:=value.String()
+		stakingKey := value.String()
 		if err != nil {
 			return err
 		}
@@ -287,4 +287,33 @@ func getNodeNetworkingKey(nodeIds []string, block *flow.Block, db *database.Db, 
 	}
 
 	return db.SaveNodeNetworkingKey(totalStakeArr)
+}
+
+func getNodeNetworkingAddress(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating get node networking address")
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(nodeID: String): String {
+	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
+	  return nodeInfo.networkingAddress
+  }`, flowClient.Contract().StakingTable)
+
+	totalStakeArr := make([]types.NodeNetworkingAddress, len(nodeIds))
+	for i, id := range nodeIds {
+		nodeId := []cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
+		if err != nil {
+			return err
+		}
+
+		stakingKey := value.String()
+		if err != nil {
+			return err
+		}
+
+		totalStakeArr[i] = types.NewNodeNetworkingAddress(nodeIds[i], stakingKey, int64(block.Height))
+	}
+
+	return db.SaveNodeNetworkingAddress(totalStakeArr)
 }
