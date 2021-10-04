@@ -633,9 +633,7 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 
 	/*  TODO: Prepare parameter    */
 
-	input := []types.CutPercentage{
-		types.NewCutPercentage("0x1", 2, 1),
-	}
+	input := types.NewCutPercentage([]string{"abc","def"}, 1)
 
 	// ------------------------------
 	// --- Save the data
@@ -647,11 +645,12 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedRow := dbtypes.NewCutPercentageRow("0x1", 2, 1)
+	expectedRow := dbtypes.NewCutPercentageRow(`["abc","def"]`, 1)
 	var outputs []dbtypes.CutPercentageRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM cut_percentage`)
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
+	fmt.Println(outputs[0])
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
