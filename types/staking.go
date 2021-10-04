@@ -405,20 +405,38 @@ func NewNodeInfoFromAddress(
 	}
 }
 
-type NodeInfoFromNodeID struct { 
-	NodeId string
+type NodeInfoFromNodeID struct {
+	NodeId   string
 	NodeInfo StakerNodeInfo
-	Height int64
-  }
-  
-   // NodeInfoFromNodeID allows to build a new NodeInfoFromNodeID
-  func NewNodeInfoFromNodeID( 
+	Height   int64
+}
+
+// NodeInfoFromNodeID allows to build a new NodeInfoFromNodeID
+func NewNodeInfoFromNodeID(
 	nodeId string,
 	nodeInfo StakerNodeInfo,
-	height int64) NodeInfoFromNodeID{
-   return NodeInfoFromNodeID{
-   NodeId:nodeId,
-   NodeInfo:nodeInfo,
-   Height:height,
-  }
-  }
+	height int64) NodeInfoFromNodeID {
+	return NodeInfoFromNodeID{
+		NodeId:   nodeId,
+		NodeInfo: nodeInfo,
+		Height:   height,
+	}
+}
+
+type NodeCommittedTokens struct {
+	NodeId          string
+	CommittedTokens uint64
+	Height          int64
+}
+
+// NodeCommittedTokens allows to build a new NodeCommittedTokens
+func NewNodeCommittedTokens(
+	nodeId string,
+	committedTokens uint64,
+	height int64) NodeCommittedTokens {
+	return NodeCommittedTokens{
+		NodeId:          nodeId,
+		CommittedTokens: committedTokens,
+		Height:          height,
+	}
+}

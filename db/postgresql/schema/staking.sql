@@ -106,3 +106,9 @@ CREATE TABLE node_info_from_node_id
   node_info TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_committed_tokens
+(  node_id TEXT NOT NULL ,
+  committed_tokens TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

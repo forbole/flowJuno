@@ -449,27 +449,53 @@ func NewNodeInfoFromAddressRow(
 }
 
 // NodeInfoFromNodeIDRow represents a single row of the node_info_from_node_i_d table
-type NodeInfoFromNodeIDRow struct { 
-	NodeId string `db:"node_id"`
+type NodeInfoFromNodeIDRow struct {
+	NodeId   string `db:"node_id"`
 	NodeInfo string `db:"node_info"`
-	Height int64 `db:"height"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v NodeInfoFromNodeIDRow) Equal(w NodeInfoFromNodeIDRow)bool{
-	return v.NodeId==w.NodeId && 
-  v.NodeInfo==w.NodeInfo && 
-  v.Height==w.Height }
-  
-	  // NodeInfoFromNodeIDRow allows to build a new NodeInfoFromNodeIDRow
-  func NewNodeInfoFromNodeIDRow( 
+	Height   int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeInfoFromNodeIDRow) Equal(w NodeInfoFromNodeIDRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.NodeInfo == w.NodeInfo &&
+		v.Height == w.Height
+}
+
+// NodeInfoFromNodeIDRow allows to build a new NodeInfoFromNodeIDRow
+func NewNodeInfoFromNodeIDRow(
 	nodeId string,
 	nodeInfo string,
-	height int64) NodeInfoFromNodeIDRow{
-   return NodeInfoFromNodeIDRow{
-   NodeId:nodeId,
-   NodeInfo:nodeInfo,
-   Height:height,
-  }
-  }
-  
+	height int64) NodeInfoFromNodeIDRow {
+	return NodeInfoFromNodeIDRow{
+		NodeId:   nodeId,
+		NodeInfo: nodeInfo,
+		Height:   height,
+	}
+}
+
+// NodeCommittedTokensRow represents a single row of the node_committed_tokens table
+type NodeCommittedTokensRow struct {
+	NodeId          string `db:"node_id"`
+	CommittedTokens uint64 `db:"committed_tokens"`
+	Height          int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeCommittedTokensRow) Equal(w NodeCommittedTokensRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.CommittedTokens == w.CommittedTokens &&
+		v.Height == w.Height
+}
+
+// NodeCommittedTokensRow allows to build a new NodeCommittedTokensRow
+func NewNodeCommittedTokensRow(
+	nodeId string,
+	committedTokens uint64,
+	height int64) NodeCommittedTokensRow {
+	return NodeCommittedTokensRow{
+		NodeId:          nodeId,
+		CommittedTokens: committedTokens,
+		Height:          height,
+	}
+}

@@ -365,28 +365,51 @@ func (db *Db) SaveNodeInfoFromAddresses(NodeInfoFromAddress []types.NodeInfoFrom
 }
 
 func (db *Db) SaveNodeInfoFromNodeIDs(nodeInfoFromNodeID []types.NodeInfoFromNodeID) error {
-    stmt:= `INSERT INTO node_info_from_node_id(node_id,node_info,height) VALUES `
+	stmt := `INSERT INTO node_info_from_node_id(node_id,node_info,height) VALUES `
 
-    var params []interface{}
+	var params []interface{}
 
-	  for i, rows := range nodeInfoFromNodeID{
-      ai := i * 3
-      stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1,ai+2,ai+3)
+	for i, rows := range nodeInfoFromNodeID {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
-      nodeInfo, err := json.Marshal(rows.NodeInfo)
+		nodeInfo, err := json.Marshal(rows.NodeInfo)
 		if err != nil {
 			return err
 		}
-      params = append(params,rows.NodeId,nodeInfo,rows.Height)
+		params = append(params, rows.NodeId, nodeInfo, rows.Height)
 
-    }
-	  stmt = stmt[:len(stmt)-1]
-    stmt += ` ON CONFLICT DO NOTHING` 
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
 
-    _, err := db.Sqlx.Exec(stmt, params...)
-    if err != nil {
-      return err
-    }
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
 
-    return nil 
-    }
+	return nil
+}
+
+func (db *Db) SaveNodeCommittedTokens(nodeCommittedTokens []types.NodeCommittedTokens) error {
+	stmt := `INSERT INTO node_committed_tokens(node_id,committed_tokens,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range nodeCommittedTokens {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.CommittedTokens, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
