@@ -94,3 +94,15 @@ CREATE TABLE node_initial_weight
   initial_weight TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE node_info_from_address
+(  address TEXT NOT NULL ,
+  node_info TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);
+
+CREATE TABLE node_info_from_node_id
+(  node_id TEXT NOT NULL ,
+  node_info TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

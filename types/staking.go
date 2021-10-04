@@ -386,3 +386,39 @@ func NewNodeInitialWeight(
 		Height:        height,
 	}
 }
+
+type NodeInfoFromAddress struct {
+	Address  string
+	NodeInfo StakerNodeInfo
+	Height   int64
+}
+
+// NodeInfoFromNodeIDs allows to build a new NodeInfoFromNodeIDs
+func NewNodeInfoFromAddress(
+	address string,
+	nodeInfo StakerNodeInfo,
+	height int64) NodeInfoFromAddress {
+	return NodeInfoFromAddress{
+		Address:  address,
+		NodeInfo: nodeInfo,
+		Height:   height,
+	}
+}
+
+type NodeInfoFromNodeID struct { 
+	NodeId string
+	NodeInfo StakerNodeInfo
+	Height int64
+  }
+  
+   // NodeInfoFromNodeID allows to build a new NodeInfoFromNodeID
+  func NewNodeInfoFromNodeID( 
+	nodeId string,
+	nodeInfo StakerNodeInfo,
+	height int64) NodeInfoFromNodeID{
+   return NodeInfoFromNodeID{
+   NodeId:nodeId,
+   NodeInfo:nodeInfo,
+   Height:height,
+  }
+  }

@@ -421,3 +421,55 @@ func NewNodeInitialWeightRow(
 		Height:        height,
 	}
 }
+
+// NodeInfoFromNodeIDsRow represents a single row of the node_info_from_address table
+type NodeInfoFromAddressRow struct {
+	Address  string `db:"address"`
+	NodeInfo string `db:"node_info"`
+	Height   int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeInfoFromAddressRow) Equal(w NodeInfoFromAddressRow) bool {
+	return v.Address == w.Address &&
+		v.NodeInfo == w.NodeInfo &&
+		v.Height == w.Height
+}
+
+// NodeInfoFromNodeIDsRow allows to build a new NodeInfoFromNodeIDsRow
+func NewNodeInfoFromAddressRow(
+	address string,
+	nodeInfo string,
+	height int64) NodeInfoFromAddressRow {
+	return NodeInfoFromAddressRow{
+		Address:  address,
+		NodeInfo: nodeInfo,
+		Height:   height,
+	}
+}
+
+// NodeInfoFromNodeIDRow represents a single row of the node_info_from_node_i_d table
+type NodeInfoFromNodeIDRow struct { 
+	NodeId string `db:"node_id"`
+	NodeInfo string `db:"node_info"`
+	Height int64 `db:"height"`
+  }
+  
+	 // Equal tells whether v and w represent the same rows
+  func (v NodeInfoFromNodeIDRow) Equal(w NodeInfoFromNodeIDRow)bool{
+	return v.NodeId==w.NodeId && 
+  v.NodeInfo==w.NodeInfo && 
+  v.Height==w.Height }
+  
+	  // NodeInfoFromNodeIDRow allows to build a new NodeInfoFromNodeIDRow
+  func NewNodeInfoFromNodeIDRow( 
+	nodeId string,
+	nodeInfo string,
+	height int64) NodeInfoFromNodeIDRow{
+   return NodeInfoFromNodeIDRow{
+   NodeId:nodeId,
+   NodeInfo:nodeInfo,
+   Height:height,
+  }
+  }
+  

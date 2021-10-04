@@ -336,3 +336,57 @@ func (db *Db) SaveNodeInitialWeight(nodeInitialWeight []types.NodeInitialWeight)
 
 	return nil
 }
+
+func (db *Db) SaveNodeInfoFromAddresses(NodeInfoFromAddress []types.NodeInfoFromAddress) error {
+	stmt := `INSERT INTO node_info_from_address(address,node_info,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range NodeInfoFromAddress {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		nodeInfo, err := json.Marshal(rows.NodeInfo)
+		if err != nil {
+			return err
+		}
+		params = append(params, rows.Address, nodeInfo, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Db) SaveNodeInfoFromNodeIDs(nodeInfoFromNodeID []types.NodeInfoFromNodeID) error {
+    stmt:= `INSERT INTO node_info_from_node_id(node_id,node_info,height) VALUES `
+
+    var params []interface{}
+
+	  for i, rows := range nodeInfoFromNodeID{
+      ai := i * 3
+      stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1,ai+2,ai+3)
+
+      nodeInfo, err := json.Marshal(rows.NodeInfo)
+		if err != nil {
+			return err
+		}
+      params = append(params,rows.NodeId,nodeInfo,rows.Height)
+
+    }
+	  stmt = stmt[:len(stmt)-1]
+    stmt += ` ON CONFLICT DO NOTHING` 
+
+    _, err := db.Sqlx.Exec(stmt, params...)
+    if err != nil {
+      return err
+    }
+
+    return nil 
+    }
