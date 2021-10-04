@@ -112,3 +112,9 @@ CREATE TABLE node_committed_tokens
   committed_tokens TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE cut_percentage
+(  node_id TEXT NOT NULL ,
+  cut_percentage TEXT NOT NULL ,
+  height BIGINT  NOT NULL
+);

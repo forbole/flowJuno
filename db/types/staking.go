@@ -499,3 +499,29 @@ func NewNodeCommittedTokensRow(
 		Height:          height,
 	}
 }
+
+// CutPercentageRow represents a single row of the cut_percentage table
+type CutPercentageRow struct {
+	NodeId        string `db:"node_id"`
+	CutPercentage uint64 `db:"cut_percentage"`
+	Height        int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v CutPercentageRow) Equal(w CutPercentageRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.CutPercentage == w.CutPercentage &&
+		v.Height == w.Height
+}
+
+// CutPercentageRow allows to build a new CutPercentageRow
+func NewCutPercentageRow(
+	nodeId string,
+	cutPercentage uint64,
+	height int64) CutPercentageRow {
+	return CutPercentageRow{
+		NodeId:        nodeId,
+		CutPercentage: cutPercentage,
+		Height:        height,
+	}
+}

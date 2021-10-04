@@ -413,3 +413,26 @@ func (db *Db) SaveNodeCommittedTokens(nodeCommittedTokens []types.NodeCommittedT
 
 	return nil
 }
+
+func (db *Db) SaveCutPercentage(cutPercentage []types.CutPercentage) error {
+	stmt := `INSERT INTO cut_percentage(node_id,cut_percentage,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range cutPercentage {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.CutPercentage, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
