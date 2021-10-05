@@ -117,3 +117,10 @@ CREATE TABLE cut_percentage
 (  cut_percentage TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE TABLE delegator_committed
+(  committed TEXT NOT NULL ,
+  height TEXT NOT NULL ,
+  node_id TEXT NOT NULL ,
+  delegator_i_d TEXT NOT NULL
+);

@@ -499,23 +499,55 @@ func NewNodeCommittedTokensRow(
 		Height:          height,
 	}
 }
+
 // CutPercentageRow represents a single row of the cut_percentage table
-type CutPercentageRow struct { 
+type CutPercentageRow struct {
 	CutPercentage string `db:"cut_percentage"`
-	Height int64 `db:"height"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v CutPercentageRow) Equal(w CutPercentageRow)bool{
-	return v.CutPercentage==w.CutPercentage && 
-  v.Height==w.Height }
-  
-	  // CutPercentageRow allows to build a new CutPercentageRow
-  func NewCutPercentageRow( 
+	Height        int64  `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v CutPercentageRow) Equal(w CutPercentageRow) bool {
+	return v.CutPercentage == w.CutPercentage &&
+		v.Height == w.Height
+}
+
+// CutPercentageRow allows to build a new CutPercentageRow
+func NewCutPercentageRow(
 	cutPercentage string,
-	height int64) CutPercentageRow{
-   return CutPercentageRow{
-   CutPercentage:cutPercentage,
-   Height:height,
-  }
-  }
+	height int64) CutPercentageRow {
+	return CutPercentageRow{
+		CutPercentage: cutPercentage,
+		Height:        height,
+	}
+}
+
+// DelegatorCommittedRow represents a single row of the delegator_committed table
+type DelegatorCommittedRow struct {
+	Committed   uint64 `db:"committed"`
+	Height      uint64 `db:"height"`
+	NodeId      string `db:"node_id"`
+	DelegatorID uint32 `db:"delegator_i_d"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorCommittedRow) Equal(w DelegatorCommittedRow) bool {
+	return v.Committed == w.Committed &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorID == w.DelegatorID
+}
+
+// DelegatorCommittedRow allows to build a new DelegatorCommittedRow
+func NewDelegatorCommittedRow(
+	committed uint64,
+	height uint64,
+	nodeId string,
+	delegatorID uint32) DelegatorCommittedRow {
+	return DelegatorCommittedRow{
+		Committed:   committed,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorID: delegatorID,
+	}
+}

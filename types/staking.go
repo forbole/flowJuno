@@ -455,3 +455,32 @@ func NewCutPercentage(
 		Height:        height,
 	}
 }
+
+type DelegatorCommitted struct {
+	Committed   uint64
+	Height      uint64
+	NodeId      string
+	DelegatorID uint32
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorCommitted) Equal(w DelegatorCommitted) bool {
+	return v.Committed == w.Committed &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorID == w.DelegatorID
+}
+
+// DelegatorCommitted allows to build a new DelegatorCommitted
+func NewDelegatorCommitted(
+	committed uint64,
+	height uint64,
+	nodeId string,
+	delegatorID uint32) DelegatorCommitted {
+	return DelegatorCommitted{
+		Committed:   committed,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorID: delegatorID,
+	}
+}

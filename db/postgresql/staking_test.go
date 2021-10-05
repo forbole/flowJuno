@@ -633,7 +633,7 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 
 	/*  TODO: Prepare parameter    */
 
-	input := types.NewCutPercentage([]string{"abc","def"}, 1)
+	input := types.NewCutPercentage([]string{"abc", "def"}, 1)
 
 	// ------------------------------
 	// --- Save the data
@@ -651,6 +651,35 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
 	fmt.Println(outputs[0])
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}
+
+func (suite *DbTestSuite) TestBigDipperDb_DelegatorCommitted() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	input := types.NewDelegatorCommitted(1, 2, "0x1", 3)
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveDelegatorCommitted(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewDelegatorCommittedRow(1, 2, "0x1", 3)
+	var outputs []dbtypes.DelegatorCommittedRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM delegator_committed`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }

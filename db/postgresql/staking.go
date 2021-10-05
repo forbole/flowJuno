@@ -414,11 +414,20 @@ func (db *Db) SaveNodeCommittedTokens(nodeCommittedTokens []types.NodeCommittedT
 	return nil
 }
 func (db *Db) SaveCutPercentage(cutPercentage types.CutPercentage) error {
-	stmt:= `INSERT INTO cut_percentage(cut_percentage,height) VALUES ($1,$2) ON CONFLICT DO NOTHING` 
-	cut,err:=json.Marshal(cutPercentage.CutPercentage)
-	if err!=nil{
+	stmt := `INSERT INTO cut_percentage(cut_percentage,height) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+	cut, err := json.Marshal(cutPercentage.CutPercentage)
+	if err != nil {
 		return err
 	}
-	_, err = db.Sql.Exec(stmt,cut,cutPercentage.Height)
-	return err 
+	_, err = db.Sql.Exec(stmt, cut, cutPercentage.Height)
+	return err
+}
+
+func (db *Db) SaveDelegatorCommitted(delegatorCommitted types.DelegatorCommitted) error {
+	stmt := `INSERT INTO delegator_committed(committed,height,node_id,delegator_i_d) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, delegatorCommitted.Committed,
+		delegatorCommitted.Height,
+		delegatorCommitted.NodeId,
+		delegatorCommitted.DelegatorID)
+	return err
 }

@@ -236,20 +236,19 @@ func getCutPercentage(block *flow.Block, db *database.Db, flowClient client.Prox
 		Msg("updating cut percentage")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): uFix64 {
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.getRewardCutPercentage()
+	pub fun main(): UFix64 {
+	  return FlowIDTableStaking.getRewardCutPercentage()
   }`, flowClient.Contract().StakingTable)
 
-  value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-  if err != nil {
-	  return err
-  }
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
+	if err != nil {
+		return err
+	}
 
-  table, err := utils.CadenceConvertStringArray(value)
-  if err != nil {
-	  return err
-  }
+	table, err := utils.CadenceConvertStringArray(value)
+	if err != nil {
+		return err
+	}
 
-  return db.SaveCutPercentage(types.NewCutPercentage(table,height))
+	return db.SaveCutPercentage(types.NewCutPercentage(table, int64(block.Height)))
 }
