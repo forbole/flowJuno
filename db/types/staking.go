@@ -527,7 +527,7 @@ type DelegatorCommittedRow struct {
 	Committed   uint64 `db:"committed"`
 	Height      uint64 `db:"height"`
 	NodeId      string `db:"node_id"`
-	DelegatorID uint32 `db:"delegator_i_d"`
+	DelegatorID uint32 `db:"delegator_id"`
 }
 
 // Equal tells whether v and w represent the same rows
@@ -551,3 +551,58 @@ func NewDelegatorCommittedRow(
 		DelegatorID: delegatorID,
 	}
 }
+
+// DelegatorInfoRow represents a single row of the delegator_info table
+type DelegatorInfoRow struct {
+	DelegatorInfo string `db:"delegator_info"`
+	Height        uint64 `db:"height"`
+	NodeId        string `db:"node_id"`
+	DelegatorID   uint32 `db:"delegator_id"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorInfoRow) Equal(w DelegatorInfoRow) bool {
+	return v.DelegatorInfo == w.DelegatorInfo &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorID == w.DelegatorID
+}
+
+// DelegatorInfoRow allows to build a new DelegatorInfoRow
+func NewDelegatorInfoRow(
+	delegatorInfo string,
+	height uint64,
+	nodeId string,
+	delegatorID uint32) DelegatorInfoRow {
+	return DelegatorInfoRow{
+		DelegatorInfo: delegatorInfo,
+		Height:        height,
+		NodeId:        nodeId,
+		DelegatorID:   delegatorID,
+	}
+}
+
+// DelegatorInfoFromAddressRow represents a single row of the delegator_info_from_address table
+type DelegatorInfoFromAddressRow struct { 
+	DelegatorInfo string `db:"delegator_info"`
+	Height int64 `db:"height"`
+	Address string `db:"address"`
+  }
+  
+	 // Equal tells whether v and w represent the same rows
+  func (v DelegatorInfoFromAddressRow) Equal(w DelegatorInfoFromAddressRow)bool{
+	return v.DelegatorInfo==w.DelegatorInfo && 
+  v.Height==w.Height && 
+  v.Address==w.Address }
+  
+	  // DelegatorInfoFromAddressRow allows to build a new DelegatorInfoFromAddressRow
+  func NewDelegatorInfoFromAddressRow( 
+	delegatorInfo string,
+	height int64,
+	address string) DelegatorInfoFromAddressRow{
+   return DelegatorInfoFromAddressRow{
+   DelegatorInfo:delegatorInfo,
+   Height:height,
+   Address:address,
+  }
+  }

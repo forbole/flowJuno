@@ -25,8 +25,8 @@ func getDelegatorCommitted(nodeId string, delegatorID uint32, block *flow.Block,
 	  return delInfo.tokensCommitted
   }`, flowClient.Contract().StakingTable)
 
-	arg := []cadence.Value{cadence.NewString(nodeId), cadence.NewUInt32(delegatorID)}
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), arg)
+	args := []cadence.Value{cadence.NewString(nodeId), cadence.NewUInt32(delegatorID)}
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), args)
 	if err != nil {
 		return err
 	}
@@ -37,4 +37,27 @@ func getDelegatorCommitted(nodeId string, delegatorID uint32, block *flow.Block,
 	}
 
 	return db.SaveDelegatorCommitted(types.NewDelegatorCommitted(committed, block.Height, nodeId, delegatorID))
+}
+
+func getDelegatorInfo(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating node unstaking tokens")
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(nodeID: String, delegatorID: UInt32): FlowIDTableStaking.DelegatorInfo {
+	  return FlowIDTableStaking.DelegatorInfo(nodeID: nodeID, delegatorID: delegatorID)
+  }`, flowClient.Contract().StakingTable)
+
+	args := []cadence.Value{cadence.NewString(nodeId), cadence.NewUInt32(delegatorID)}
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), args)
+	if err != nil {
+		return err
+	}
+
+	committed, err := types.DelegatorNodeInfoFromCadence(value)
+	if err != nil {
+		return err
+	}
+
+	return db.SaveDelegatorInfo(types.NewDelegatorInfo(committed, block.Height, nodeId, delegatorID))
 }

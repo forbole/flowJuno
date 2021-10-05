@@ -484,3 +484,43 @@ func NewDelegatorCommitted(
 		DelegatorID: delegatorID,
 	}
 }
+
+type DelegatorInfo struct {
+	DelegatorInfo DelegatorNodeInfo
+	Height        uint64
+	NodeId        string
+	DelegatorID   uint32
+}
+
+// DelegatorInfo allows to build a new DelegatorInfo
+func NewDelegatorInfo(
+	delegatorInfo DelegatorNodeInfo,
+	height uint64,
+	nodeId string,
+	delegatorID uint32) DelegatorInfo {
+	return DelegatorInfo{
+		DelegatorInfo: delegatorInfo,
+		Height:        height,
+		NodeId:        nodeId,
+		DelegatorID:   delegatorID,
+	}
+}
+
+type DelegatorInfoFromAddress struct { 
+	DelegatorInfo DelegatorNodeInfo
+	Height int64
+	Address string
+  }
+  
+  
+   // DelegatorInfoFromAddress allows to build a new DelegatorInfoFromAddress
+  func NewDelegatorInfoFromAddress( 
+	delegatorInfo DelegatorNodeInfo,
+	height int64,
+	address string) DelegatorInfoFromAddress{
+   return DelegatorInfoFromAddress{
+   DelegatorInfo:delegatorInfo,
+   Height:height,
+   Address:address,
+  }
+  }

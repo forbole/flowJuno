@@ -122,5 +122,18 @@ CREATE TABLE delegator_committed
 (  committed TEXT NOT NULL ,
   height TEXT NOT NULL ,
   node_id TEXT NOT NULL ,
-  delegator_i_d TEXT NOT NULL
+  delegator_id TEXT NOT NULL
+);
+
+CREATE TABLE delegator_info
+(  delegator_info TEXT NOT NULL ,
+  height TEXT NOT NULL ,
+  node_id TEXT NOT NULL ,
+  delegator_id TEXT NOT NULL
+);
+
+CREATE TABLE delegator_info_from_address
+(  delegator_info TEXT NOT NULL ,
+  height BIGINT  NOT NULL ,
+  address TEXT NOT NULL
 );

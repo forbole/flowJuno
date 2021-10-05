@@ -683,3 +683,70 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorCommitted() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
+
+func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfo() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+	delegatorId := int64(8411)
+	delegatorNodeId := "2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e"
+	nodeInfo := types.NewDelegatorNodeInfo(uint32(delegatorId), delegatorNodeId, 0, 0, 0, 0, 0, 0)
+
+	input := types.NewDelegatorInfo(nodeInfo, 2, "0x1", 3)
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveDelegatorInfo(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedDelegatorNodeId := `{"Id":8411,"NodeID":"2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e","TokensCommitted":0,"TokensStaked":0,"TokensUnstaking":0,"TokensRewarded":0,"TokensUnstaked":0,"TokensRequestedToUnstake":0}`
+	expectedRow := dbtypes.NewDelegatorInfoRow(expectedDelegatorNodeId, 2, "0x1", 3)
+	var outputs []dbtypes.DelegatorInfoRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM delegator_info`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}
+
+func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfoFromAddress() {
+
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	/*  TODO: Prepare parameter    */
+
+	delegatorId := int64(8411)
+	delegatorNodeId := "2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e"
+	nodeInfo := types.NewDelegatorNodeInfo(uint32(delegatorId), delegatorNodeId, 0, 0, 0, 0, 0, 0)
+
+	input := []types.DelegatorInfoFromAddress{types.NewDelegatorInfoFromAddress(nodeInfo, 2, "0x1")}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveDelegatorInfoFromAddress(input)
+	suite.Require().NoError(err)
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedDelegatorNodeId := `{"Id":8411,"NodeID":"2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e","TokensCommitted":0,"TokensStaked":0,"TokensUnstaking":0,"TokensRewarded":0,"TokensUnstaked":0,"TokensRequestedToUnstake":0}`
+	expectedRow := dbtypes.NewDelegatorInfoFromAddressRow(expectedDelegatorNodeId, 2, "0x1")
+	var outputs []dbtypes.DelegatorInfoFromAddressRow
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM delegator_info_from_address`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().True(expectedRow.Equal(outputs[0]))
+
+}

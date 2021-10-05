@@ -424,10 +424,54 @@ func (db *Db) SaveCutPercentage(cutPercentage types.CutPercentage) error {
 }
 
 func (db *Db) SaveDelegatorCommitted(delegatorCommitted types.DelegatorCommitted) error {
-	stmt := `INSERT INTO delegator_committed(committed,height,node_id,delegator_i_d) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	stmt := `INSERT INTO delegator_committed(committed,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
 	_, err := db.Sql.Exec(stmt, delegatorCommitted.Committed,
 		delegatorCommitted.Height,
 		delegatorCommitted.NodeId,
 		delegatorCommitted.DelegatorID)
 	return err
 }
+
+func (db *Db) SaveDelegatorInfo(delegatorInfo types.DelegatorInfo) error {
+	stmt := `INSERT INTO delegator_info(delegator_info,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+
+	info, err := json.Marshal(delegatorInfo.DelegatorInfo)
+	if err != nil {
+		return err
+	}
+	_, err = db.Sql.Exec(stmt, info,
+		delegatorInfo.Height,
+		delegatorInfo.NodeId,
+		delegatorInfo.DelegatorID)
+	return err
+}
+
+func (db *Db) SaveDelegatorInfoFromAddress(delegatorInfoFromAddress []types.DelegatorInfoFromAddress) error {
+    stmt:= `INSERT INTO delegator_info_from_address(delegator_info,height,address) VALUES `
+
+    var params []interface{}
+
+	  for i, rows := range delegatorInfoFromAddress{
+      ai := i * 3
+      stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1,ai+2,ai+3)
+
+	  
+	info, err := json.Marshal(rows.DelegatorInfo)
+	if err != nil {
+		return err
+	}
+      
+      params = append(params,info,rows.Height,rows.Address)
+
+    }
+	  stmt = stmt[:len(stmt)-1]
+    stmt += ` ON CONFLICT DO NOTHING` 
+
+    _, err := db.Sqlx.Exec(stmt, params...)
+    if err != nil {
+      return err
+    }
+
+    return nil 
+    }
+     
