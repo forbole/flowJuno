@@ -751,8 +751,6 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfoFromAddress() {
 
 }
 
-
-
 func (suite *DbTestSuite) TestBigDipperDb_DelegatorRequest() {
 
 	// ------------------------------
@@ -760,7 +758,7 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorRequest() {
 	// ------------------------------
 
 	/*  TODO: Prepare parameter    */
-	
+
 	input := types.NewDelegatorRequest(1, 2, "0x1", 3)
 
 	// ------------------------------
@@ -781,8 +779,6 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorRequest() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 }
 
-
-
 func (suite *DbTestSuite) TestBigDipperDb_DelegatorRewarded() {
 
 	// ------------------------------
@@ -790,7 +786,7 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorRewarded() {
 	// ------------------------------
 
 	/*  TODO: Prepare parameter    */
-	
+
 	input := types.NewDelegatorRewarded(1, 2, "0x1", 3)
 
 	// ------------------------------
@@ -810,4 +806,3 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorRewarded() {
 	suite.Require().Len(outputs, 1, "should contain only one row")
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 }
-

@@ -151,3 +151,10 @@ CREATE TABLE delegator_rewarded
   node_id TEXT NOT NULL ,
   delegator_id TEXT NOT NULL
 );
+
+CREATE TABLE delegator_staked
+(  staked TEXT NOT NULL ,
+  height BIGINT  NOT NULL ,
+  node_id TEXT NOT NULL ,
+  delegator_id TEXT NOT NULL
+);

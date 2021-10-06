@@ -545,30 +545,52 @@ func NewDelegatorRequest(
 	}
 }
 
-type DelegatorRewarded struct { 
-	Rewarded uint64
-	Height int64
-	NodeId string
+type DelegatorRewarded struct {
+	Rewarded    uint64
+	Height      int64
+	NodeId      string
 	DelegatorId uint32
-  }
-  
-  // Equal tells whether v and w represent the same rows
-  func (v DelegatorRewarded) Equal(w DelegatorRewarded)bool{
-	return v.Rewarded==w.Rewarded && 
-  v.Height==w.Height && 
-  v.NodeId==w.NodeId && 
-  v.DelegatorId==w.DelegatorId }
-  
-   // DelegatorRewarded allows to build a new DelegatorRewarded
-  func NewDelegatorRewarded( 
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorRewarded) Equal(w DelegatorRewarded) bool {
+	return v.Rewarded == w.Rewarded &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorId == w.DelegatorId
+}
+
+// DelegatorRewarded allows to build a new DelegatorRewarded
+func NewDelegatorRewarded(
 	rewarded uint64,
 	height int64,
 	nodeId string,
-	delegatorId uint32) DelegatorRewarded{
-   return DelegatorRewarded{
-   Rewarded:rewarded,
-   Height:height,
-   NodeId:nodeId,
-   DelegatorId:delegatorId,
-  }
-  }
+	delegatorId uint32) DelegatorRewarded {
+	return DelegatorRewarded{
+		Rewarded:    rewarded,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorId: delegatorId,
+	}
+}
+
+type DelegatorStaked struct {
+	Staked      uint64
+	Height      int64
+	NodeId      string
+	DelegatorId uint32
+}
+
+// DelegatorStaked allows to build a new DelegatorStaked
+func NewDelegatorStaked(
+	staked uint64,
+	height int64,
+	nodeId string,
+	delegatorId uint32) DelegatorStaked {
+	return DelegatorStaked{
+		Staked:      staked,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorId: delegatorId,
+	}
+}

@@ -484,11 +484,19 @@ func (db *Db) SaveDelegatorRequest(delegatorRequest types.DelegatorRequest) erro
 }
 
 func (db *Db) SaveDelegatorRewarded(delegatorRewarded types.DelegatorRewarded) error {
-	stmt:= `INSERT INTO delegator_rewarded(rewarded,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING` 
-	_, err := db.Sql.Exec(stmt,delegatorRewarded.Rewarded,
-	delegatorRewarded.Height,
-	delegatorRewarded.NodeId,
-	delegatorRewarded.DelegatorId)
-		return err 
-	 }
-	
+	stmt := `INSERT INTO delegator_rewarded(rewarded,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, delegatorRewarded.Rewarded,
+		delegatorRewarded.Height,
+		delegatorRewarded.NodeId,
+		delegatorRewarded.DelegatorId)
+	return err
+}
+
+func (db *Db) SaveDelegatorStaked(delegatorStaked types.DelegatorStaked) error {
+	stmt := `INSERT INTO delegator_staked(staked,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, delegatorStaked.Staked,
+		delegatorStaked.Height,
+		delegatorStaked.NodeId,
+		delegatorStaked.DelegatorId)
+	return err
+}

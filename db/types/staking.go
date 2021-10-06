@@ -639,30 +639,61 @@ func NewDelegatorRequestRow(
 }
 
 // DelegatorRewardedRow represents a single row of the delegator_rewarded table
-type DelegatorRewardedRow struct { 
-	Rewarded uint64 `db:"rewarded"`
-	Height int64 `db:"height"`
-	NodeId string `db:"node_id"`
+type DelegatorRewardedRow struct {
+	Rewarded    uint64 `db:"rewarded"`
+	Height      int64  `db:"height"`
+	NodeId      string `db:"node_id"`
 	DelegatorId uint32 `db:"delegator_id"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v DelegatorRewardedRow) Equal(w DelegatorRewardedRow)bool{
-	return v.Rewarded==w.Rewarded && 
-  v.Height==w.Height && 
-  v.NodeId==w.NodeId && 
-  v.DelegatorId==w.DelegatorId }
-  
-	  // DelegatorRewardedRow allows to build a new DelegatorRewardedRow
-  func NewDelegatorRewardedRow( 
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorRewardedRow) Equal(w DelegatorRewardedRow) bool {
+	return v.Rewarded == w.Rewarded &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorId == w.DelegatorId
+}
+
+// DelegatorRewardedRow allows to build a new DelegatorRewardedRow
+func NewDelegatorRewardedRow(
 	rewarded uint64,
 	height int64,
 	nodeId string,
-	delegatorId uint32) DelegatorRewardedRow{
-   return DelegatorRewardedRow{
-   Rewarded:rewarded,
-   Height:height,
-   NodeId:nodeId,
-   DelegatorId:delegatorId,
-  }
-  }
+	delegatorId uint32) DelegatorRewardedRow {
+	return DelegatorRewardedRow{
+		Rewarded:    rewarded,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorId: delegatorId,
+	}
+}
+
+// DelegatorStakedRow represents a single row of the delegator_staked table
+type DelegatorStakedRow struct {
+	Staked      uint64 `db:"staked"`
+	Height      int64  `db:"height"`
+	NodeId      string `db:"node_id"`
+	DelegatorId uint32 `db:"delegator_id"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorStakedRow) Equal(w DelegatorStakedRow) bool {
+	return v.Staked == w.Staked &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorId == w.DelegatorId
+}
+
+// DelegatorStakedRow allows to build a new DelegatorStakedRow
+func NewDelegatorStakedRow(
+	staked uint64,
+	height int64,
+	nodeId string,
+	delegatorId uint32) DelegatorStakedRow {
+	return DelegatorStakedRow{
+		Staked:      staked,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorId: delegatorId,
+	}
+}
