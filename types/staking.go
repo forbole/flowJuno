@@ -506,21 +506,41 @@ func NewDelegatorInfo(
 	}
 }
 
-type DelegatorInfoFromAddress struct { 
+type DelegatorInfoFromAddress struct {
 	DelegatorInfo DelegatorNodeInfo
-	Height int64
-	Address string
-  }
-  
-  
-   // DelegatorInfoFromAddress allows to build a new DelegatorInfoFromAddress
-  func NewDelegatorInfoFromAddress( 
+	Height        int64
+	Address       string
+}
+
+// DelegatorInfoFromAddress allows to build a new DelegatorInfoFromAddress
+func NewDelegatorInfoFromAddress(
 	delegatorInfo DelegatorNodeInfo,
 	height int64,
-	address string) DelegatorInfoFromAddress{
-   return DelegatorInfoFromAddress{
-   DelegatorInfo:delegatorInfo,
-   Height:height,
-   Address:address,
-  }
-  }
+	address string) DelegatorInfoFromAddress {
+	return DelegatorInfoFromAddress{
+		DelegatorInfo: delegatorInfo,
+		Height:        height,
+		Address:       address,
+	}
+}
+
+type DelegatorRequest struct {
+	RequestToUnstake uint64
+	Height           int64
+	NodeId           string
+	DelegatorId      uint32
+}
+
+// DelegatorRequest allows to build a new DelegatorRequest
+func NewDelegatorRequest(
+	requestToUnstake uint64,
+	height int64,
+	nodeId string,
+	delegatorId uint32) DelegatorRequest {
+	return DelegatorRequest{
+		RequestToUnstake: requestToUnstake,
+		Height:           height,
+		NodeId:           nodeId,
+		DelegatorId:      delegatorId,
+	}
+}

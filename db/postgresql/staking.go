@@ -447,31 +447,38 @@ func (db *Db) SaveDelegatorInfo(delegatorInfo types.DelegatorInfo) error {
 }
 
 func (db *Db) SaveDelegatorInfoFromAddress(delegatorInfoFromAddress []types.DelegatorInfoFromAddress) error {
-    stmt:= `INSERT INTO delegator_info_from_address(delegator_info,height,address) VALUES `
+	stmt := `INSERT INTO delegator_info_from_address(delegator_info,height,address) VALUES `
 
-    var params []interface{}
+	var params []interface{}
 
-	  for i, rows := range delegatorInfoFromAddress{
-      ai := i * 3
-      stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1,ai+2,ai+3)
+	for i, rows := range delegatorInfoFromAddress {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
-	  
-	info, err := json.Marshal(rows.DelegatorInfo)
+		info, err := json.Marshal(rows.DelegatorInfo)
+		if err != nil {
+			return err
+		}
+
+		params = append(params, info, rows.Height, rows.Address)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
 		return err
 	}
-      
-      params = append(params,info,rows.Height,rows.Address)
 
-    }
-	  stmt = stmt[:len(stmt)-1]
-    stmt += ` ON CONFLICT DO NOTHING` 
+	return nil
+}
 
-    _, err := db.Sqlx.Exec(stmt, params...)
-    if err != nil {
-      return err
-    }
-
-    return nil 
-    }
-     
+func (db *Db) SaveDelegatorRequest(delegatorRequest types.DelegatorRequest) error {
+	stmt := `INSERT INTO delegator_request(request_to_unstake,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, delegatorRequest.RequestToUnstake,
+		delegatorRequest.Height,
+		delegatorRequest.NodeId,
+		delegatorRequest.DelegatorId)
+	return err
+}

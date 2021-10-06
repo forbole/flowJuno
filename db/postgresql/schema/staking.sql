@@ -137,3 +137,10 @@ CREATE TABLE delegator_info_from_address
   height BIGINT  NOT NULL ,
   address TEXT NOT NULL
 );
+
+CREATE TABLE delegator_request
+(  request_to_unstake TEXT NOT NULL ,
+  height BIGINT  NOT NULL ,
+  node_id TEXT NOT NULL ,
+  delegator_id TEXT NOT NULL
+);

@@ -583,26 +583,57 @@ func NewDelegatorInfoRow(
 }
 
 // DelegatorInfoFromAddressRow represents a single row of the delegator_info_from_address table
-type DelegatorInfoFromAddressRow struct { 
+type DelegatorInfoFromAddressRow struct {
 	DelegatorInfo string `db:"delegator_info"`
-	Height int64 `db:"height"`
-	Address string `db:"address"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v DelegatorInfoFromAddressRow) Equal(w DelegatorInfoFromAddressRow)bool{
-	return v.DelegatorInfo==w.DelegatorInfo && 
-  v.Height==w.Height && 
-  v.Address==w.Address }
-  
-	  // DelegatorInfoFromAddressRow allows to build a new DelegatorInfoFromAddressRow
-  func NewDelegatorInfoFromAddressRow( 
+	Height        int64  `db:"height"`
+	Address       string `db:"address"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorInfoFromAddressRow) Equal(w DelegatorInfoFromAddressRow) bool {
+	return v.DelegatorInfo == w.DelegatorInfo &&
+		v.Height == w.Height &&
+		v.Address == w.Address
+}
+
+// DelegatorInfoFromAddressRow allows to build a new DelegatorInfoFromAddressRow
+func NewDelegatorInfoFromAddressRow(
 	delegatorInfo string,
 	height int64,
-	address string) DelegatorInfoFromAddressRow{
-   return DelegatorInfoFromAddressRow{
-   DelegatorInfo:delegatorInfo,
-   Height:height,
-   Address:address,
-  }
-  }
+	address string) DelegatorInfoFromAddressRow {
+	return DelegatorInfoFromAddressRow{
+		DelegatorInfo: delegatorInfo,
+		Height:        height,
+		Address:       address,
+	}
+}
+
+// DelegatorRequestRow represents a single row of the delegator_request table
+type DelegatorRequestRow struct {
+	RequestToUnstake uint64 `db:"request_to_unstake"`
+	Height           int64  `db:"height"`
+	NodeId           string `db:"node_id"`
+	DelegatorId      uint32 `db:"delegator_id"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorRequestRow) Equal(w DelegatorRequestRow) bool {
+	return v.RequestToUnstake == w.RequestToUnstake &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorId == w.DelegatorId
+}
+
+// DelegatorRequestRow allows to build a new DelegatorRequestRow
+func NewDelegatorRequestRow(
+	requestToUnstake uint64,
+	height int64,
+	nodeId string,
+	DelegatorId uint32) DelegatorRequestRow {
+	return DelegatorRequestRow{
+		RequestToUnstake: requestToUnstake,
+		Height:           height,
+		NodeId:           nodeId,
+		DelegatorId:      DelegatorId,
+	}
+}
