@@ -85,3 +85,27 @@ func getDelegatorRequest(nodeId string, delegatorID uint32, block *flow.Block, d
 
 	return db.SaveDelegatorRequest(types.NewDelegatorRequest(committed, int64(block.Height), nodeId, delegatorID))
 }
+
+func DelegatorRewarded(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating node unstaking tokens")
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	pub fun main(nodeID: String, delegatorID: UInt32): UFix64 {
+	  let delInfo = FlowIDTableStaking.DelegatorInfo(nodeID: nodeID, delegatorID: delegatorID)
+	  return delInfo.tokensRewarded
+  }`, flowClient.Contract().StakingTable)
+
+	args := []cadence.Value{cadence.NewString(nodeId), cadence.NewUInt32(delegatorID)}
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), args)
+	if err != nil {
+		return err
+	}
+
+	committed, err := utils.CadenceConvertUint64(value)
+	if err != nil {
+		return err
+	}
+
+	return db.SaveDelegatorRewarded(types.NewDelegatorRewarded(committed, int64(block.Height), nodeId, delegatorID))
+}

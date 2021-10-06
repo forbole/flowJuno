@@ -637,3 +637,32 @@ func NewDelegatorRequestRow(
 		DelegatorId:      DelegatorId,
 	}
 }
+
+// DelegatorRewardedRow represents a single row of the delegator_rewarded table
+type DelegatorRewardedRow struct { 
+	Rewarded uint64 `db:"rewarded"`
+	Height int64 `db:"height"`
+	NodeId string `db:"node_id"`
+	DelegatorId uint32 `db:"delegator_id"`
+  }
+  
+	 // Equal tells whether v and w represent the same rows
+  func (v DelegatorRewardedRow) Equal(w DelegatorRewardedRow)bool{
+	return v.Rewarded==w.Rewarded && 
+  v.Height==w.Height && 
+  v.NodeId==w.NodeId && 
+  v.DelegatorId==w.DelegatorId }
+  
+	  // DelegatorRewardedRow allows to build a new DelegatorRewardedRow
+  func NewDelegatorRewardedRow( 
+	rewarded uint64,
+	height int64,
+	nodeId string,
+	delegatorId uint32) DelegatorRewardedRow{
+   return DelegatorRewardedRow{
+   Rewarded:rewarded,
+   Height:height,
+   NodeId:nodeId,
+   DelegatorId:delegatorId,
+  }
+  }

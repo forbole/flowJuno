@@ -482,3 +482,13 @@ func (db *Db) SaveDelegatorRequest(delegatorRequest types.DelegatorRequest) erro
 		delegatorRequest.DelegatorId)
 	return err
 }
+
+func (db *Db) SaveDelegatorRewarded(delegatorRewarded types.DelegatorRewarded) error {
+	stmt:= `INSERT INTO delegator_rewarded(rewarded,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING` 
+	_, err := db.Sql.Exec(stmt,delegatorRewarded.Rewarded,
+	delegatorRewarded.Height,
+	delegatorRewarded.NodeId,
+	delegatorRewarded.DelegatorId)
+		return err 
+	 }
+	

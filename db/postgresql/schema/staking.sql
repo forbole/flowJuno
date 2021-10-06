@@ -144,3 +144,10 @@ CREATE TABLE delegator_request
   node_id TEXT NOT NULL ,
   delegator_id TEXT NOT NULL
 );
+
+CREATE TABLE delegator_rewarded
+(  rewarded TEXT NOT NULL ,
+  height BIGINT  NOT NULL ,
+  node_id TEXT NOT NULL ,
+  delegator_id TEXT NOT NULL
+);
