@@ -500,3 +500,21 @@ func (db *Db) SaveDelegatorStaked(delegatorStaked types.DelegatorStaked) error {
 		delegatorStaked.DelegatorId)
 	return err
 }
+
+func (db *Db) SaveDelegatorUnstaked(delegatorUnstaked types.DelegatorUnstaked) error {
+	stmt := `INSERT INTO delegator_unstaked(unstaked,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, delegatorUnstaked.Unstaked,
+		delegatorUnstaked.Height,
+		delegatorUnstaked.NodeId,
+		delegatorUnstaked.DelegatorId)
+	return err
+}
+
+func (db *Db) SaveDelegatorUnstaking(delegatorUnstaking types.DelegatorUnstaking) error {
+	stmt:= `INSERT INTO delegator_unstaking(unstaking,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING` 
+	_, err := db.Sql.Exec(stmt,delegatorUnstaking.Unstaking,
+	delegatorUnstaking.Height,
+	delegatorUnstaking.NodeId,
+	delegatorUnstaking.DelegatorId)
+		return err 
+	 }

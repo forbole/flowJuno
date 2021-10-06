@@ -594,3 +594,80 @@ func NewDelegatorStaked(
 		DelegatorId: delegatorId,
 	}
 }
+
+type DelegatorUnstaked struct {
+	Unstaked    uint64
+	Height      int64
+	NodeId      string
+	DelegatorId uint32
+}
+
+// DelegatorUnstaked allows to build a new DelegatorUnstaked
+func NewDelegatorUnstaked(
+	unstaked uint64,
+	height int64,
+	nodeId string,
+	delegatorId uint32) DelegatorUnstaked {
+	return DelegatorUnstaked{
+		Unstaked:    unstaked,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorId: delegatorId,
+	}
+}
+
+type DelegatorUnstaking struct { 
+	Unstaking uint64
+	Height int64
+	NodeId string
+	DelegatorId uint32
+  }
+  
+  // Equal tells whether v and w represent the same rows
+  func (v DelegatorUnstaking) Equal(w DelegatorUnstaking)bool{
+	return v.Unstaking==w.Unstaking && 
+  v.Height==w.Height && 
+  v.NodeId==w.NodeId && 
+  v.DelegatorId==w.DelegatorId }
+  
+   // DelegatorUnstaking allows to build a new DelegatorUnstaking
+  func NewDelegatorUnstaking( 
+	unstaking uint64,
+	height int64,
+	nodeId string,
+	delegatorId uint32) DelegatorUnstaking{
+   return DelegatorUnstaking{
+   Unstaking:unstaking,
+   Height:height,
+   NodeId:nodeId,
+   DelegatorId:delegatorId,
+  }
+  }
+
+  type DelegatorUnstakingRequest struct { 
+	Unstaking uint64
+	Height int64
+	NodeId string
+	DelegatorId uint32
+  }
+  
+  // Equal tells whether v and w represent the same rows
+  func (v DelegatorUnstakingRequest) Equal(w DelegatorUnstakingRequest)bool{
+	return v.Unstaking==w.Unstaking && 
+  v.Height==w.Height && 
+  v.NodeId==w.NodeId && 
+  v.DelegatorId==w.DelegatorId }
+  
+   // DelegatorUnstakingRequest allows to build a new DelegatorUnstakingRequest
+  func NewDelegatorUnstakingRequest( 
+	unstaking uint64,
+	height int64,
+	nodeId string,
+	delegatorId uint32) DelegatorUnstakingRequest{
+   return DelegatorUnstakingRequest{
+   Unstaking:unstaking,
+   Height:height,
+   NodeId:nodeId,
+   DelegatorId:delegatorId,
+  }
+  }

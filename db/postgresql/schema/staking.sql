@@ -158,3 +158,17 @@ CREATE TABLE delegator_staked
   node_id TEXT NOT NULL ,
   delegator_id TEXT NOT NULL
 );
+
+CREATE TABLE delegator_unstaked
+(  unstaked TEXT NOT NULL ,
+  height BIGINT  NOT NULL ,
+  node_id TEXT NOT NULL ,
+  delegator_id TEXT NOT NULL
+);
+
+CREATE TABLE delegator_unstaking
+(  unstaking TEXT NOT NULL ,
+  height BIGINT  NOT NULL ,
+  node_id TEXT NOT NULL ,
+  delegator_id TEXT NOT NULL
+);
