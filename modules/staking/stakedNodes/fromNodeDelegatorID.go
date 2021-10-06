@@ -15,6 +15,51 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
+func GetDataFromNodeDelegatorID(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy)	err:= getNodeInfoFromAddress(addresses,block,db,flowClient)
+	
+	err:=getDelegatorCommitted(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err:=getDelegatorInfo(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err:=getDelegatorRequest(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+
+	err:=getDelegatorRewarded(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err:=getDelegatorStaked(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err:=getDelegatorUnstaked(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err:=getDelegatorUnstaking(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err:=getDelegatorUnstakingRequest(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+}
+
 func getDelegatorCommitted(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
@@ -86,7 +131,7 @@ func getDelegatorRequest(nodeId string, delegatorID uint32, block *flow.Block, d
 	return db.SaveDelegatorRequest(types.NewDelegatorRequest(committed, int64(block.Height), nodeId, delegatorID))
 }
 
-func DelegatorRewarded(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getDelegatorRewarded(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`

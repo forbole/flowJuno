@@ -7,6 +7,8 @@ import (
 
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/types"
+	"github.com/forbole/flowJuno/modules/staking/stakedNodes"
+
 	"github.com/onflow/flow-go-sdk"
 
 	"github.com/forbole/flowJuno/client"
@@ -18,6 +20,20 @@ import (
 )
 
 func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db, height int64, flowClient client.Proxy) error {
+	err := GetCadenceWithNoArgs(block, db, int64(block.Height), flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err=staking.GetStakedNodeInfosFromNodeID(block, db, flowClient)
+
+	err=staking.GetDataFromNodeDelegatorID(block, db, flowClient)
+
+
+	return nil
+}
+
+func GetCadenceWithNoArgs(block *flow.Block, db *db.Db, height int64, flowClient client.Proxy) error {
 	err := getWeeklyPayout(block, db, flowClient)
 	if err != nil {
 		return err
@@ -45,6 +61,11 @@ func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db
 
 	err = getProposedTable(block, db, flowClient)
 	if err != nil {
+		return err
+	}
+
+	err=getCutPercentage(block, db, flowClient)
+	if err!=nil{
 		return err
 	}
 

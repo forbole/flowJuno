@@ -15,7 +15,9 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func getStakedNodeInfos(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+
+
+func GetStakedNodeInfosFromNodeID(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("getting staked node infos")
 
@@ -26,6 +28,61 @@ func getStakedNodeInfos(block *flow.Block, db *database.Db, flowClient client.Pr
 
 	err = getNodeUnstakingTokens(ids, block, db, flowClient)
 	if err != nil {
+		return err
+	}
+
+	err = getNodeTotalCommitment(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+	
+	err = getNodeTotalCommitmentWithoutDelegators(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeStakingKey(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeStakedTokens(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeRole(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeRewardedTokens(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeNetworkingKey(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeNetworkingAddress(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeInitialWeight(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeInfoFromNodeID(ids, block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err = getNodeCommittedTokens(ids, block, db, flowClient)
+	if err!=nil{
 		return err
 	}
 

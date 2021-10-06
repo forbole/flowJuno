@@ -14,6 +14,20 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
+func getCadenceDataFromAddresses(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy)error{
+	err:= getNodeInfoFromAddress(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+	err= getDelegatorInfoFromAddress(addresses,block,db,flowClient)
+	if err!=nil{
+		return err
+	}
+
+	return nil
+}
+
 func getNodeInfoFromAddress(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get node networking address")
