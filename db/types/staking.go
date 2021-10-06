@@ -729,30 +729,61 @@ func NewDelegatorUnstakedRow(
 }
 
 // DelegatorUnstakingRow represents a single row of the delegator_unstaking table
-type DelegatorUnstakingRow struct { 
-	Unstaking uint64 `db:"unstaking"`
-	Height int64 `db:"height"`
-	NodeId string `db:"node_id"`
+type DelegatorUnstakingRow struct {
+	Unstaking   uint64 `db:"unstaking"`
+	Height      int64  `db:"height"`
+	NodeId      string `db:"node_id"`
 	DelegatorId uint32 `db:"delegator_id"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v DelegatorUnstakingRow) Equal(w DelegatorUnstakingRow)bool{
-	return v.Unstaking==w.Unstaking && 
-  v.Height==w.Height && 
-  v.NodeId==w.NodeId && 
-  v.DelegatorId==w.DelegatorId }
-  
-	  // DelegatorUnstakingRow allows to build a new DelegatorUnstakingRow
-  func NewDelegatorUnstakingRow( 
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorUnstakingRow) Equal(w DelegatorUnstakingRow) bool {
+	return v.Unstaking == w.Unstaking &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorId == w.DelegatorId
+}
+
+// DelegatorUnstakingRow allows to build a new DelegatorUnstakingRow
+func NewDelegatorUnstakingRow(
 	unstaking uint64,
 	height int64,
 	nodeId string,
-	delegatorId uint32) DelegatorUnstakingRow{
-   return DelegatorUnstakingRow{
-   Unstaking:unstaking,
-   Height:height,
-   NodeId:nodeId,
-   DelegatorId:delegatorId,
-  }
-  }
+	delegatorId uint32) DelegatorUnstakingRow {
+	return DelegatorUnstakingRow{
+		Unstaking:   unstaking,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorId: delegatorId,
+	}
+}
+
+// DelegatorUnstakingRequestRow represents a single row of the delegator_unstaking_request table
+type DelegatorUnstakingRequestRow struct {
+	Unstaking   uint64 `db:"unstaking"`
+	Height      int64  `db:"height"`
+	NodeId      string `db:"node_id"`
+	DelegatorId uint32 `db:"delegator_id"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v DelegatorUnstakingRequestRow) Equal(w DelegatorUnstakingRequestRow) bool {
+	return v.Unstaking == w.Unstaking &&
+		v.Height == w.Height &&
+		v.NodeId == w.NodeId &&
+		v.DelegatorId == w.DelegatorId
+}
+
+// DelegatorUnstakingRequestRow allows to build a new DelegatorUnstakingRequestRow
+func NewDelegatorUnstakingRequestRow(
+	unstaking uint64,
+	height int64,
+	nodeId string,
+	delegatorId uint32) DelegatorUnstakingRequestRow {
+	return DelegatorUnstakingRequestRow{
+		Unstaking:   unstaking,
+		Height:      height,
+		NodeId:      nodeId,
+		DelegatorId: delegatorId,
+	}
+}

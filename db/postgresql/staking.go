@@ -511,10 +511,19 @@ func (db *Db) SaveDelegatorUnstaked(delegatorUnstaked types.DelegatorUnstaked) e
 }
 
 func (db *Db) SaveDelegatorUnstaking(delegatorUnstaking types.DelegatorUnstaking) error {
-	stmt:= `INSERT INTO delegator_unstaking(unstaking,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING` 
-	_, err := db.Sql.Exec(stmt,delegatorUnstaking.Unstaking,
-	delegatorUnstaking.Height,
-	delegatorUnstaking.NodeId,
-	delegatorUnstaking.DelegatorId)
-		return err 
-	 }
+	stmt := `INSERT INTO delegator_unstaking(unstaking,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, delegatorUnstaking.Unstaking,
+		delegatorUnstaking.Height,
+		delegatorUnstaking.NodeId,
+		delegatorUnstaking.DelegatorId)
+	return err
+}
+
+func (db *Db) SaveDelegatorUnstakingRequest(delegatorUnstakingRequest types.DelegatorUnstakingRequest) error {
+	stmt := `INSERT INTO delegator_unstaking_request(unstaking,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	_, err := db.Sql.Exec(stmt, delegatorUnstakingRequest.Unstaking,
+		delegatorUnstakingRequest.Height,
+		delegatorUnstakingRequest.NodeId,
+		delegatorUnstakingRequest.DelegatorId)
+	return err
+}

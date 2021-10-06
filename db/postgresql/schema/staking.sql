@@ -172,3 +172,10 @@ CREATE TABLE delegator_unstaking
   node_id TEXT NOT NULL ,
   delegator_id TEXT NOT NULL
 );
+
+CREATE TABLE delegator_unstaking_request
+(  unstaking TEXT NOT NULL ,
+  height BIGINT  NOT NULL ,
+  node_id TEXT NOT NULL ,
+  delegator_id TEXT NOT NULL
+);
