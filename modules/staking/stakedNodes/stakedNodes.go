@@ -17,7 +17,7 @@ import (
 
 
 
-func GetStakedNodeInfosFromNodeID(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func GetDataFromNodeID(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("getting staked node infos")
 
@@ -89,33 +89,7 @@ func GetStakedNodeInfosFromNodeID(block *flow.Block, db *database.Db, flowClient
 	return nil
 }
 
-func getCurrentTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]string, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("Getting staked node ids")
 
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(): UFix64 {
-	  return FlowIDTableStaking.getStakedNodeIDs()
-  }`, flowClient.Contract().StakingTable)
-
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	ids, err := utils.CadenceConvertStringArray(value)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.SaveCurrentTable(types.NewCurrentTable(int64(block.Height), ids))
-	if err != nil {
-		return nil, err
-	}
-
-	return ids, nil
-}
 
 func getNodeUnstakingTokens(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
@@ -403,33 +377,6 @@ func getNodeInitialWeight(nodeIds []string, block *flow.Block, db *database.Db, 
 	return db.SaveNodeInitialWeight(totalStakeArr)
 }
 
-func getNodeInfoFromNodeID(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get node networking address")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): FlowIDTableStaking.NodeInfo {
-	  return FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-  }`, flowClient.Contract().StakingTable)
-
-	totalStakeArr := make([]types.NodeInfoFromNodeID, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		stakingKey, err := types.NewStakerNodeInfoFromCadence(value)
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeInfoFromNodeID(nodeIds[i], stakingKey, int64(block.Height))
-	}
-
-	return db.SaveNodeInfoFromNodeIDs(totalStakeArr)
-}
 
 func getNodeCommittedTokens(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).

@@ -19,156 +19,37 @@ import (
 	"github.com/onflow/cadence"
 )
 
-func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db, height int64, flowClient client.Proxy) error {
-	err := GetCadenceWithNoArgs(block, db, int64(block.Height), flowClient)
+func HandleAdditionalOperation(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db, height int64, flowClient client.Proxy) error {
+	
+
+	nodeIds,err:=getTable(block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err=staking.GetStakedNodeInfosFromNodeID(block, db, flowClient)
+	NodeInfos,err:=getNodeInfoFromNodeID(nodeIds,block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+	
+	for i,nodeInfo:=range NodeInfos{
+		nodeInfo.NodeInfo.DelegatorIDCounter
+	}
+	err = staking.GetDataWithNoArgs(block, db, int64(block.Height), flowClient)
+	if err!=nil{
+		return err
+	}
 
+	err=staking.GetDataFromNodeID(block, db, flowClient)
+
+	
 	err=staking.GetDataFromNodeDelegatorID(block, db, flowClient)
 
 
 	return nil
 }
 
-func GetCadenceWithNoArgs(block *flow.Block, db *db.Db, height int64, flowClient client.Proxy) error {
-	err := getWeeklyPayout(block, db, flowClient)
-	if err != nil {
-		return err
-	}
-
-	err = getTotalStake(block, db, flowClient)
-	if err != nil {
-		return err
-	}
-
-	err = getTotalStakeByType(block, db, flowClient)
-	if err != nil {
-		return err
-	}
-
-	err = getTable(block, db, flowClient)
-	if err != nil {
-		return err
-	}
-
-	err = getStakeRequirements(block, db, flowClient)
-	if err != nil {
-		return err
-	}
-
-	err = getProposedTable(block, db, flowClient)
-	if err != nil {
-		return err
-	}
-
-	err=getCutPercentage(block, db, flowClient)
-	if err!=nil{
-		return err
-	}
-
-	return nil
-}
-
-// getStakedNodeId get staked node id from cadence script
-func getWeeklyPayout(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get weekly epoch payout")
-
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(): UFix64 {
-	  return FlowIDTableStaking.getEpochTokenPayout()
-  }`, flowClient.Contract().StakingTable)
-
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-	if err != nil {
-		return err
-	}
-
-	payout, err := utils.CadenceConvertUint64(value)
-	if err != nil {
-		return err
-	}
-
-	return db.SaveWeeklyPayout(types.NewWeeklyPayout(int64(block.Height), payout))
-}
-
-func getTotalStake(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get total stake by type")
-
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(): UFix64 {
-	  let stakedTokens = FlowIDTableStaking.getTotalTokensStakedByNodeType()
-  
-	  // calculate the total number of tokens staked
-	  var totalStaked: UFix64 = 0.0
-	  for nodeType in stakedTokens.keys {
-		  // Do not count access nodes
-		  if nodeType != UInt8(5) {
-			  totalStaked = totalStaked + stakedTokens[nodeType]!
-		  }
-	  }
-  
-	  return totalStaked
-  }`, flowClient.Contract().StakingTable)
-
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-	if err != nil {
-		return err
-	}
-
-	totalStake, err := utils.CadenceConvertUint64(value)
-	if err != nil {
-		return err
-	}
-
-	return db.SaveTotalStake(types.NewTotalStake(int64(block.Height), totalStake))
-}
-
-func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating getTotalStakeByType")
-
-		// https://github.com/onflow/flow-core-contracts/blob/301206b27090fa9116c1aba35cd8bade8a26857c/contracts/FlowIDTableStaking.cdc#L101
-		//
-		// 1 = collection
-		// 2 = consensus
-		// 3 = execution
-		// 4 = verification
-		// 5 = access
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(role: UInt8): UFix64 {
-	  let staked = FlowIDTableStaking.getTotalTokensStakedByNodeType()
- 
-	  return staked[role]!
-	}`, flowClient.Contract().StakingTable)
-
-	totalStakeArr := make([]types.TotalStakeByType, 5)
-	for role := 1; role <= 5; role++ {
-		arg := []cadence.Value{cadence.NewUInt8(uint8(role))}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), arg)
-		if err != nil {
-			return err
-		}
-
-		totalStake, err := utils.CadenceConvertUint64(value)
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[role-1] = types.NewTotalStakeByType(int64(block.Height), int8(role), totalStake)
-	}
-
-	return db.SaveTotalStakeByType(totalStakeArr)
-}
-
-func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]string,error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get Staked Node id per block")
 
@@ -180,96 +61,43 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error
 
 	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
 	if err != nil {
-		return err
+		return nil,err
 	}
 
 	table, err := utils.CadenceConvertStringArray(value)
 	if err != nil {
-		return err
+		return nil,err
 	}
 
-	return db.SaveStakingTable(types.NewStakingTable(int64(block.Height), table))
+	return table,db.SaveStakingTable(types.NewStakingTable(int64(block.Height), table))
 
 }
 
-func getStakeRequirements(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get stake requirement")
 
-		// https://github.com/onflow/flow-core-contracts/blob/301206b27090fa9116c1aba35cd8bade8a26857c/contracts/FlowIDTableStaking.cdc#L101
-		//
-		// 1 = collection
-		// 2 = consensus
-		// 3 = execution
-		// 4 = verification
-		// 5 = access
+func getNodeInfoFromNodeID(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.NodeInfoFromNodeID,error) {
+	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+		Msg("updating get node networking address")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
-	pub fun main(role: UInt8): UFix64 {
-	  let req = FlowIDTableStaking.getMinimumStakeRequirements()
-  
-	  return req[role]!
+	pub fun main(nodeID: String): FlowIDTableStaking.NodeInfo {
+	  return FlowIDTableStaking.NodeInfo(nodeID: nodeID)
   }`, flowClient.Contract().StakingTable)
 
-	stakeRequirements := make([]types.StakeRequirements, 5)
-	for role := 1; role <= 5; role++ {
-		arg := []cadence.Value{cadence.NewUInt8(uint8(role))}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), arg)
+	totalStakeArr := make([]types.NodeInfoFromNodeID, len(nodeIds))
+	for i, id := range nodeIds {
+		nodeId := []cadence.Value{cadence.NewString(id)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
-			return err
+			return nil,err
 		}
 
-		totalStake, err := utils.CadenceConvertUint64(value)
+		stakingKey, err := types.NewStakerNodeInfoFromCadence(value)
 		if err != nil {
-			return err
+			return nil,err
 		}
-		stakeRequirements[role-1] = types.NewStakeRequirements(int64(block.Height), uint8(role), totalStake)
+
+		totalStakeArr[i] = types.NewNodeInfoFromNodeID(nodeIds[i], stakingKey, int64(block.Height))
 	}
 
-	return db.SaveStakeRequirements(stakeRequirements)
-}
-
-func getProposedTable(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get ProposedTable")
-
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-          pub fun main(): [String] {
-            return FlowIDTableStaking.getProposedNodeIDs()
-        }`, flowClient.Contract().StakingTable)
-
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-	if err != nil {
-		return err
-	}
-
-	table, err := utils.CadenceConvertStringArray(value)
-	if err != nil {
-		return err
-	}
-
-	return db.SaveProposedTable(types.NewProposedTable(int64(block.Height), table))
-}
-
-func getCutPercentage(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating cut percentage")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(): UFix64 {
-	  return FlowIDTableStaking.getRewardCutPercentage()
-  }`, flowClient.Contract().StakingTable)
-
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-	if err != nil {
-		return err
-	}
-
-	table, err := utils.CadenceConvertStringArray(value)
-	if err != nil {
-		return err
-	}
-
-	return db.SaveCutPercentage(types.NewCutPercentage(table, int64(block.Height)))
+	return totalStakeArr,db.SaveNodeInfoFromNodeIDs(totalStakeArr)
 }
