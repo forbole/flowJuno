@@ -14,7 +14,7 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func getCadenceDataFromAddresses(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy)error{
+func GetDataFromAddresses(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy)error{
 	err:= getNodeInfoFromAddress(addresses,block,db,flowClient)
 	if err!=nil{
 		return err

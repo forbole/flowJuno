@@ -21,7 +21,10 @@ import (
 
 func HandleAdditionalOperation(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db, height int64, flowClient client.Proxy) error {
 	
-
+	accounts,err:=db.GetAccounts()
+	if err!=nil{
+		return err
+	}
 	nodeIds,err:=getTable(block, db, flowClient)
 	if err!=nil{
 		return err
@@ -31,10 +34,17 @@ func HandleAdditionalOperation(block *flow.Block, _ messages.MessageAddressesPar
 	if err!=nil{
 		return err
 	}
-	
-	for i,nodeInfo:=range NodeInfos{
-		nodeInfo.NodeInfo.DelegatorIDCounter
+
+	addresses :=make([]string,len(accounts))
+	for i,account:=range accounts{
+		addresses[i]= account.Address
 	}
+	
+	err=staking.GetDataFromAddresses(addresses,block, db, flowClient)
+	if err!=nil{
+		return err
+	}
+	
 	err = staking.GetDataWithNoArgs(block, db, int64(block.Height), flowClient)
 	if err!=nil{
 		return err
