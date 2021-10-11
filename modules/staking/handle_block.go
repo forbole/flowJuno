@@ -29,8 +29,7 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 		return err
 	}
  */
- 	HandleStaking( db, flowClient)
-	return nil
+ 	return HandleStaking( db, flowClient)
 }
 
 func HandleStaking(db *db.Db, flowClient client.Proxy) error {
@@ -115,8 +114,10 @@ func getNodeInfoFromNodeID(nodeIds []string, block *flow.Block, db *database.Db,
 	totalStakeArr := make([]types.NodeInfoFromNodeID, len(nodeIds))
 	for i, id := range nodeIds {
 		nodeId := []cadence.Value{cadence.NewString(id)}
+		fmt.Println(id)
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
+			fmt.Println(id)
 			return nil,err
 		}
 
