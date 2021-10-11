@@ -1,4 +1,4 @@
-package staking
+package stakingutils
 
 import (
 	"fmt"
@@ -72,11 +72,6 @@ func GetDataFromNodeID(block *flow.Block, db *database.Db, flowClient client.Pro
 	}
 
 	err = getNodeInitialWeight(ids, block, db, flowClient)
-	if err!=nil{
-		return err
-	}
-
-	err = getNodeInfoFromNodeID(ids, block, db, flowClient)
 	if err!=nil{
 		return err
 	}

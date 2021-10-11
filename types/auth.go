@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/onflow/cadence"
 )
@@ -154,6 +155,25 @@ type StakerNodeInfo struct {
 	TokensRequestedToUnstake uint64
 	InitialWeight            uint64
 }
+
+func (w StakerNodeInfo) Equals (v StakerNodeInfo)bool {
+	return (w.Id                ==v.Id                &&
+	w.Role              ==v.Role              &&
+	w.NetworkingAddress ==v.NetworkingAddress &&
+	w.NetworkingKey     ==v.NetworkingKey     &&
+	w.StakingKey        ==v.StakingKey        &&
+	w.TokensStaked      ==v.TokensStaked      &&
+	w.TokensCommitted   ==v.TokensCommitted   &&
+	w.TokensUnstaking   ==v.TokensUnstaking   &&
+	w.TokensUnstaked    ==v.TokensUnstaked    &&
+	w.TokensRewarded    ==v.TokensRewarded    &&
+	reflect.DeepEqual(w.Delegators,v.Delegators)&&
+	w.DelegatorIDCounter       ==v.DelegatorIDCounter       &&
+	w.TokensRequestedToUnstake ==v.TokensRequestedToUnstake &&
+	w.InitialWeight            ==v.InitialWeight            )
+}
+
+
 
 // NewNodeOperatorInfoFromInterface create a NodeOperatorInfo from []interface{}
 func NewStakerNodeInfoFromCadence(value cadence.Value) (StakerNodeInfo, error) {

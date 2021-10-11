@@ -3,11 +3,12 @@ package staking
 import (
 	"fmt"
 
+	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 
-	"github.com/forbole/flowJuno/modules/messages"
+	"github.com/forbole/flowJuno/modules/staking/stakingutils"
+
 	"github.com/forbole/flowJuno/types"
-	"github.com/forbole/flowJuno/modules/staking/stakedNodes"
 
 	"github.com/onflow/flow-go-sdk"
 
@@ -19,8 +20,24 @@ import (
 	"github.com/onflow/cadence"
 )
 
-func HandleAdditionalOperation(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db, height int64, flowClient client.Proxy) error {
-	
+func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClient client.Proxy) error {
+	log.Debug().Str("module", "PriceFeed").Msg("setting up periodic tasks")
+
+	/* if _, err := scheduler.Every(1).Week().Tuesday().At("15:00").StartImmediately().Do(func() {
+		utils.WatchMethod(func() error { return HandleStaking( db, flowClient) })
+	}); err != nil {
+		return err
+	}
+ */
+ 	HandleStaking( db, flowClient)
+	return nil
+}
+
+func HandleStaking(db *db.Db, flowClient client.Proxy) error {
+	block,err:=flowClient.Client().GetLatestBlock(flowClient.Ctx(),false)
+	if err!=nil{
+		return err
+	}
 	accounts,err:=db.GetAccounts()
 	if err!=nil{
 		return err
@@ -30,30 +47,32 @@ func HandleAdditionalOperation(block *flow.Block, _ messages.MessageAddressesPar
 		return err
 	}
 
-	NodeInfos,err:=getNodeInfoFromNodeID(nodeIds,block, db, flowClient)
+	nodeInfo,err:=getNodeInfoFromNodeID(nodeIds,block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	addresses :=make([]string,len(accounts))
-	for i,account:=range accounts{
-		addresses[i]= account.Address
-	}
+	addresses:=getAddressesFromAccounts(accounts)
 	
-	err=staking.GetDataFromAddresses(addresses,block, db, flowClient)
+	err=stakingutils.GetDataFromAddresses(addresses,block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 	
-	err = staking.GetDataWithNoArgs(block, db, int64(block.Height), flowClient)
+	err = stakingutils.GetDataWithNoArgs(block, db, int64(block.Height), flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err=staking.GetDataFromNodeID(block, db, flowClient)
-
+	err=stakingutils.GetDataFromNodeID(block, db, flowClient)
+	if err!=nil{
+		return err
+	}
 	
-	err=staking.GetDataFromNodeDelegatorID(block, db, flowClient)
+	err=stakingutils.GetDataFromNodeDelegatorID(nodeInfo,block, db, flowClient)
+	if err!=nil{
+		return err
+	}
 
 
 	return nil
@@ -110,4 +129,12 @@ func getNodeInfoFromNodeID(nodeIds []string, block *flow.Block, db *database.Db,
 	}
 
 	return totalStakeArr,db.SaveNodeInfoFromNodeIDs(totalStakeArr)
+}
+
+func getAddressesFromAccounts(accounts []types.Account)[]string{
+	addresses:=make([]string,len(accounts))
+	for i,account:=range accounts{
+		addresses[i]=account.Address
+	}
+	return addresses
 }

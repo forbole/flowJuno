@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/forbole/flowJuno/types"
+	dbtypes "github.com/forbole/flowJuno/db/types"
+
 )
 
 // SaveStakeRequirements save the stake requirement from cadence call
@@ -527,3 +529,23 @@ func (db *Db) SaveDelegatorUnstakingRequest(delegatorUnstakingRequest types.Dele
 		delegatorUnstakingRequest.DelegatorId)
 	return err
 }
+
+func (db *Db) GetDelegatorInfoFromNodeId(nodeId string,height int64) ([]types.NodeInfoFromNodeID,error) {
+	var rows []dbtypes.NodeInfoFromNodeIDRow
+	stmt := `SELECT * FROM node_info_from_node_id WHERE node_id=$1 AND height=$2;`
+	err := db.Sqlx.Select(&rows, stmt,nodeId,height)
+	if err != nil {
+		return nil, err
+	}
+	returnRows := make([]types.NodeInfoFromNodeID, len(rows))
+	for i, row := range rows {
+		var nodeInfo types.StakerNodeInfo
+		err=json.Unmarshal([]byte(row.NodeInfo),&nodeInfo)
+		if err!=nil{
+			return nil,err
+		}
+		returnRows[i] = types.NewNodeInfoFromNodeID(nodeId,nodeInfo,height)
+	}
+	return returnRows, nil
+}
+

@@ -1,13 +1,11 @@
-package staking
+package stakingutils
 
 import (
 	"fmt"
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/types"
-	"github.com/forbole/flowJuno/modules/staking/stakedNodes"
 
 	"github.com/onflow/flow-go-sdk"
 

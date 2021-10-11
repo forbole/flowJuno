@@ -1,4 +1,4 @@
-package staking
+package stakingutils
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package staking
+package stakingutils
 
 import (
 	"fmt"
@@ -15,49 +15,56 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func GetDataFromNodeDelegatorID(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy)	err:= getNodeInfoFromAddress(addresses,block,db,flowClient)
+func GetDataFromNodeDelegatorID(nodeInfo []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy)error	{
 	
-	err:=getDelegatorCommitted(addresses,block,db,flowClient)
-	if err!=nil{
-		return err
+	for _, node:=range nodeInfo{
+		for _,delegatorID:=range node.NodeInfo.Delegators{
+			nodeId:=node.NodeId
+			err:=getDelegatorCommitted(nodeId,delegatorID,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		
+			err=getDelegatorInfo(nodeId,delegatorID,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		
+			err=getDelegatorRequest(nodeId,delegatorID,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		
+		
+			err=getDelegatorRewarded(nodeId,delegatorID,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		
+			err=getDelegatorStaked(nodeId,delegatorID,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		
+			err=getDelegatorUnstaked(nodeId,delegatorID,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		
+			err=getDelegatorUnstaking(nodeId,delegatorID,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		
+			err=getDelegatorUnstakingRequest(nodeId,delegatorID,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		
+		}
 	}
-
-	err:=getDelegatorInfo(addresses,block,db,flowClient)
-	if err!=nil{
-		return err
-	}
-
-	err:=getDelegatorRequest(addresses,block,db,flowClient)
-	if err!=nil{
-		return err
-	}
-
-
-	err:=getDelegatorRewarded(addresses,block,db,flowClient)
-	if err!=nil{
-		return err
-	}
-
-	err:=getDelegatorStaked(addresses,block,db,flowClient)
-	if err!=nil{
-		return err
-	}
-
-	err:=getDelegatorUnstaked(addresses,block,db,flowClient)
-	if err!=nil{
-		return err
-	}
-
-	err:=getDelegatorUnstaking(addresses,block,db,flowClient)
-	if err!=nil{
-		return err
-	}
-
-	err:=getDelegatorUnstakingRequest(addresses,block,db,flowClient)
-	if err!=nil{
-		return err
-	}
-
+	
+	return nil
 }
 
 func getDelegatorCommitted(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
