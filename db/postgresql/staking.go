@@ -376,15 +376,16 @@ func (db *Db) SaveNodeInfoFromNodeIDs(nodeInfoFromNodeID []types.NodeInfoFromNod
 		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
 		nodeInfo, err := json.Marshal(rows.NodeInfo)
+		nodeInfoString:=string(nodeInfo)
 		if err != nil {
 			return err
 		}
-		params = append(params, rows.NodeId, nodeInfo, rows.Height)
+		params = append(params, rows.NodeId, nodeInfoString, rows.Height)
 
 	}
 	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
+	stmt += ` ON CONFLICT DO NOTHING;`
+	fmt.Println(stmt)
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
 		return err
@@ -417,11 +418,8 @@ func (db *Db) SaveNodeCommittedTokens(nodeCommittedTokens []types.NodeCommittedT
 }
 func (db *Db) SaveCutPercentage(cutPercentage types.CutPercentage) error {
 	stmt := `INSERT INTO cut_percentage(cut_percentage,height) VALUES ($1,$2) ON CONFLICT DO NOTHING`
-	cut, err := json.Marshal(cutPercentage.CutPercentage)
-	if err != nil {
-		return err
-	}
-	_, err = db.Sql.Exec(stmt, cut, cutPercentage.Height)
+
+	_, err := db.Sql.Exec(stmt, cutPercentage.CutPercentage, cutPercentage.Height)
 	return err
 }
 

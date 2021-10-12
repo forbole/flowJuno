@@ -348,7 +348,7 @@ func getNodeInitialWeight(nodeIds []string, block *flow.Block, db *database.Db, 
 		Msg("updating get node networking address")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): uFix64 {
+	pub fun main(nodeID: String): UInt64{
 	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
 	  return nodeInfo.initialWeight
   }`, flowClient.Contract().StakingTable)
@@ -378,7 +378,7 @@ func getNodeCommittedTokens(nodeIds []string, block *flow.Block, db *database.Db
 		Msg("updating get node networking address")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): uFix64 {
+	pub fun main(nodeID: String): UFix64{
 	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
 	  return nodeInfo.tokensCommitted
   }`, flowClient.Contract().StakingTable)

@@ -94,10 +94,24 @@ func NewDelegatorNodeInfo(id uint32,
 	}
 }
 
-func DelegatorNodeInfoFromCadence(value cadence.Value) (DelegatorNodeInfo, error) {
-	arrayValue := value.(cadence.Array)
+func DelegatorNodeInfoArrayFromCadence(value cadence.Value)([]DelegatorNodeInfo, error){
+	arrayValue ,ok:= value.(cadence.Array)
+	if !ok{
+		return nil,fmt.Errorf("This is not an array")
+	}
+	stakers:=make([]DelegatorNodeInfo,len(arrayValue.Values))
+	for i,value:=range(arrayValue.Values){
+		stakervalue,err:=DelegatorNodeInfoFromCadence(value)
+		if err!=nil{
+			return nil,err
+		}
+		stakers[i]=stakervalue
+	}
+	return stakers,nil
+}
 
-	fields := arrayValue.Values[0].(cadence.Struct).Fields
+func DelegatorNodeInfoFromCadence(value cadence.Value) (DelegatorNodeInfo, error) {
+	fields := value.(cadence.Struct).Fields
 
 	id, ok := fields[0].ToGoValue().(uint32)
 	if !ok {
@@ -173,13 +187,25 @@ func (w StakerNodeInfo) Equals (v StakerNodeInfo)bool {
 	w.InitialWeight            ==v.InitialWeight            )
 }
 
-
+func NewStakerNodeInfoArrayFromCadence(value cadence.Value)([]StakerNodeInfo, error){
+	arrayValue ,ok:= value.(cadence.Array)
+	if !ok{
+		return nil,fmt.Errorf("This is not an array")
+	}
+	stakers:=make([]StakerNodeInfo,len(arrayValue.Values))
+	for i,value:=range(arrayValue.Values){
+		stakervalue,err:=NewStakerNodeInfoFromCadence(value)
+		if err!=nil{
+			return nil,err
+		}
+		stakers[i]=stakervalue
+	}
+	return stakers,nil
+}
 
 // NewNodeOperatorInfoFromInterface create a NodeOperatorInfo from []interface{}
 func NewStakerNodeInfoFromCadence(value cadence.Value) (StakerNodeInfo, error) {
-	arrayValue := value.(cadence.Array)
-
-	fields := arrayValue.Values[0].(cadence.Struct).Fields
+	fields := value.(cadence.Struct).Fields
 
 	d, ok := fields[10].(cadence.Array)
 	if !ok {

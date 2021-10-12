@@ -572,6 +572,7 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeInfoFromNodeID() {
 
 	input := []types.NodeInfoFromNodeID{
 		types.NewNodeInfoFromNodeID("0x1", stakerNodeInfo, 1),
+		types.NewNodeInfoFromNodeID("0x2", stakerNodeInfo, 2),
 	}
 
 	// ------------------------------
@@ -590,7 +591,7 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeInfoFromNodeID() {
 	var outputs []dbtypes.NodeInfoFromNodeIDRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_info_from_node_id`)
 	suite.Require().NoError(err)
-	suite.Require().Len(outputs, 1, "should contain only one row")
+	suite.Require().Len(outputs, 2, "should contain only two row")
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 }
 

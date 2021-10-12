@@ -61,9 +61,9 @@ func getCurrentTable(block *flow.Block, db *database.Db, flowClient client.Proxy
 
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
-	pub fun main(): UFix64 {
-	  return FlowIDTableStaking.getStakedNodeIDs()
-  }`, flowClient.Contract().StakingTable)
+	pub fun main(): [String] {
+		return FlowIDTableStaking.getStakedNodeIDs()
+	}`, flowClient.Contract().StakingTable)
 
 	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
 	if err != nil {
@@ -255,7 +255,7 @@ func getCutPercentage(block *flow.Block, db *database.Db, flowClient client.Prox
 		return err
 	}
 
-	table, err := utils.CadenceConvertStringArray(value)
+	table, err := utils.CadenceConvertUint64(value)
 	if err != nil {
 		return err
 	}

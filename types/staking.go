@@ -446,13 +446,13 @@ func NewNodeCommittedTokens(
 }
 
 type CutPercentage struct {
-	CutPercentage []string
+	CutPercentage uint64
 	Height        int64
 }
 
 // CutPercentage allows to build a new CutPercentage
 func NewCutPercentage(
-	cutPercentage []string,
+	cutPercentage uint64,
 	height int64) CutPercentage {
 	return CutPercentage{
 		CutPercentage: cutPercentage,

@@ -21,7 +21,7 @@ import (
 )
 
 func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClient client.Proxy) error {
-	log.Debug().Str("module", "PriceFeed").Msg("setting up periodic tasks")
+	log.Debug().Str("module", "staking").Msg("setting up periodic tasks")
 
 	/* if _, err := scheduler.Every(1).Week().Tuesday().At("15:00").StartImmediately().Do(func() {
 		utils.WatchMethod(func() error { return HandleStaking( db, flowClient) })
@@ -33,14 +33,15 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 }
 
 func HandleStaking(db *db.Db, flowClient client.Proxy) error {
-	block,err:=flowClient.Client().GetLatestBlock(flowClient.Ctx(),false)
+	 block,err:=flowClient.Client().GetLatestBlock(flowClient.Ctx(),false)
 	if err!=nil{
 		return err
 	}
+	/* 
 	accounts,err:=db.GetAccounts()
 	if err!=nil{
 		return err
-	}
+	} */
 	nodeIds,err:=getTable(block, db, flowClient)
 	if err!=nil{
 		return err
@@ -50,23 +51,25 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	if err!=nil{
 		return err
 	}
-
+/*
 	addresses:=getAddressesFromAccounts(accounts)
 	
-	err=stakingutils.GetDataFromAddresses(addresses,block, db, flowClient)
-	if err!=nil{
-		return err
+	if len(addresses)!=0{
+		err=stakingutils.GetDataFromAddresses(addresses,block, db, flowClient)
+		if err!=nil{
+			return err
+		}
 	}
 	
 	err = stakingutils.GetDataWithNoArgs(block, db, int64(block.Height), flowClient)
 	if err!=nil{
 		return err
-	}
-
+	} */
+/* 
 	err=stakingutils.GetDataFromNodeID(block, db, flowClient)
 	if err!=nil{
 		return err
-	}
+	} */
 	
 	err=stakingutils.GetDataFromNodeDelegatorID(nodeInfo,block, db, flowClient)
 	if err!=nil{
@@ -103,8 +106,7 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]st
 
 
 func getNodeInfoFromNodeID(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.NodeInfoFromNodeID,error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get node networking address")
+	
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(nodeID: String): FlowIDTableStaking.NodeInfo {
@@ -114,7 +116,6 @@ func getNodeInfoFromNodeID(nodeIds []string, block *flow.Block, db *database.Db,
 	totalStakeArr := make([]types.NodeInfoFromNodeID, len(nodeIds))
 	for i, id := range nodeIds {
 		nodeId := []cadence.Value{cadence.NewString(id)}
-		fmt.Println(id)
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
 			fmt.Println(id)

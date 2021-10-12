@@ -14,7 +14,12 @@ func CadenceConvertStringArray(value cadence.Value) ([]string, error) {
 
 	table := make([]string, len(valueArray.Values))
 	for i, val := range valueArray.Values {
-		table[i] = val.String()
+		strvalue,ok:=val.ToGoValue().(string)
+		if !ok{
+			return nil, fmt.Errorf("the cadance value is not a string value")
+		}
+		table[i] = strvalue
+
 	}
 	return table, nil
 }

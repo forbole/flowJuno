@@ -502,7 +502,7 @@ func NewNodeCommittedTokensRow(
 
 // CutPercentageRow represents a single row of the cut_percentage table
 type CutPercentageRow struct {
-	CutPercentage string `db:"cut_percentage"`
+	CutPercentage uint64 `db:"cut_percentage"`
 	Height        int64  `db:"height"`
 }
 
@@ -514,7 +514,7 @@ func (v CutPercentageRow) Equal(w CutPercentageRow) bool {
 
 // CutPercentageRow allows to build a new CutPercentageRow
 func NewCutPercentageRow(
-	cutPercentage string,
+	cutPercentage uint64,
 	height int64) CutPercentageRow {
 	return CutPercentageRow{
 		CutPercentage: cutPercentage,
