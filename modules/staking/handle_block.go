@@ -42,12 +42,12 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	if err!=nil{
 		return err
 	} */
-	nodeIds,err:=getTable(block, db, flowClient)
+	_,err=getTable(block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	nodeInfo,err:=getNodeInfoFromNodeID(nodeIds,block, db, flowClient)
+	nodeInfo,err:=getNodeInfoFromNodeID(block, db, flowClient)
 	if err!=nil{
 		return err
 	}
@@ -65,11 +65,11 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	if err!=nil{
 		return err
 	} */
-/* 
-	err=stakingutils.GetDataFromNodeID(block, db, flowClient)
+
+	err=stakingutils.GetDataFromNodeID(nodeInfo,block, db, flowClient)
 	if err!=nil{
 		return err
-	} */
+	} 
 	
 	err=stakingutils.GetDataFromNodeDelegatorID(nodeInfo,block, db, flowClient)
 	if err!=nil{
@@ -105,29 +105,33 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]st
 }
 
 
-func getNodeInfoFromNodeID(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.NodeInfoFromNodeID,error) {
+func getNodeInfoFromNodeID(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.NodeInfoFromNodeID,error) {
 	
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(nodeID: String): FlowIDTableStaking.NodeInfo {
-	  return FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-  }`, flowClient.Contract().StakingTable)
-
-	totalStakeArr := make([]types.NodeInfoFromNodeID, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			fmt.Println(id)
-			return nil,err
+		var nodeIds=FlowIDTableStaking.getNodeIDs()
+		let nodeInfoArray: [FlowIDTableStaking.NodeInfo] = []
+		for node in nodeIds{
+			nodeInfoArray.append(FlowIDTableStaking.NodeInfo(nodeID: node))
 		}
+		return nodeInfoArray
+    }`, flowClient.Contract().StakingTable)
 
-		stakingKey, err := types.NewStakerNodeInfoFromCadence(value)
-		if err != nil {
-			return nil,err
-		}
+	var totalStakeArr []types.NodeInfoFromNodeID
 
-		totalStakeArr[i] = types.NewNodeInfoFromNodeID(nodeIds[i], stakingKey, int64(block.Height))
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script),nil)
+	if err != nil {
+		return nil,err
+	}
+
+	stakingKeys, err := types.NewStakerNodeInfoArrayFromCadence(value)
+	if err != nil {
+		return nil,err
+	}
+
+	for i,stakingKey:=range stakingKeys{
+		totalStakeArr[i] = types.NewNodeInfoFromNodeID(stakingKey.Id, stakingKey, int64(block.Height))
 	}
 
 	return totalStakeArr,db.SaveNodeInfoFromNodeIDs(totalStakeArr)

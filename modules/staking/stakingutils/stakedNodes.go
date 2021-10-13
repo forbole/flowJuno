@@ -17,66 +17,61 @@ import (
 
 
 
-func GetDataFromNodeID(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func GetDataFromNodeID(nodeInfofromNodeId []types.NodeInfoFromNodeID,block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("getting staked node infos")
 
-	ids, err := getCurrentTable(block, db, flowClient)
+	err := getNodeUnstakingTokens(nodeInfofromNodeId, block, db, flowClient)
 	if err != nil {
 		return err
 	}
 
-	err = getNodeUnstakingTokens(ids, block, db, flowClient)
-	if err != nil {
-		return err
-	}
-
-	err = getNodeTotalCommitment(ids, block, db, flowClient)
+	err = getNodeTotalCommitment(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 	
-	err = getNodeTotalCommitmentWithoutDelegators(ids, block, db, flowClient)
+	err = getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err = getNodeStakingKey(ids, block, db, flowClient)
+	err = getNodeStakingKey(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err = getNodeStakedTokens(ids, block, db, flowClient)
+	err = getNodeStakedTokens(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err = getNodeRole(ids, block, db, flowClient)
+	err = getNodeRole(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err = getNodeRewardedTokens(ids, block, db, flowClient)
+	err = getNodeRewardedTokens(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err = getNodeNetworkingKey(ids, block, db, flowClient)
+	err = getNodeNetworkingKey(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err = getNodeNetworkingAddress(ids, block, db, flowClient)
+	err = getNodeNetworkingAddress(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err = getNodeInitialWeight(ids, block, db, flowClient)
+	err = getNodeInitialWeight(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
 
-	err = getNodeCommittedTokens(ids, block, db, flowClient)
+	err = getNodeCommittedTokens(nodeInfofromNodeId, block, db, flowClient)
 	if err!=nil{
 		return err
 	}
@@ -86,36 +81,19 @@ func GetDataFromNodeID(block *flow.Block, db *database.Db, flowClient client.Pro
 
 
 
-func getNodeUnstakingTokens(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeUnstakingTokens(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): UFix64 {
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.tokensUnstaking
-  }`, flowClient.Contract().StakingTable)
 
-	totalStakeArr := make([]types.NodeUnstakingTokens, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		tokensUnstaking, err := utils.CadenceConvertUint64(value)
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeUnstakingTokens(nodeIds[i], tokensUnstaking, int64(block.Height))
+	totalStakeArr := make([]types.NodeUnstakingTokens, len(nodeInfos))
+	for i, id := range nodeInfos {
+		totalStakeArr[i] = types.NewNodeUnstakingTokens(id.NodeId,id.NodeInfo.TokensUnstaking,int64(block.Height))
 	}
 
 	return db.SaveNodeUnstakingTokens(totalStakeArr)
 }
 
-func getNodeTotalCommitment(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeTotalCommitment(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
@@ -125,9 +103,9 @@ func getNodeTotalCommitment(nodeIds []string, block *flow.Block, db *database.Db
 	  return nodeInfo.totalCommittedWithDelegators()
   }`, flowClient.Contract().StakingTable)
 
-	totalStakeArr := make([]types.NodeTotalCommitment, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
+	totalStakeArr := make([]types.NodeTotalCommitment, len(nodeInfos))
+	for i, id := range nodeInfos {
+		nodeId := []cadence.Value{cadence.NewString(id.NodeId)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
 			return err
@@ -138,13 +116,13 @@ func getNodeTotalCommitment(nodeIds []string, block *flow.Block, db *database.Db
 			return err
 		}
 
-		totalStakeArr[i] = types.NewNodeTotalCommitment(nodeIds[i], tokensUnstaking, int64(block.Height))
+		totalStakeArr[i] = types.NewNodeTotalCommitment(id.NodeId, tokensUnstaking, int64(block.Height))
 	}
 
 	return db.SaveNodeTotalCommitment(totalStakeArr)
 }
 
-func getNodeTotalCommitmentWithoutDelegators(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
@@ -154,9 +132,9 @@ func getNodeTotalCommitmentWithoutDelegators(nodeIds []string, block *flow.Block
 	  return nodeInfo.totalCommittedWithoutDelegators()
   }`, flowClient.Contract().StakingTable)
 
-	totalStakeArr := make([]types.NodeTotalCommitmentWithoutDelegators, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
+	totalStakeArr := make([]types.NodeTotalCommitmentWithoutDelegators, len(nodeInfos))
+	for i, id := range nodeInfos {
+		nodeId := []cadence.Value{cadence.NewString(id.NodeId)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
 			return err
@@ -167,236 +145,101 @@ func getNodeTotalCommitmentWithoutDelegators(nodeIds []string, block *flow.Block
 			return err
 		}
 
-		totalStakeArr[i] = types.NewNodeTotalCommitmentWithoutDelegators(nodeIds[i], tokensUnstaking, int64(block.Height))
+		totalStakeArr[i] = types.NewNodeTotalCommitmentWithoutDelegators(id.NodeId, tokensUnstaking, int64(block.Height))
 	}
 
 	return db.SaveNodeTotalCommitmentWithoutDelegators(totalStakeArr)
 }
 
-func getNodeStakingKey(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeStakingKey(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): String {
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.stakingKey
-  }`, flowClient.Contract().StakingTable)
 
-	totalStakeArr := make([]types.NodeStakingKey, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
+	totalStakeArr := make([]types.NodeStakingKey, len(nodeInfos))
+	for i, id := range nodeInfos {
+		stakingKey := id.NodeInfo.StakingKey
 
-		stakingKey := value.String()
-
-		totalStakeArr[i] = types.NewNodeStakingKey(nodeIds[i], stakingKey, int64(block.Height))
+		totalStakeArr[i] = types.NewNodeStakingKey(id.NodeId, stakingKey, int64(block.Height))
 	}
 
 	return db.SaveNodeStakingKey(totalStakeArr)
 }
 
-func getNodeStakedTokens(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeStakedTokens(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): UFix64 {
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.tokensStaked
-  }`, flowClient.Contract().StakingTable)
-
-	totalStakeArr := make([]types.NodeStakedTokens, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		stakingKey, err := utils.CadenceConvertUint64(value)
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeStakedTokens(nodeIds[i], stakingKey, int64(block.Height))
+	totalStakeArr := make([]types.NodeStakedTokens, len(nodeInfos))
+	for i, id := range nodeInfos {
+		totalStakeArr[i] = types.NewNodeStakedTokens(id.NodeId, id.NodeInfo.TokensStaked, int64(block.Height))
 	}
 
 	return db.SaveNodeStakedTokens(totalStakeArr)
 }
 
-func getNodeRole(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeRole(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating node unstaking tokens")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): UInt8 {
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.role
-  }`, flowClient.Contract().StakingTable)
+		Msg("updating node role")
 
-	totalStakeArr := make([]types.NodeRole, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		stakingKey, err := utils.CadenceConvertUint8(value)
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeRole(nodeIds[i], stakingKey, int64(block.Height))
+	totalStakeArr := make([]types.NodeRole, len(nodeInfos))
+	for i, id := range nodeInfos {
+		totalStakeArr[i] = types.NewNodeRole(id.NodeId, id.NodeInfo.Role, int64(block.Height))
 	}
 
 	return db.SaveNodeRole(totalStakeArr)
 }
 
-func getNodeRewardedTokens(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeRewardedTokens(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get node rewarded tokens")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): UFix64 {
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.tokensRewarded
-  }`, flowClient.Contract().StakingTable)
 
-	totalStakeArr := make([]types.NodeRewardedTokens, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		stakingKey, err := utils.CadenceConvertUint64(value)
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeRewardedTokens(nodeIds[i], stakingKey, int64(block.Height))
+	totalStakeArr := make([]types.NodeRewardedTokens, len(nodeInfos))
+	for i, id := range nodeInfos {
+		totalStakeArr[i] = types.NewNodeRewardedTokens(id.NodeId, id.NodeInfo.TokensRewarded, int64(block.Height))
 	}
 
 	return db.SaveNodeRewardedTokens(totalStakeArr)
 }
 
-func getNodeNetworkingKey(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeNetworkingKey(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get node networking key")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): String {
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.networkingKey
-  }`, flowClient.Contract().StakingTable)
-
-	totalStakeArr := make([]types.NodeNetworkingKey, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		stakingKey := value.String()
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeNetworkingKey(nodeIds[i], stakingKey, int64(block.Height))
+	totalStakeArr := make([]types.NodeNetworkingKey, len(nodeInfos))
+	for i, id := range nodeInfos {
+		totalStakeArr[i] = types.NewNodeNetworkingKey(id.NodeId, id.NodeInfo.NetworkingKey, int64(block.Height))
 	}
 
 	return db.SaveNodeNetworkingKey(totalStakeArr)
 }
 
-func getNodeNetworkingAddress(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeNetworkingAddress(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get node networking address")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): String {
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.networkingAddress
-  }`, flowClient.Contract().StakingTable)
+	totalStakeArr := make([]types.NodeNetworkingAddress, len(nodeInfos))
+	for i, id := range nodeInfos {
 
-	totalStakeArr := make([]types.NodeNetworkingAddress, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		stakingKey := value.String()
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeNetworkingAddress(nodeIds[i], stakingKey, int64(block.Height))
+		totalStakeArr[i] = types.NewNodeNetworkingAddress(id.NodeId, id.NodeInfo.NetworkingAddress, int64(block.Height))
 	}
 
 	return db.SaveNodeNetworkingAddress(totalStakeArr)
 }
-func getNodeInitialWeight(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeInitialWeight(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get node networking address")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): UInt64{
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.initialWeight
-  }`, flowClient.Contract().StakingTable)
-
-	totalStakeArr := make([]types.NodeInitialWeight, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		stakingKey, err := utils.CadenceConvertUint64(value)
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeInitialWeight(nodeIds[i], stakingKey, int64(block.Height))
+	totalStakeArr := make([]types.NodeInitialWeight, len(nodeInfos))
+	for i, id := range nodeInfos {
+		totalStakeArr[i] = types.NewNodeInitialWeight(id.NodeId, id.NodeInfo.InitialWeight, int64(block.Height))
 	}
 
 	return db.SaveNodeInitialWeight(totalStakeArr)
 }
 
 
-func getNodeCommittedTokens(nodeIds []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getNodeCommittedTokens(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get node networking address")
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): UFix64{
-	  let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: nodeID)
-	  return nodeInfo.tokensCommitted
-  }`, flowClient.Contract().StakingTable)
-
-	totalStakeArr := make([]types.NodeCommittedTokens, len(nodeIds))
-	for i, id := range nodeIds {
-		nodeId := []cadence.Value{cadence.NewString(id)}
-		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
-			return err
-		}
-
-		stakingKey, err := utils.CadenceConvertUint64(value)
-		if err != nil {
-			return err
-		}
-
-		totalStakeArr[i] = types.NewNodeCommittedTokens(nodeIds[i], stakingKey, int64(block.Height))
+	totalStakeArr := make([]types.NodeCommittedTokens, len(nodeInfos))
+	for i, id := range nodeInfos {
+		totalStakeArr[i] = types.NewNodeCommittedTokens(id.NodeId, id.NodeInfo.TokensCommitted, int64(block.Height))
 	}
 
 	return db.SaveNodeCommittedTokens(totalStakeArr)
