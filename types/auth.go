@@ -94,20 +94,20 @@ func NewDelegatorNodeInfo(id uint32,
 	}
 }
 
-func DelegatorNodeInfoArrayFromCadence(value cadence.Value)([]DelegatorNodeInfo, error){
-	arrayValue ,ok:= value.(cadence.Array)
-	if !ok{
-		return nil,fmt.Errorf("This is not an array")
+func DelegatorNodeInfoArrayFromCadence(value cadence.Value) ([]DelegatorNodeInfo, error) {
+	arrayValue, ok := value.(cadence.Array)
+	if !ok {
+		return nil, fmt.Errorf("This is not an array")
 	}
-	stakers:=make([]DelegatorNodeInfo,len(arrayValue.Values))
-	for i,value:=range(arrayValue.Values){
-		stakervalue,err:=DelegatorNodeInfoFromCadence(value)
-		if err!=nil{
-			return nil,err
+	stakers := make([]DelegatorNodeInfo, len(arrayValue.Values))
+	for i, value := range arrayValue.Values {
+		stakervalue, err := DelegatorNodeInfoFromCadence(value)
+		if err != nil {
+			return nil, err
 		}
-		stakers[i]=stakervalue
+		stakers[i] = stakervalue
 	}
-	return stakers,nil
+	return stakers, nil
 }
 
 func DelegatorNodeInfoFromCadence(value cadence.Value) (DelegatorNodeInfo, error) {
@@ -170,37 +170,37 @@ type StakerNodeInfo struct {
 	InitialWeight            uint64
 }
 
-func (w StakerNodeInfo) Equals (v StakerNodeInfo)bool {
-	return (w.Id                ==v.Id                &&
-	w.Role              ==v.Role              &&
-	w.NetworkingAddress ==v.NetworkingAddress &&
-	w.NetworkingKey     ==v.NetworkingKey     &&
-	w.StakingKey        ==v.StakingKey        &&
-	w.TokensStaked      ==v.TokensStaked      &&
-	w.TokensCommitted   ==v.TokensCommitted   &&
-	w.TokensUnstaking   ==v.TokensUnstaking   &&
-	w.TokensUnstaked    ==v.TokensUnstaked    &&
-	w.TokensRewarded    ==v.TokensRewarded    &&
-	reflect.DeepEqual(w.Delegators,v.Delegators)&&
-	w.DelegatorIDCounter       ==v.DelegatorIDCounter       &&
-	w.TokensRequestedToUnstake ==v.TokensRequestedToUnstake &&
-	w.InitialWeight            ==v.InitialWeight            )
+func (w StakerNodeInfo) Equals(v StakerNodeInfo) bool {
+	return (w.Id == v.Id &&
+		w.Role == v.Role &&
+		w.NetworkingAddress == v.NetworkingAddress &&
+		w.NetworkingKey == v.NetworkingKey &&
+		w.StakingKey == v.StakingKey &&
+		w.TokensStaked == v.TokensStaked &&
+		w.TokensCommitted == v.TokensCommitted &&
+		w.TokensUnstaking == v.TokensUnstaking &&
+		w.TokensUnstaked == v.TokensUnstaked &&
+		w.TokensRewarded == v.TokensRewarded &&
+		reflect.DeepEqual(w.Delegators, v.Delegators) &&
+		w.DelegatorIDCounter == v.DelegatorIDCounter &&
+		w.TokensRequestedToUnstake == v.TokensRequestedToUnstake &&
+		w.InitialWeight == v.InitialWeight)
 }
 
-func NewStakerNodeInfoArrayFromCadence(value cadence.Value)([]StakerNodeInfo, error){
-	arrayValue ,ok:= value.(cadence.Array)
-	if !ok{
-		return nil,fmt.Errorf("This is not an array")
+func NewStakerNodeInfoArrayFromCadence(value cadence.Value) ([]StakerNodeInfo, error) {
+	arrayValue, ok := value.(cadence.Array)
+	if !ok {
+		return nil, fmt.Errorf("This is not an array")
 	}
-	stakers:=make([]StakerNodeInfo,len(arrayValue.Values))
-	for i,value:=range(arrayValue.Values){
-		stakervalue,err:=NewStakerNodeInfoFromCadence(value)
-		if err!=nil{
-			return nil,err
+	stakers := make([]StakerNodeInfo, len(arrayValue.Values))
+	for i, value := range arrayValue.Values {
+		stakervalue, err := NewStakerNodeInfoFromCadence(value)
+		if err != nil {
+			return nil, err
 		}
-		stakers[i]=stakervalue
+		stakers[i] = stakervalue
 	}
-	return stakers,nil
+	return stakers, nil
 }
 
 // NewNodeOperatorInfoFromInterface create a NodeOperatorInfo from []interface{}

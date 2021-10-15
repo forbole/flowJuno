@@ -114,7 +114,7 @@ CREATE TABLE node_committed_tokens
 );
 
 CREATE TABLE cut_percentage
-(  cut_percentage TEXT NOT NULL ,
+(  cut_percentage BIGINT NOT NULL ,
   height BIGINT  NOT NULL
 );
 
@@ -126,10 +126,15 @@ CREATE TABLE delegator_committed
 );
 
 CREATE TABLE delegator_info
-(  delegator_info TEXT NOT NULL ,
-  height TEXT NOT NULL ,
+(  id TEXT NOT NULL ,
   node_id TEXT NOT NULL ,
-  delegator_id TEXT NOT NULL
+  tokens_committed TEXT NOT NULL ,
+  tokens_staked TEXT NOT NULL ,
+  tokens_unstaking TEXT NOT NULL ,
+  tokens_rewarded TEXT NOT NULL ,
+  tokens_unstaked TEXT NOT NULL ,
+  tokens_requested_to_unstake TEXT NOT NULL ,
+  height TEXT NOT NULL
 );
 
 CREATE TABLE delegator_info_from_address

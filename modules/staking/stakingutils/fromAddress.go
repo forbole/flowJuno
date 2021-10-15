@@ -14,14 +14,14 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func GetDataFromAddresses(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy)error{
-	err:= getNodeInfoFromAddress(addresses,block,db,flowClient)
-	if err!=nil{
+func GetDataFromAddresses(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	err := getNodeInfoFromAddress(addresses, block, db, flowClient)
+	if err != nil {
 		return err
 	}
 
-	err= getDelegatorInfoFromAddress(addresses,block,db,flowClient)
-	if err!=nil{
+	err = getDelegatorInfoFromAddress(addresses, block, db, flowClient)
+	if err != nil {
 		return err
 	}
 

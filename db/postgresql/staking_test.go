@@ -634,7 +634,7 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 
 	/*  TODO: Prepare parameter    */
 
-	input := types.NewCutPercentage([]string{"abc", "def"}, 1)
+	input := types.NewCutPercentage(1, 1)
 
 	// ------------------------------
 	// --- Save the data
@@ -646,7 +646,7 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedRow := dbtypes.NewCutPercentageRow(`["abc","def"]`, 1)
+	expectedRow := dbtypes.NewCutPercentageRow(1, 1)
 	var outputs []dbtypes.CutPercentageRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM cut_percentage`)
 	suite.Require().NoError(err)
@@ -696,26 +696,26 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfo() {
 	delegatorNodeId := "2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e"
 	nodeInfo := types.NewDelegatorNodeInfo(uint32(delegatorId), delegatorNodeId, 0, 0, 0, 0, 0, 0)
 
-	input := types.NewDelegatorInfo(nodeInfo, 2, "0x1", 3)
+	input := []types.DelegatorNodeInfo{
+		nodeInfo,
+	}
 
 	// ------------------------------
 	// --- Save the data
 	// ------------------------------
 
-	err := suite.database.SaveDelegatorInfo(input)
+	err := suite.database.SaveDelegatorInfo(input, 1)
 	suite.Require().NoError(err)
 
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedDelegatorNodeId := `{"Id":8411,"NodeID":"2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e","TokensCommitted":0,"TokensStaked":0,"TokensUnstaking":0,"TokensRewarded":0,"TokensUnstaked":0,"TokensRequestedToUnstake":0}`
-	expectedRow := dbtypes.NewDelegatorInfoRow(expectedDelegatorNodeId, 2, "0x1", 3)
+	expectedRow := dbtypes.NewDelegatorInfoRow(8411, "2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e", 0, 0, 0, 0, 0, 0, 1)
 	var outputs []dbtypes.DelegatorInfoRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM delegator_info`)
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
 	suite.Require().True(expectedRow.Equal(outputs[0]))
-
 }
 
 func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfoFromAddress() {
@@ -892,17 +892,16 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorUnstaking() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 }
 
-func (suite *DbTestSuite) TestBigDipperDb_GetDelegatorInfoFromNodeId(){
-	
+func (suite *DbTestSuite) TestBigDipperDb_GetDelegatorInfoFromNodeId() {
 
 	// ------------------------------
 	// --- Prepare the data
 	// ------------------------------
-	
+
 	stakerNodeInfo := `{"Id":"e7df1454826425251716a703e907981672a43208ef3eabfc95d593673da778f6","Role":5,"NetworkingAddress":"34.211.45.12:3569","NetworkingKey":"3fa19db960a86a1722a2d8ffa9563bd1e7d905c91536860c64f9e808ef88862639112a1e872d7eef93dd91207d07dd7c043e2a1e80077b109290682250429f1f","StakingKey":"87d827de3e1b3541c394dcbbb6d76d98e3a7710d6740d28122c468b83f41002625e7a5788cabfcd6ce76b188f7f60de614364d4ab2932dfe0ed6f2d602bd551606ea31045ca2ccde9658a175ccd73da859ab17e56ad81ca4f6ef982c5968a7cb","TokensStaked":0,"TokensCommitted":20000000,"TokensUnstaking":0,"TokensUnstaked":0,"TokensRewarded":0,"Delegators":[],"DelegatorIDCounter":0,"TokensRequestedToUnstake":0,"InitialWeight":0}`
 
-	_,err := suite.database.Sqlx.Exec(`INSERT INTO node_info_from_node_id(node_id,node_info,height) VALUES ($1,$2,$3);`,
-									"0x1",stakerNodeInfo,1)
+	_, err := suite.database.Sqlx.Exec(`INSERT INTO node_info_from_node_id(node_id,node_info,height) VALUES ($1,$2,$3);`,
+		"0x1", stakerNodeInfo, 1)
 
 	suite.Require().NoError(err)
 
@@ -910,7 +909,7 @@ func (suite *DbTestSuite) TestBigDipperDb_GetDelegatorInfoFromNodeId(){
 	// --- Take the data
 	// ------------------------------
 
-	outputs,err:=suite.database.GetDelegatorInfoFromNodeId("0x1",1)
+	outputs, err := suite.database.GetDelegatorInfoFromNodeId("0x1", 1)
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
 
@@ -925,7 +924,7 @@ func (suite *DbTestSuite) TestBigDipperDb_GetDelegatorInfoFromNodeId(){
 		"87d827de3e1b3541c394dcbbb6d76d98e3a7710d6740d28122c468b83f41002625e7a5788cabfcd6ce76b188f7f60de614364d4ab2932dfe0ed6f2d602bd551606ea31045ca2ccde9658a175ccd73da859ab17e56ad81ca4f6ef982c5968a7cb",
 		0, 20000000, 0, 0, 0, []uint32{}, 0, 0, 0)
 
-	expectedOutput:=types.NewNodeInfoFromNodeID("0x1", ExpectedStakerNodeInfo, 1)
+	expectedOutput := types.NewNodeInfoFromNodeID("0x1", ExpectedStakerNodeInfo, 1)
 
 	suite.Require().True(expectedOutput.Equals(outputs[0]))
 

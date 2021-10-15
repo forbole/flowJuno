@@ -16,6 +16,7 @@ import (
 	db "github.com/forbole/flowJuno/db/postgresql"
 	"github.com/onflow/cadence"
 )
+
 func GetDataWithNoArgs(block *flow.Block, db *db.Db, height int64, flowClient client.Proxy) error {
 	err := getWeeklyPayout(block, db, flowClient)
 	if err != nil {
@@ -32,7 +33,7 @@ func GetDataWithNoArgs(block *flow.Block, db *db.Db, height int64, flowClient cl
 		return err
 	}
 
-	_,err = getCurrentTable(block, db, flowClient)
+	_, err = getCurrentTable(block, db, flowClient)
 	if err != nil {
 		return err
 	}
@@ -47,8 +48,8 @@ func GetDataWithNoArgs(block *flow.Block, db *db.Db, height int64, flowClient cl
 		return err
 	}
 
-	err=getCutPercentage(block, db, flowClient)
-	if err!=nil{
+	err = getCutPercentage(block, db, flowClient)
+	if err != nil {
 		return err
 	}
 
@@ -178,8 +179,6 @@ func getTotalStakeByType(block *flow.Block, db *database.Db, flowClient client.P
 
 	return db.SaveTotalStakeByType(totalStakeArr)
 }
-
-
 
 func getStakeRequirements(block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).

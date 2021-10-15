@@ -17,7 +17,6 @@ import (
 
 	database "github.com/forbole/flowJuno/db/postgresql"
 	db "github.com/forbole/flowJuno/db/postgresql"
-	"github.com/onflow/cadence"
 )
 
 func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClient client.Proxy) error {
@@ -28,59 +27,58 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 	}); err != nil {
 		return err
 	}
- */
- 	return HandleStaking( db, flowClient)
+	*/
+	return HandleStaking(db, flowClient)
 }
 
 func HandleStaking(db *db.Db, flowClient client.Proxy) error {
-	 block,err:=flowClient.Client().GetLatestBlock(flowClient.Ctx(),false)
-	if err!=nil{
+	block, err := flowClient.Client().GetLatestBlock(flowClient.Ctx(), false)
+	if err != nil {
 		return err
 	}
-	/* 
-	accounts,err:=db.GetAccounts()
-	if err!=nil{
-		return err
-	} */
-	_,err=getTable(block, db, flowClient)
-	if err!=nil{
-		return err
-	}
-
-	nodeInfo,err:=getNodeInfoFromNodeID(block, db, flowClient)
-	if err!=nil{
-		return err
-	}
-/*
-	addresses:=getAddressesFromAccounts(accounts)
-	
-	if len(addresses)!=0{
-		err=stakingutils.GetDataFromAddresses(addresses,block, db, flowClient)
+	/*
+		accounts,err:=db.GetAccounts()
 		if err!=nil{
 			return err
+		} */
+	_, err = getTable(block, db, flowClient)
+	if err != nil {
+		return err
+	}
+
+	nodeInfo, err := getNodeInfoFromNodeID(block, db, flowClient)
+	if err != nil {
+		return err
+	}
+	/*
+		addresses:=getAddressesFromAccounts(accounts)
+
+		if len(addresses)!=0{
+			err=stakingutils.GetDataFromAddresses(addresses,block, db, flowClient)
+			if err!=nil{
+				return err
+			}
 		}
-	}
-	
-	err = stakingutils.GetDataWithNoArgs(block, db, int64(block.Height), flowClient)
-	if err!=nil{
-		return err
-	} */
 
-	err=stakingutils.GetDataFromNodeID(nodeInfo,block, db, flowClient)
-	if err!=nil{
-		return err
-	} 
-	
-	err=stakingutils.GetDataFromNodeDelegatorID(nodeInfo,block, db, flowClient)
-	if err!=nil{
+		err = stakingutils.GetDataWithNoArgs(block, db, int64(block.Height), flowClient)
+		if err!=nil{
+			return err
+		} */
+
+	err = stakingutils.GetDataFromNodeID(nodeInfo, block, db, flowClient)
+	if err != nil {
 		return err
 	}
 
+	err = stakingutils.GetDataFromNodeDelegatorID(nodeInfo, block, db, flowClient)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]string,error) {
+func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]string, error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get Staked Node id per block")
 
@@ -92,24 +90,23 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]st
 
 	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	table, err := utils.CadenceConvertStringArray(value)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
-	return table,db.SaveStakingTable(types.NewStakingTable(int64(block.Height), table))
+	return table, db.SaveStakingTable(types.NewStakingTable(int64(block.Height), table))
 
 }
 
+func getNodeInfoFromNodeID(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.NodeInfoFromNodeID, error) {
 
-func getNodeInfoFromNodeID(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.NodeInfoFromNodeID,error) {
-	
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String): FlowIDTableStaking.NodeInfo {
+	pub fun main(): [FlowIDTableStaking.NodeInfo] {
 		var nodeIds=FlowIDTableStaking.getNodeIDs()
 		let nodeInfoArray: [FlowIDTableStaking.NodeInfo] = []
 		for node in nodeIds{
@@ -120,27 +117,27 @@ func getNodeInfoFromNodeID(block *flow.Block, db *database.Db, flowClient client
 
 	var totalStakeArr []types.NodeInfoFromNodeID
 
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script),nil)
+	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	stakingKeys, err := types.NewStakerNodeInfoArrayFromCadence(value)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
-	for i,stakingKey:=range stakingKeys{
+	for i, stakingKey := range stakingKeys {
 		totalStakeArr[i] = types.NewNodeInfoFromNodeID(stakingKey.Id, stakingKey, int64(block.Height))
 	}
 
-	return totalStakeArr,db.SaveNodeInfoFromNodeIDs(totalStakeArr)
+	return totalStakeArr, db.SaveNodeInfoFromNodeIDs(totalStakeArr)
 }
 
-func getAddressesFromAccounts(accounts []types.Account)[]string{
-	addresses:=make([]string,len(accounts))
-	for i,account:=range accounts{
-		addresses[i]=account.Address
+func getAddressesFromAccounts(accounts []types.Account) []string {
+	addresses := make([]string, len(accounts))
+	for i, account := range accounts {
+		addresses[i] = account.Address
 	}
 	return addresses
 }

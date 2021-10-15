@@ -411,8 +411,8 @@ type NodeInfoFromNodeID struct {
 	Height   int64
 }
 
-func (w NodeInfoFromNodeID) Equals (v NodeInfoFromNodeID)bool{
-	return w.NodeId==v.NodeId && w.NodeInfo.Equals(v.NodeInfo) &&w.Height==v.Height
+func (w NodeInfoFromNodeID) Equals(v NodeInfoFromNodeID) bool {
+	return w.NodeId == v.NodeId && w.NodeInfo.Equals(v.NodeInfo) && w.Height == v.Height
 }
 
 // NodeInfoFromNodeID allows to build a new NodeInfoFromNodeID

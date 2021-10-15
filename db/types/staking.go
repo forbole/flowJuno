@@ -554,31 +554,51 @@ func NewDelegatorCommittedRow(
 
 // DelegatorInfoRow represents a single row of the delegator_info table
 type DelegatorInfoRow struct {
-	DelegatorInfo string `db:"delegator_info"`
-	Height        uint64 `db:"height"`
-	NodeId        string `db:"node_id"`
-	DelegatorID   uint32 `db:"delegator_id"`
+	Id                       uint32 `db:"id"`
+	NodeId                   string `db:"node_id"`
+	TokensCommitted          uint64 `db:"tokens_committed"`
+	TokensStaked             uint64 `db:"tokens_staked"`
+	TokensUnstaking          uint64 `db:"tokens_unstaking"`
+	TokensRewarded           uint64 `db:"tokens_rewarded"`
+	TokensUnstaked           uint64 `db:"tokens_unstaked"`
+	TokensRequestedToUnstake uint64 `db:"tokens_requested_to_unstake"`
+	Height                   uint64 `db:"height"`
 }
 
 // Equal tells whether v and w represent the same rows
 func (v DelegatorInfoRow) Equal(w DelegatorInfoRow) bool {
-	return v.DelegatorInfo == w.DelegatorInfo &&
-		v.Height == w.Height &&
+	return v.Id == w.Id &&
 		v.NodeId == w.NodeId &&
-		v.DelegatorID == w.DelegatorID
+		v.TokensCommitted == w.TokensCommitted &&
+		v.TokensStaked == w.TokensStaked &&
+		v.TokensUnstaking == w.TokensUnstaking &&
+		v.TokensRewarded == w.TokensRewarded &&
+		v.TokensUnstaked == w.TokensUnstaked &&
+		v.TokensRequestedToUnstake == w.TokensRequestedToUnstake &&
+		v.Height == w.Height
 }
 
 // DelegatorInfoRow allows to build a new DelegatorInfoRow
 func NewDelegatorInfoRow(
-	delegatorInfo string,
-	height uint64,
+	id uint32,
 	nodeId string,
-	delegatorID uint32) DelegatorInfoRow {
+	tokensCommitted uint64,
+	tokensStaked uint64,
+	tokensUnstaking uint64,
+	tokensRewarded uint64,
+	tokensUnstaked uint64,
+	tokensRequestedToUnstake uint64,
+	height uint64) DelegatorInfoRow {
 	return DelegatorInfoRow{
-		DelegatorInfo: delegatorInfo,
-		Height:        height,
-		NodeId:        nodeId,
-		DelegatorID:   delegatorID,
+		Id:                       id,
+		NodeId:                   nodeId,
+		TokensCommitted:          tokensCommitted,
+		TokensStaked:             tokensStaked,
+		TokensUnstaking:          tokensUnstaking,
+		TokensRewarded:           tokensRewarded,
+		TokensUnstaked:           tokensUnstaked,
+		TokensRequestedToUnstake: tokensRequestedToUnstake,
+		Height:                   height,
 	}
 }
 

@@ -10,64 +10,60 @@ import (
 	"github.com/onflow/flow-go-sdk"
 
 	"github.com/forbole/flowJuno/client"
-	"github.com/forbole/flowJuno/modules/utils"
 
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func GetDataFromNodeDelegatorID(nodeInfo []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy)error	{
-	
-	for _, node:=range nodeInfo{
-		for _,delegatorID:=range node.NodeInfo.Delegators{
-			nodeId:=node.NodeId
-			err:=getDelegatorCommitted(nodeId,delegatorID,block,db,flowClient)
-			if err!=nil{
-				return err
-			}
-		
-			err=getDelegatorInfo(nodeId,delegatorID,block,db,flowClient)
-			if err!=nil{
-				return err
-			}
-		
-			err=getDelegatorRequest(nodeId,delegatorID,block,db,flowClient)
-			if err!=nil{
-				return err
-			}
-		
-		
-			err=getDelegatorRewarded(nodeId,delegatorID,block,db,flowClient)
-			if err!=nil{
-				return err
-			}
-		
-			err=getDelegatorStaked(nodeId,delegatorID,block,db,flowClient)
-			if err!=nil{
-				return err
-			}
-		
-			err=getDelegatorUnstaked(nodeId,delegatorID,block,db,flowClient)
-			if err!=nil{
-				return err
-			}
-		
-			err=getDelegatorUnstaking(nodeId,delegatorID,block,db,flowClient)
-			if err!=nil{
-				return err
-			}
-		
-			err=getDelegatorUnstakingRequest(nodeId,delegatorID,block,db,flowClient)
-			if err!=nil{
-				return err
-			}
-		
+func GetDataFromNodeDelegatorID(nodeInfo []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+
+	for _, node := range nodeInfo {
+		/* err:=getDelegatorCommitted(node,block,db,flowClient)
+		if err!=nil{
+			return err
 		}
+		*/
+		_, err := getDelegatorInfo(node, block, db, flowClient)
+		if err != nil {
+			return err
+		}
+		/*
+			err=getDelegatorRequest(node,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+
+
+			err=getDelegatorRewarded(node,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+
+			err=getDelegatorStaked(node,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+
+			err=getDelegatorUnstaked(node,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+
+			err=getDelegatorUnstaking(node,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+
+			err=getDelegatorUnstakingRequest(node,block,db,flowClient)
+			if err!=nil{
+				return err
+			}
+		*/
 	}
-	
+
 	return nil
 }
 
-func getDelegatorCommitted(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+/* func getDelegatorCommitted(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
@@ -89,32 +85,57 @@ func getDelegatorCommitted(nodeId string, delegatorID uint32, block *flow.Block,
 	}
 
 	return db.SaveDelegatorCommitted(types.NewDelegatorCommitted(committed, block.Height, nodeId, delegatorID))
-}
 
-func getDelegatorInfo(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+	return nil
+} */
+
+func getDelegatorInfo(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.DelegatorNodeInfo, error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String, delegatorID: UInt32): FlowIDTableStaking.DelegatorInfo {
-	  return FlowIDTableStaking.DelegatorInfo(nodeID: nodeID, delegatorID: delegatorID)
+	pub fun main(node:String,begin:UInt32,end:UInt32): [FlowIDTableStaking.DelegatorInfo] {
+		let delegatorInfoArray: [FlowIDTableStaking.DelegatorInfo] = []
+		
+		var i:UInt32 = begin
+
+		while i<end {
+			i=i+1
+			delegatorInfoArray.append(FlowIDTableStaking.DelegatorInfo(nodeID: node, delegatorID: i))
+		}
+			
+		return delegatorInfoArray
+	
   }`, flowClient.Contract().StakingTable)
 
-	args := []cadence.Value{cadence.NewString(nodeId), cadence.NewUInt32(delegatorID)}
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), args)
-	if err != nil {
-		return err
+	var i uint32
+	delegatorNum := nodeInfo.NodeInfo.DelegatorIDCounter - 1
+	delegatorInfoArray := make([]types.DelegatorNodeInfo, delegatorNum)
+	for i = 0; i < delegatorNum; {
+		end := i + 4000
+		if end > delegatorNum {
+			end = delegatorNum
+		}
+		args := []cadence.Value{cadence.NewString(nodeInfo.NodeId), cadence.NewUInt32(i), cadence.NewUInt32(4000)}
+		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), args)
+		if err != nil {
+			return nil, err
+		}
+
+		committed, err := types.DelegatorNodeInfoArrayFromCadence(value)
+		if err != nil {
+			return nil, err
+		}
+
+		delegatorInfoArray = append(delegatorInfoArray, committed...)
+		i = i + 4000
 	}
 
-	committed, err := types.DelegatorNodeInfoFromCadence(value)
-	if err != nil {
-		return err
-	}
-
-	return db.SaveDelegatorInfo(types.NewDelegatorInfo(committed, block.Height, nodeId, delegatorID))
+	return delegatorInfoArray, db.SaveDelegatorInfo(delegatorInfoArray, block.Height)
 }
 
-func getDelegatorRequest(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+/*
+func getDelegatorRequest(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
@@ -138,14 +159,23 @@ func getDelegatorRequest(nodeId string, delegatorID uint32, block *flow.Block, d
 	return db.SaveDelegatorRequest(types.NewDelegatorRequest(committed, int64(block.Height), nodeId, delegatorID))
 }
 
-func getDelegatorRewarded(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getDelegatorRewarded(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
-	pub fun main(nodeID: String, delegatorID: UInt32): UFix64 {
-	  let delInfo = FlowIDTableStaking.DelegatorInfo(nodeID: nodeID, delegatorID: delegatorID)
-	  return delInfo.tokensRewarded
+	pub fun main(node:String,begin:UInt32,end:UInt32): [FlowIDTableStaking.DelegatorInfo] {
+		let delegatorInfoArray: [FlowIDTableStaking.DelegatorInfo] = []
+
+		var i:UInt32 = begin
+
+		while i<end {
+			i=i+1
+			delegatorInfoArray.append(FlowIDTableStaking.DelegatorInfo(nodeID: node, delegatorID: i))
+		}
+
+		return delegatorInfoArray
+
   }`, flowClient.Contract().StakingTable)
 
 	args := []cadence.Value{cadence.NewString(nodeId), cadence.NewUInt32(delegatorID)}
@@ -162,7 +192,7 @@ func getDelegatorRewarded(nodeId string, delegatorID uint32, block *flow.Block, 
 	return db.SaveDelegatorRewarded(types.NewDelegatorRewarded(committed, int64(block.Height), nodeId, delegatorID))
 }
 
-func getDelegatorStaked(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getDelegatorStaked(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
@@ -186,7 +216,7 @@ func getDelegatorStaked(nodeId string, delegatorID uint32, block *flow.Block, db
 	return db.SaveDelegatorStaked(types.NewDelegatorStaked(staked, int64(block.Height), nodeId, delegatorID))
 }
 
-func getDelegatorUnstaked(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getDelegatorUnstaked(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
@@ -210,7 +240,7 @@ func getDelegatorUnstaked(nodeId string, delegatorID uint32, block *flow.Block, 
 	return db.SaveDelegatorUnstaked(types.NewDelegatorUnstaked(staked, int64(block.Height), nodeId, delegatorID))
 }
 
-func getDelegatorUnstaking(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getDelegatorUnstaking(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
@@ -234,7 +264,7 @@ func getDelegatorUnstaking(nodeId string, delegatorID uint32, block *flow.Block,
 	return db.SaveDelegatorUnstaking(types.NewDelegatorUnstaking(staking, int64(block.Height), nodeId, delegatorID))
 }
 
-func getDelegatorUnstakingRequest(nodeId string, delegatorID uint32, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func getDelegatorUnstakingRequest(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
@@ -257,3 +287,4 @@ func getDelegatorUnstakingRequest(nodeId string, delegatorID uint32, block *flow
 
 	return db.SaveDelegatorUnstakingRequest(types.NewDelegatorUnstakingRequest(staking, int64(block.Height), nodeId, delegatorID))
 }
+*/

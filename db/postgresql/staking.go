@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/forbole/flowJuno/types"
 	dbtypes "github.com/forbole/flowJuno/db/types"
-
+	"github.com/forbole/flowJuno/types"
 )
 
 // SaveStakeRequirements save the stake requirement from cadence call
@@ -366,7 +365,7 @@ func (db *Db) SaveNodeInfoFromAddresses(NodeInfoFromAddress []types.NodeInfoFrom
 	return nil
 }
 
-func (db *Db) SaveNodeInfoFromNodeIDs(nodeInfoFromNodeID []types.NodeInfoFromNodeID) error {
+func (db *Db) SaveNodeInfoFromNodeIDs(nodeInfoFromNodeID []types.StakerNodeInfo,height uint64) error {
 	stmt := `INSERT INTO node_info_from_node_id(node_id,node_info,height) VALUES `
 
 	var params []interface{}
@@ -376,7 +375,7 @@ func (db *Db) SaveNodeInfoFromNodeIDs(nodeInfoFromNodeID []types.NodeInfoFromNod
 		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
 		nodeInfo, err := json.Marshal(rows.NodeInfo)
-		nodeInfoString:=string(nodeInfo)
+		nodeInfoString := string(nodeInfo)
 		if err != nil {
 			return err
 		}
@@ -431,19 +430,27 @@ func (db *Db) SaveDelegatorCommitted(delegatorCommitted types.DelegatorCommitted
 		delegatorCommitted.DelegatorID)
 	return err
 }
+func (db *Db) SaveDelegatorInfo(delegatorInfo []types.DelegatorNodeInfo, height uint64) error {
+	stmt := `INSERT INTO delegator_info(id,node_id,tokens_committed,tokens_staked,tokens_unstaking,tokens_rewarded,tokens_unstaked,tokens_requested_to_unstake,height) VALUES `
 
-func (db *Db) SaveDelegatorInfo(delegatorInfo types.DelegatorInfo) error {
-	stmt := `INSERT INTO delegator_info(delegator_info,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
+	var params []interface{}
 
-	info, err := json.Marshal(delegatorInfo.DelegatorInfo)
+	for i, rows := range delegatorInfo {
+		ai := i * 9
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8, ai+9)
+
+		params = append(params, rows.Id, rows.NodeID, rows.TokensCommitted, rows.TokensStaked, rows.TokensUnstaking, rows.TokensRewarded, rows.TokensUnstaked, rows.TokensRequestedToUnstake, height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
 		return err
 	}
-	_, err = db.Sql.Exec(stmt, info,
-		delegatorInfo.Height,
-		delegatorInfo.NodeId,
-		delegatorInfo.DelegatorID)
-	return err
+
+	return nil
 }
 
 func (db *Db) SaveDelegatorInfoFromAddress(delegatorInfoFromAddress []types.DelegatorInfoFromAddress) error {
@@ -528,22 +535,21 @@ func (db *Db) SaveDelegatorUnstakingRequest(delegatorUnstakingRequest types.Dele
 	return err
 }
 
-func (db *Db) GetDelegatorInfoFromNodeId(nodeId string,height int64) ([]types.NodeInfoFromNodeID,error) {
+func (db *Db) GetDelegatorInfoFromNodeId(nodeId string, height int64) ([]types.NodeInfoFromNodeID, error) {
 	var rows []dbtypes.NodeInfoFromNodeIDRow
 	stmt := `SELECT * FROM node_info_from_node_id WHERE node_id=$1 AND height=$2;`
-	err := db.Sqlx.Select(&rows, stmt,nodeId,height)
+	err := db.Sqlx.Select(&rows, stmt, nodeId, height)
 	if err != nil {
 		return nil, err
 	}
 	returnRows := make([]types.NodeInfoFromNodeID, len(rows))
 	for i, row := range rows {
 		var nodeInfo types.StakerNodeInfo
-		err=json.Unmarshal([]byte(row.NodeInfo),&nodeInfo)
-		if err!=nil{
-			return nil,err
+		err = json.Unmarshal([]byte(row.NodeInfo), &nodeInfo)
+		if err != nil {
+			return nil, err
 		}
-		returnRows[i] = types.NewNodeInfoFromNodeID(nodeId,nodeInfo,height)
+		returnRows[i] = types.NewNodeInfoFromNodeID(nodeId, nodeInfo, height)
 	}
 	return returnRows, nil
 }
-

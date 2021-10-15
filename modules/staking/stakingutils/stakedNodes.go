@@ -15,9 +15,7 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-
-
-func GetDataFromNodeID(nodeInfofromNodeId []types.NodeInfoFromNodeID,block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func GetDataFromNodeID(nodeInfofromNodeId []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("getting staked node infos")
 
@@ -27,59 +25,57 @@ func GetDataFromNodeID(nodeInfofromNodeId []types.NodeInfoFromNodeID,block *flow
 	}
 
 	err = getNodeTotalCommitment(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
-	
+
 	err = getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	err = getNodeStakingKey(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	err = getNodeStakedTokens(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	err = getNodeRole(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	err = getNodeRewardedTokens(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	err = getNodeNetworkingKey(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	err = getNodeNetworkingAddress(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	err = getNodeInitialWeight(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	err = getNodeCommittedTokens(nodeInfofromNodeId, block, db, flowClient)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
-
 
 func getNodeUnstakingTokens(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
@@ -87,7 +83,7 @@ func getNodeUnstakingTokens(nodeInfos []types.NodeInfoFromNodeID, block *flow.Bl
 
 	totalStakeArr := make([]types.NodeUnstakingTokens, len(nodeInfos))
 	for i, id := range nodeInfos {
-		totalStakeArr[i] = types.NewNodeUnstakingTokens(id.NodeId,id.NodeInfo.TokensUnstaking,int64(block.Height))
+		totalStakeArr[i] = types.NewNodeUnstakingTokens(id.NodeId, id.NodeInfo.TokensUnstaking, int64(block.Height))
 	}
 
 	return db.SaveNodeUnstakingTokens(totalStakeArr)
@@ -232,7 +228,6 @@ func getNodeInitialWeight(nodeInfos []types.NodeInfoFromNodeID, block *flow.Bloc
 
 	return db.SaveNodeInitialWeight(totalStakeArr)
 }
-
 
 func getNodeCommittedTokens(nodeInfos []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
