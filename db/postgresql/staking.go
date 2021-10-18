@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	dbtypes "github.com/forbole/flowJuno/db/types"
+	"github.com/lib/pq"
+
 	"github.com/forbole/flowJuno/types"
 )
 
@@ -210,7 +211,6 @@ func (db *Db) SaveNodeStakedTokens(nodeStakedTokens []types.NodeStakedTokens) er
 		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
 		params = append(params, rows.NodeId, rows.NodeStakedTokens, rows.Height)
-
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
@@ -365,33 +365,28 @@ func (db *Db) SaveNodeInfoFromAddresses(NodeInfoFromAddress []types.NodeInfoFrom
 	return nil
 }
 
-func (db *Db) SaveNodeInfoFromNodeIDs(nodeInfoFromNodeID []types.StakerNodeInfo,height uint64) error {
-	stmt := `INSERT INTO node_info_from_node_id(node_id,node_info,height) VALUES `
+func (db *Db) SaveNodeInfosFromTable(nodeInfosFromTable []types.StakerNodeInfo,height uint64) error {
+    stmt:= `INSERT INTO node_infos_from_table(id,role,networking_address,networking_key,staking_key,tokens_staked,tokens_committed,tokens_unstaking,tokens_unstaked,tokens_rewarded,delegators,delegator_i_d_counter,tokens_requested_to_unstake,initial_weight,height) VALUES `
 
-	var params []interface{}
+    var params []interface{}
 
-	for i, rows := range nodeInfoFromNodeID {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+	  for i, rows := range nodeInfosFromTable{
+      ai := i * 15
+      stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4,ai+5,ai+6,ai+7,ai+8,ai+9,ai+10,ai+11,ai+12,ai+13,ai+14,ai+15)
+      
+      params = append(params,rows.Id,rows.Role,rows.NetworkingAddress,rows.NetworkingKey,rows.StakingKey,rows.TokensStaked,rows.TokensCommitted,rows.TokensUnstaking,rows.TokensUnstaked,rows.TokensRewarded,pq.Array(rows.Delegators),rows.DelegatorIDCounter,rows.TokensRequestedToUnstake,rows.InitialWeight,height)
 
-		nodeInfo, err := json.Marshal(rows.NodeInfo)
-		nodeInfoString := string(nodeInfo)
-		if err != nil {
-			return err
-		}
-		params = append(params, rows.NodeId, nodeInfoString, rows.Height)
+    }
+	  stmt = stmt[:len(stmt)-1]
+    stmt += ` ON CONFLICT DO NOTHING` 
 
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING;`
-	fmt.Println(stmt)
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
+    _, err := db.Sqlx.Exec(stmt, params...)
+    if err != nil {
+      return err
+    }
 
-	return nil
-}
+    return nil 
+    }
 
 func (db *Db) SaveNodeCommittedTokens(nodeCommittedTokens []types.NodeCommittedTokens) error {
 	stmt := `INSERT INTO node_committed_tokens(node_id,committed_tokens,height) VALUES `
@@ -535,7 +530,7 @@ func (db *Db) SaveDelegatorUnstakingRequest(delegatorUnstakingRequest types.Dele
 	return err
 }
 
-func (db *Db) GetDelegatorInfoFromNodeId(nodeId string, height int64) ([]types.NodeInfoFromNodeID, error) {
+/* func (db *Db) GetDelegatorInfoFromNodeId(nodeId string, height int64) ([]types.NodeInfoFromNodeID, error) {
 	var rows []dbtypes.NodeInfoFromNodeIDRow
 	stmt := `SELECT * FROM node_info_from_node_id WHERE node_id=$1 AND height=$2;`
 	err := db.Sqlx.Select(&rows, stmt, nodeId, height)
@@ -552,4 +547,4 @@ func (db *Db) GetDelegatorInfoFromNodeId(nodeId string, height int64) ([]types.N
 		returnRows[i] = types.NewNodeInfoFromNodeID(nodeId, nodeInfo, height)
 	}
 	return returnRows, nil
-}
+} */

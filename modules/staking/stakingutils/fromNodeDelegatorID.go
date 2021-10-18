@@ -5,6 +5,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/forbole/flowJuno/modules/utils"
 	"github.com/forbole/flowJuno/types"
 	"github.com/onflow/cadence"
 	"github.com/onflow/flow-go-sdk"
@@ -14,7 +15,7 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func GetDataFromNodeDelegatorID(nodeInfo []types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 
 	for _, node := range nodeInfo {
 		/* err:=getDelegatorCommitted(node,block,db,flowClient)
@@ -89,9 +90,14 @@ func GetDataFromNodeDelegatorID(nodeInfo []types.NodeInfoFromNodeID, block *flow
 	return nil
 } */
 
-func getDelegatorInfo(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.DelegatorNodeInfo, error) {
+func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.DelegatorNodeInfo, error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
+
+	if nodeInfo.DelegatorIDCounter==0{
+		return nil,nil
+	}
+	
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(node:String,begin:UInt32,end:UInt32): [FlowIDTableStaking.DelegatorInfo] {
@@ -108,15 +114,21 @@ func getDelegatorInfo(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *
 	
   }`, flowClient.Contract().StakingTable)
 
+
 	var i uint32
-	delegatorNum := nodeInfo.NodeInfo.DelegatorIDCounter - 1
+	delegatorNum := nodeInfo.DelegatorIDCounter - 1
+	fmt.Println(delegatorNum)
+	fmt.Println(nodeInfo.Delegators)
+	fmt.Println(len(nodeInfo.Delegators))
+	fmt.Println(nodeInfo.Id)
 	delegatorInfoArray := make([]types.DelegatorNodeInfo, delegatorNum)
-	for i = 0; i < delegatorNum; {
+	for i = 0; i < delegatorNum;i = i + 4000 {
 		end := i + 4000
 		if end > delegatorNum {
 			end = delegatorNum
 		}
-		args := []cadence.Value{cadence.NewString(nodeInfo.NodeId), cadence.NewUInt32(i), cadence.NewUInt32(4000)}
+		fmt.Println(fmt.Sprintf("start %d end %d",i,end))
+		args := []cadence.Value{cadence.NewString(nodeInfo.Id), cadence.NewUInt32(i), cadence.NewUInt32(end)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), args)
 		if err != nil {
 			return nil, err
@@ -128,10 +140,18 @@ func getDelegatorInfo(nodeInfo types.NodeInfoFromNodeID, block *flow.Block, db *
 		}
 
 		delegatorInfoArray = append(delegatorInfoArray, committed...)
-		i = i + 4000
+		
 	}
 
-	return delegatorInfoArray, db.SaveDelegatorInfo(delegatorInfoArray, block.Height)
+	splittedDelegatorInfos:=utils.SplitDelegatorNodeInfo(delegatorInfoArray,9)
+
+	for _,arr:=range splittedDelegatorInfos{
+		err:=db.SaveDelegatorInfo(arr, block.Height)
+		if err!=nil{
+			return nil,err
+		}
+	}
+	return delegatorInfoArray, nil
 }
 
 /*

@@ -46,7 +46,7 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 		return err
 	}
 
-	nodeInfo, err := getNodeInfoFromNodeID(block, db, flowClient)
+	nodeInfo, err := getNodeInfosFromTable(block, db, flowClient)
 	if err != nil {
 		return err
 	}
@@ -65,10 +65,10 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 			return err
 		} */
 
-	err = stakingutils.GetDataFromNodeID(nodeInfo, block, db, flowClient)
+	/* err = stakingutils.GetDataFromNodeID(nodeInfo, block, db, flowClient)
 	if err != nil {
 		return err
-	}
+	} */
 
 	err = stakingutils.GetDataFromNodeDelegatorID(nodeInfo, block, db, flowClient)
 	if err != nil {
@@ -102,7 +102,7 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]st
 
 }
 
-func getNodeInfoFromNodeID(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.NodeInfoFromNodeID, error) {
+func getNodeInfosFromTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.StakerNodeInfo, error) {
 
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
@@ -115,8 +115,6 @@ func getNodeInfoFromNodeID(block *flow.Block, db *database.Db, flowClient client
 		return nodeInfoArray
     }`, flowClient.Contract().StakingTable)
 
-	var totalStakeArr []types.NodeInfoFromNodeID
-
 	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
 	if err != nil {
 		return nil, err
@@ -127,11 +125,7 @@ func getNodeInfoFromNodeID(block *flow.Block, db *database.Db, flowClient client
 		return nil, err
 	}
 
-	for i, stakingKey := range stakingKeys {
-		totalStakeArr[i] = types.NewNodeInfoFromNodeID(stakingKey.Id, stakingKey, int64(block.Height))
-	}
-
-	return totalStakeArr, db.SaveNodeInfoFromNodeIDs(totalStakeArr)
+	return stakingKeys, db.SaveNodeInfosFromTable(stakingKeys,block.Height)
 }
 
 func getAddressesFromAccounts(accounts []types.Account) []string {

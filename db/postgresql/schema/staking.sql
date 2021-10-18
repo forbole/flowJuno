@@ -101,9 +101,21 @@ CREATE TABLE node_info_from_address
   height BIGINT  NOT NULL
 );
 
-CREATE TABLE node_info_from_node_id
-(  node_id TEXT NOT NULL ,
-  node_info TEXT NOT NULL ,
+CREATE TABLE node_infos_from_table
+(  id TEXT  NOT NULL ,
+  role BIGINT  NOT NULL ,
+  networking_address TEXT  NOT NULL ,
+  networking_key TEXT  NOT NULL ,
+  staking_key TEXT  NOT NULL ,
+  tokens_staked BIGINT  NOT NULL ,
+  tokens_committed BIGINT  NOT NULL ,
+  tokens_unstaking BIGINT  NOT NULL ,
+  tokens_unstaked BIGINT  NOT NULL ,
+  tokens_rewarded BIGINT  NOT NULL ,
+  delegators BIGINT[]  NOT NULL ,
+  delegator_i_d_counter BIGINT  NOT NULL ,
+  tokens_requested_to_unstake BIGINT  NOT NULL ,
+  initial_weight BIGINT  NOT NULL ,
   height BIGINT  NOT NULL
 );
 
