@@ -1,7 +1,9 @@
 package types
 
-import("reflect"
-"github.com/lib/pq"
+import (
+	"reflect"
+
+	"github.com/lib/pq"
 )
 
 // TotalStakeRow represents a single row of the total_stake table
@@ -440,7 +442,7 @@ func (v NodeInfoFromAddressRow) Equal(w NodeInfoFromAddressRow) bool {
 		v.Height == w.Height
 }
 
-func NewNodeInfosFromTableRow( 
+func NewNodeInfosFromTableRow(
 	id string,
 	role uint8,
 	networkingAddress string,
@@ -455,25 +457,25 @@ func NewNodeInfosFromTableRow(
 	delegatorIDCounter uint32,
 	tokensRequestedToUnstake uint64,
 	initialWeight uint64,
-	height uint64) NodeInfosFromTableRow{
-   return NodeInfosFromTableRow{
-   Id:id,
-   Role:role,
-   NetworkingAddress:networkingAddress,
-   NetworkingKey:networkingKey,
-   StakingKey:stakingKey,
-   TokensStaked:tokensStaked,
-   TokensCommitted:tokensCommitted,
-   TokensUnstaking:tokensUnstaking,
-   TokensUnstaked:tokensUnstaked,
-   TokensRewarded:tokensRewarded,
-   Delegators:delegators,
-   DelegatorIDCounter:delegatorIDCounter,
-   TokensRequestedToUnstake:tokensRequestedToUnstake,
-   InitialWeight:initialWeight,
-   Height:height,
-  }
-  }
+	height uint64) NodeInfosFromTableRow {
+	return NodeInfosFromTableRow{
+		Id:                       id,
+		Role:                     role,
+		NetworkingAddress:        networkingAddress,
+		NetworkingKey:            networkingKey,
+		StakingKey:               stakingKey,
+		TokensStaked:             tokensStaked,
+		TokensCommitted:          tokensCommitted,
+		TokensUnstaking:          tokensUnstaking,
+		TokensUnstaked:           tokensUnstaked,
+		TokensRewarded:           tokensRewarded,
+		Delegators:               delegators,
+		DelegatorIDCounter:       delegatorIDCounter,
+		TokensRequestedToUnstake: tokensRequestedToUnstake,
+		InitialWeight:            initialWeight,
+		Height:                   height,
+	}
+}
 
 // NodeInfoFromNodeIDsRow allows to build a new NodeInfoFromNodeIDsRow
 func NewNodeInfoFromAddressRow(
@@ -486,42 +488,44 @@ func NewNodeInfoFromAddressRow(
 		Height:   height,
 	}
 }
+
 // NodeInfosFromTableRow represents a single row of the node_infos_from_table table
-type NodeInfosFromTableRow struct { 
-	Id string `db:"id"`
-	Role uint8 `db:"role"`
-	NetworkingAddress string `db:"networking_address"`
-	NetworkingKey string `db:"networking_key"`
-	StakingKey string `db:"staking_key"`
-	TokensStaked uint64 `db:"tokens_staked"`
-	TokensCommitted uint64 `db:"tokens_committed"`
-	TokensUnstaking uint64 `db:"tokens_unstaking"`
-	TokensUnstaked uint64 `db:"tokens_unstaked"`
-	TokensRewarded uint64 `db:"tokens_rewarded"`
-	Delegators pq.Int32Array `db:"delegators"`
-	DelegatorIDCounter uint32 `db:"delegator_i_d_counter"`
-	TokensRequestedToUnstake uint64 `db:"tokens_requested_to_unstake"`
-	InitialWeight uint64 `db:"initial_weight"`
-	Height uint64 `db:"height"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v NodeInfosFromTableRow) Equal(w NodeInfosFromTableRow)bool{
-	return v.Id==w.Id && 
-  v.Role==w.Role && 
-  v.NetworkingAddress==w.NetworkingAddress && 
-  v.NetworkingKey==w.NetworkingKey && 
-  v.StakingKey==w.StakingKey && 
-  v.TokensStaked==w.TokensStaked && 
-  v.TokensCommitted==w.TokensCommitted && 
-  v.TokensUnstaking==w.TokensUnstaking && 
-  v.TokensUnstaked==w.TokensUnstaked && 
-  v.TokensRewarded==w.TokensRewarded && 
-  reflect.DeepEqual(v.Delegators,w.Delegators) && 
-  v.DelegatorIDCounter==w.DelegatorIDCounter && 
-  v.TokensRequestedToUnstake==w.TokensRequestedToUnstake && 
-  v.InitialWeight==w.InitialWeight && 
-  v.Height==w.Height }
+type NodeInfosFromTableRow struct {
+	Id                       string        `db:"id"`
+	Role                     uint8         `db:"role"`
+	NetworkingAddress        string        `db:"networking_address"`
+	NetworkingKey            string        `db:"networking_key"`
+	StakingKey               string        `db:"staking_key"`
+	TokensStaked             uint64        `db:"tokens_staked"`
+	TokensCommitted          uint64        `db:"tokens_committed"`
+	TokensUnstaking          uint64        `db:"tokens_unstaking"`
+	TokensUnstaked           uint64        `db:"tokens_unstaked"`
+	TokensRewarded           uint64        `db:"tokens_rewarded"`
+	Delegators               pq.Int32Array `db:"delegators"`
+	DelegatorIDCounter       uint32        `db:"delegator_i_d_counter"`
+	TokensRequestedToUnstake uint64        `db:"tokens_requested_to_unstake"`
+	InitialWeight            uint64        `db:"initial_weight"`
+	Height                   uint64        `db:"height"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v NodeInfosFromTableRow) Equal(w NodeInfosFromTableRow) bool {
+	return v.Id == w.Id &&
+		v.Role == w.Role &&
+		v.NetworkingAddress == w.NetworkingAddress &&
+		v.NetworkingKey == w.NetworkingKey &&
+		v.StakingKey == w.StakingKey &&
+		v.TokensStaked == w.TokensStaked &&
+		v.TokensCommitted == w.TokensCommitted &&
+		v.TokensUnstaking == w.TokensUnstaking &&
+		v.TokensUnstaked == w.TokensUnstaked &&
+		v.TokensRewarded == w.TokensRewarded &&
+		reflect.DeepEqual(v.Delegators, w.Delegators) &&
+		v.DelegatorIDCounter == w.DelegatorIDCounter &&
+		v.TokensRequestedToUnstake == w.TokensRequestedToUnstake &&
+		v.InitialWeight == w.InitialWeight &&
+		v.Height == w.Height
+}
 
 // NodeCommittedTokensRow represents a single row of the node_committed_tokens table
 type NodeCommittedTokensRow struct {

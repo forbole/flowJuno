@@ -94,10 +94,10 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
 
-	if nodeInfo.DelegatorIDCounter==0{
-		return nil,nil
+	if nodeInfo.DelegatorIDCounter == 0 {
+		return nil, nil
 	}
-	
+
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(node:String,begin:UInt32,end:UInt32): [FlowIDTableStaking.DelegatorInfo] {
@@ -114,17 +114,16 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 	
   }`, flowClient.Contract().StakingTable)
 
-
 	var i uint32
 	delegatorNum := nodeInfo.DelegatorIDCounter - 1
 	var delegatorInfoArray []types.DelegatorNodeInfo
-	for i = 0; i <= delegatorNum;i = i + 4000 {
+	for i = 0; i <= delegatorNum; i = i + 4000 {
 		end := i + 4000
 		if end > delegatorNum {
 			end = delegatorNum
 		}
-		if end==0{
-			end=1
+		if end == 0 {
+			end = 1
 		}
 		args := []cadence.Value{cadence.NewString(nodeInfo.Id), cadence.NewUInt32(i), cadence.NewUInt32(end)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), args)
@@ -141,14 +140,13 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 
 	}
 
-	
-	splittedDelegatorInfos:=utils.SplitDelegatorNodeInfo(delegatorInfoArray,9)
+	splittedDelegatorInfos := utils.SplitDelegatorNodeInfo(delegatorInfoArray, 9)
 
-	for _,arr:=range splittedDelegatorInfos{
+	for _, arr := range splittedDelegatorInfos {
 		fmt.Println(len(arr))
-		err:=db.SaveDelegatorInfo(arr, block.Height)
-		if err!=nil{
-			return nil,err
+		err := db.SaveDelegatorInfo(arr, block.Height)
+		if err != nil {
+			return nil, err
 		}
 	}
 	return delegatorInfoArray, nil

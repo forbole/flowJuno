@@ -365,28 +365,28 @@ func (db *Db) SaveNodeInfoFromAddresses(NodeInfoFromAddress []types.NodeInfoFrom
 	return nil
 }
 
-func (db *Db) SaveNodeInfosFromTable(nodeInfosFromTable []types.StakerNodeInfo,height uint64) error {
-    stmt:= `INSERT INTO node_infos_from_table(id,role,networking_address,networking_key,staking_key,tokens_staked,tokens_committed,tokens_unstaking,tokens_unstaked,tokens_rewarded,delegators,delegator_i_d_counter,tokens_requested_to_unstake,initial_weight,height) VALUES `
+func (db *Db) SaveNodeInfosFromTable(nodeInfosFromTable []types.StakerNodeInfo, height uint64) error {
+	stmt := `INSERT INTO node_infos_from_table(id,role,networking_address,networking_key,staking_key,tokens_staked,tokens_committed,tokens_unstaking,tokens_unstaked,tokens_rewarded,delegators,delegator_i_d_counter,tokens_requested_to_unstake,initial_weight,height) VALUES `
 
-    var params []interface{}
+	var params []interface{}
 
-	  for i, rows := range nodeInfosFromTable{
-      ai := i * 15
-      stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4,ai+5,ai+6,ai+7,ai+8,ai+9,ai+10,ai+11,ai+12,ai+13,ai+14,ai+15)
-      
-      params = append(params,rows.Id,rows.Role,rows.NetworkingAddress,rows.NetworkingKey,rows.StakingKey,rows.TokensStaked,rows.TokensCommitted,rows.TokensUnstaking,rows.TokensUnstaked,rows.TokensRewarded,pq.Array(rows.Delegators),rows.DelegatorIDCounter,rows.TokensRequestedToUnstake,rows.InitialWeight,height)
+	for i, rows := range nodeInfosFromTable {
+		ai := i * 15
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8, ai+9, ai+10, ai+11, ai+12, ai+13, ai+14, ai+15)
 
-    }
-	  stmt = stmt[:len(stmt)-1]
-    stmt += ` ON CONFLICT DO NOTHING` 
+		params = append(params, rows.Id, rows.Role, rows.NetworkingAddress, rows.NetworkingKey, rows.StakingKey, rows.TokensStaked, rows.TokensCommitted, rows.TokensUnstaking, rows.TokensUnstaked, rows.TokensRewarded, pq.Array(rows.Delegators), rows.DelegatorIDCounter, rows.TokensRequestedToUnstake, rows.InitialWeight, height)
 
-    _, err := db.Sqlx.Exec(stmt, params...)
-    if err != nil {
-      return err
-    }
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
 
-    return nil 
-    }
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (db *Db) SaveNodeCommittedTokens(nodeCommittedTokens []types.NodeCommittedTokens) error {
 	stmt := `INSERT INTO node_committed_tokens(node_id,committed_tokens,height) VALUES `

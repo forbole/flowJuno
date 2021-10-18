@@ -1,6 +1,6 @@
 package utils
 
-import(
+import (
 	"github.com/forbole/flowJuno/types"
 )
 
@@ -11,10 +11,10 @@ const (
 func SplitDelegatorNodeInfo(inputarr []types.DelegatorNodeInfo, paramsNumber int) [][]types.DelegatorNodeInfo {
 	maxBalancesPerSlice := maxPostgreSQLParams / paramsNumber
 
-	if len(inputarr)<maxBalancesPerSlice{
+	if len(inputarr) < maxBalancesPerSlice {
 		return [][]types.DelegatorNodeInfo{inputarr}
 	}
-	
+
 	slices := make([][]types.DelegatorNodeInfo, len(inputarr)/maxBalancesPerSlice+1)
 
 	sliceIndex := 0
