@@ -121,7 +121,7 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 	fmt.Println(nodeInfo.Delegators)
 	fmt.Println(len(nodeInfo.Delegators))
 	fmt.Println(nodeInfo.Id)
-	delegatorInfoArray := make([]types.DelegatorNodeInfo, delegatorNum)
+	var delegatorInfoArray []types.DelegatorNodeInfo
 	for i = 0; i <= delegatorNum;i = i + 4000 {
 		end := i + 4000
 		if end > delegatorNum {
