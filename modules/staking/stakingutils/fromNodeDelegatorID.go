@@ -122,10 +122,13 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 	fmt.Println(len(nodeInfo.Delegators))
 	fmt.Println(nodeInfo.Id)
 	delegatorInfoArray := make([]types.DelegatorNodeInfo, delegatorNum)
-	for i = 0; i < delegatorNum;i = i + 4000 {
+	for i = 0; i <= delegatorNum;i = i + 4000 {
 		end := i + 4000
 		if end > delegatorNum {
 			end = delegatorNum
+		}
+		if end==0{
+			end=1
 		}
 		fmt.Println(fmt.Sprintf("start %d end %d",i,end))
 		args := []cadence.Value{cadence.NewString(nodeInfo.Id), cadence.NewUInt32(i), cadence.NewUInt32(end)}
@@ -138,14 +141,19 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(committed[0])
 
 		delegatorInfoArray = append(delegatorInfoArray, committed...)
-		
-	}
+		fmt.Println(delegatorInfoArray[0])
 
+	}
+	//fmt.Println(delegatorInfoArray[0])
+
+	
 	splittedDelegatorInfos:=utils.SplitDelegatorNodeInfo(delegatorInfoArray,9)
 
 	for _,arr:=range splittedDelegatorInfos{
+		fmt.Println(len(arr))
 		err:=db.SaveDelegatorInfo(arr, block.Height)
 		if err!=nil{
 			return nil,err

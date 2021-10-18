@@ -439,7 +439,7 @@ func (db *Db) SaveDelegatorInfo(delegatorInfo []types.DelegatorNodeInfo, height 
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
-
+	fmt.Println(stmt)
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
 		return err
