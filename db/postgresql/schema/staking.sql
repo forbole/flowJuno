@@ -87,3 +87,10 @@ CREATE TABLE delegator_info_from_address
   height BIGINT  NOT NULL ,
   address TEXT NOT NULL
 );
+
+CREATE TABLE node_info_from_address
+(
+  address TEXT NOT NULL,
+  node_info TEXT NOT NULL,
+  height BIGINT  NOT NULL 
+)

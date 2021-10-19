@@ -109,29 +109,6 @@ func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
 	return err
 }
 
-func (db *Db) SaveNodeUnstakingTokens(nodeUnstakingTokens []types.NodeUnstakingTokens) error {
-	stmt := `INSERT INTO node_unstaking_tokens(node_id,token_unstaking,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeUnstakingTokens {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.TokenUnstaking, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (db *Db) SaveNodeTotalCommitment(nodeTotalCommitment []types.NodeTotalCommitment) error {
 	stmt := `INSERT INTO node_total_commitment(node_id,total_commitment,height) VALUES `
 
@@ -165,166 +142,6 @@ func (db *Db) SaveNodeTotalCommitmentWithoutDelegators(nodeTotalCommitmentWithou
 		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
 		params = append(params, rows.NodeId, rows.TotalCommitmentWithoutDelegators, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *Db) SaveNodeStakingKey(nodeStakingKey []types.NodeStakingKey) error {
-	stmt := `INSERT INTO node_staking_key(node_id,node_staking_key,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeStakingKey {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.NodeStakingKey, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *Db) SaveNodeStakedTokens(nodeStakedTokens []types.NodeStakedTokens) error {
-	stmt := `INSERT INTO node_staked_tokens(node_id,node_staked_tokens,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeStakedTokens {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.NodeStakedTokens, rows.Height)
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *Db) SaveNodeRole(nodeRole []types.NodeRole) error {
-	stmt := `INSERT INTO node_role(node_id,role,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeRole {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.Role, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *Db) SaveNodeRewardedTokens(nodeRewardedTokens []types.NodeRewardedTokens) error {
-	stmt := `INSERT INTO node_rewarded_tokens(node_id,node_rewarded_tokens,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeRewardedTokens {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.NodeRewardedTokens, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *Db) SaveNodeNetworkingKey(nodeNetworkingKey []types.NodeNetworkingKey) error {
-	stmt := `INSERT INTO node_networking_key(node_id,networking_key,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeNetworkingKey {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.NetworkingKey, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *Db) SaveNodeNetworkingAddress(nodeNetworkingAddress []types.NodeNetworkingAddress) error {
-	stmt := `INSERT INTO node_networking_address(node_id,networking_address,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeNetworkingAddress {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.NetworkingAddress, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *Db) SaveNodeInitialWeight(nodeInitialWeight []types.NodeInitialWeight) error {
-	stmt := `INSERT INTO node_initial_weight(node_id,initial_weight,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeInitialWeight {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.InitialWeight, rows.Height)
 
 	}
 	stmt = stmt[:len(stmt)-1]
@@ -388,28 +205,6 @@ func (db *Db) SaveNodeInfosFromTable(nodeInfosFromTable []types.StakerNodeInfo, 
 	return nil
 }
 
-func (db *Db) SaveNodeCommittedTokens(nodeCommittedTokens []types.NodeCommittedTokens) error {
-	stmt := `INSERT INTO node_committed_tokens(node_id,committed_tokens,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range nodeCommittedTokens {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.NodeId, rows.CommittedTokens, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 func (db *Db) SaveCutPercentage(cutPercentage types.CutPercentage) error {
 	stmt := `INSERT INTO cut_percentage(cut_percentage,height) VALUES ($1,$2) ON CONFLICT DO NOTHING`
 
@@ -417,14 +212,6 @@ func (db *Db) SaveCutPercentage(cutPercentage types.CutPercentage) error {
 	return err
 }
 
-func (db *Db) SaveDelegatorCommitted(delegatorCommitted types.DelegatorCommitted) error {
-	stmt := `INSERT INTO delegator_committed(committed,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
-	_, err := db.Sql.Exec(stmt, delegatorCommitted.Committed,
-		delegatorCommitted.Height,
-		delegatorCommitted.NodeId,
-		delegatorCommitted.DelegatorID)
-	return err
-}
 func (db *Db) SaveDelegatorInfo(delegatorInfo []types.DelegatorNodeInfo, height uint64) error {
 	stmt := `INSERT INTO delegator_info(id,node_id,tokens_committed,tokens_staked,tokens_unstaking,tokens_rewarded,tokens_unstaked,tokens_requested_to_unstake,height) VALUES `
 
@@ -475,76 +262,3 @@ func (db *Db) SaveDelegatorInfoFromAddress(delegatorInfoFromAddress []types.Dele
 
 	return nil
 }
-
-func (db *Db) SaveDelegatorRequest(delegatorRequest types.DelegatorRequest) error {
-	stmt := `INSERT INTO delegator_request(request_to_unstake,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
-	_, err := db.Sql.Exec(stmt, delegatorRequest.RequestToUnstake,
-		delegatorRequest.Height,
-		delegatorRequest.NodeId,
-		delegatorRequest.DelegatorId)
-	return err
-}
-
-func (db *Db) SaveDelegatorRewarded(delegatorRewarded types.DelegatorRewarded) error {
-	stmt := `INSERT INTO delegator_rewarded(rewarded,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
-	_, err := db.Sql.Exec(stmt, delegatorRewarded.Rewarded,
-		delegatorRewarded.Height,
-		delegatorRewarded.NodeId,
-		delegatorRewarded.DelegatorId)
-	return err
-}
-
-func (db *Db) SaveDelegatorStaked(delegatorStaked types.DelegatorStaked) error {
-	stmt := `INSERT INTO delegator_staked(staked,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
-	_, err := db.Sql.Exec(stmt, delegatorStaked.Staked,
-		delegatorStaked.Height,
-		delegatorStaked.NodeId,
-		delegatorStaked.DelegatorId)
-	return err
-}
-
-func (db *Db) SaveDelegatorUnstaked(delegatorUnstaked types.DelegatorUnstaked) error {
-	stmt := `INSERT INTO delegator_unstaked(unstaked,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
-	_, err := db.Sql.Exec(stmt, delegatorUnstaked.Unstaked,
-		delegatorUnstaked.Height,
-		delegatorUnstaked.NodeId,
-		delegatorUnstaked.DelegatorId)
-	return err
-}
-
-func (db *Db) SaveDelegatorUnstaking(delegatorUnstaking types.DelegatorUnstaking) error {
-	stmt := `INSERT INTO delegator_unstaking(unstaking,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
-	_, err := db.Sql.Exec(stmt, delegatorUnstaking.Unstaking,
-		delegatorUnstaking.Height,
-		delegatorUnstaking.NodeId,
-		delegatorUnstaking.DelegatorId)
-	return err
-}
-
-func (db *Db) SaveDelegatorUnstakingRequest(delegatorUnstakingRequest types.DelegatorUnstakingRequest) error {
-	stmt := `INSERT INTO delegator_unstaking_request(unstaking,height,node_id,delegator_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING`
-	_, err := db.Sql.Exec(stmt, delegatorUnstakingRequest.Unstaking,
-		delegatorUnstakingRequest.Height,
-		delegatorUnstakingRequest.NodeId,
-		delegatorUnstakingRequest.DelegatorId)
-	return err
-}
-
-/* func (db *Db) GetDelegatorInfoFromNodeId(nodeId string, height int64) ([]types.NodeInfoFromNodeID, error) {
-	var rows []dbtypes.NodeInfoFromNodeIDRow
-	stmt := `SELECT * FROM node_info_from_node_id WHERE node_id=$1 AND height=$2;`
-	err := db.Sqlx.Select(&rows, stmt, nodeId, height)
-	if err != nil {
-		return nil, err
-	}
-	returnRows := make([]types.NodeInfoFromNodeID, len(rows))
-	for i, row := range rows {
-		var nodeInfo types.StakerNodeInfo
-		err = json.Unmarshal([]byte(row.NodeInfo), &nodeInfo)
-		if err != nil {
-			return nil, err
-		}
-		returnRows[i] = types.NewNodeInfoFromNodeID(nodeId, nodeInfo, height)
-	}
-	return returnRows, nil
-} */
