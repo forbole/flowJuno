@@ -2,6 +2,7 @@ package stakingutils
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rs/zerolog/log"
 
@@ -24,11 +25,10 @@ func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, block *flow.Bl
 		return err
 	}
 
-	//Crashed because of cadence
-	/* err = getNodeTotalCommitment(nodeInfofromNodeId, block, db, flowClient)
+	err = getNodeTotalCommitment(nodeInfofromNodeId, block, db, flowClient)
 	if err != nil {
 		return err
-	} */
+	}
 
 	err = getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, block, db, flowClient)
 	if err != nil {
@@ -106,6 +106,11 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 		fmt.Println(id.Id)
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
+			// When validator exist 10000, cadence exceed computation limit. Wonfix atm
+			if strings.Contains(err.Error(),"computation limited exceeded: 100000"){
+				log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).Err(err)
+				continue
+			}
 			return err
 		}
 
