@@ -262,3 +262,28 @@ func (db *Db) SaveDelegatorInfoFromAddress(delegatorInfoFromAddress []types.Dele
 
 	return nil
 }
+
+
+func (db *Db) SaveNodeUnstakingTokens(nodeUnstakingTokens []types.NodeUnstakingTokens) error {
+	stmt := `INSERT INTO node_unstaking_tokens(node_id,token_unstaking,height) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range nodeUnstakingTokens {
+		ai := i * 3
+		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
+
+		params = append(params, rows.NodeId, rows.TokenUnstaking, rows.Height)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+

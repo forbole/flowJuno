@@ -168,266 +168,6 @@ func NewCurrentTableRow(
 	}
 }
 
-// NodeUnstakingTokensRow represents a single row of the node_unstaking_tokens table
-type NodeUnstakingTokensRow struct {
-	NodeId         string `db:"node_id"`
-	TokenUnstaking uint64 `db:"token_unstaking"`
-	Height         int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeUnstakingTokensRow) Equal(w NodeUnstakingTokensRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.TokenUnstaking == w.TokenUnstaking &&
-		v.Height == w.Height
-}
-
-// NodeUnstakingTokensRow allows to build a new NodeUnstakingTokensRow
-func NewNodeUnstakingTokensRow(
-	nodeId string,
-	tokenUnstaking uint64,
-	height int64) NodeUnstakingTokensRow {
-	return NodeUnstakingTokensRow{
-		NodeId:         nodeId,
-		TokenUnstaking: tokenUnstaking,
-		Height:         height,
-	}
-}
-
-// NodeTotalCommitmentRow represents a single row of the node_total_commitment table
-type NodeTotalCommitmentRow struct {
-	NodeId          string `db:"node_id"`
-	TotalCommitment uint64 `db:"total_commitment"`
-	Height          int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeTotalCommitmentRow) Equal(w NodeTotalCommitmentRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.TotalCommitment == w.TotalCommitment &&
-		v.Height == w.Height
-}
-
-// NodeTotalCommitmentRow allows to build a new NodeTotalCommitmentRow
-func NewNodeTotalCommitmentRow(
-	nodeId string,
-	totalCommitment uint64,
-	height int64) NodeTotalCommitmentRow {
-	return NodeTotalCommitmentRow{
-		NodeId:          nodeId,
-		TotalCommitment: totalCommitment,
-		Height:          height,
-	}
-}
-
-// NodeTotalCommitmentWithoutDelegatorsRow represents a single row of the node_total_commitment_without_delegators table
-type NodeTotalCommitmentWithoutDelegatorsRow struct {
-	NodeId                           string `db:"node_id"`
-	TotalCommitmentWithoutDelegators uint64 `db:"total_commitment_without_delegators"`
-	Height                           int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeTotalCommitmentWithoutDelegatorsRow) Equal(w NodeTotalCommitmentWithoutDelegatorsRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.TotalCommitmentWithoutDelegators == w.TotalCommitmentWithoutDelegators &&
-		v.Height == w.Height
-}
-
-// NodeTotalCommitmentWithoutDelegatorsRow allows to build a new NodeTotalCommitmentWithoutDelegatorsRow
-func NewNodeTotalCommitmentWithoutDelegatorsRow(
-	nodeId string,
-	totalCommitmentWithoutDelegators uint64,
-	height int64) NodeTotalCommitmentWithoutDelegatorsRow {
-	return NodeTotalCommitmentWithoutDelegatorsRow{
-		NodeId:                           nodeId,
-		TotalCommitmentWithoutDelegators: totalCommitmentWithoutDelegators,
-		Height:                           height,
-	}
-}
-
-// NodeStakingKeyRow represents a single row of the node_staking_key table
-type NodeStakingKeyRow struct {
-	NodeId         string `db:"node_id"`
-	NodeStakingKey string `db:"node_staking_key"`
-	Height         int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeStakingKeyRow) Equal(w NodeStakingKeyRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.NodeStakingKey == w.NodeStakingKey &&
-		v.Height == w.Height
-}
-
-// NodeStakingKeyRow allows to build a new NodeStakingKeyRow
-func NewNodeStakingKeyRow(
-	nodeId string,
-	nodeStakingKey string,
-	height int64) NodeStakingKeyRow {
-	return NodeStakingKeyRow{
-		NodeId:         nodeId,
-		NodeStakingKey: nodeStakingKey,
-		Height:         height,
-	}
-}
-
-// NodeStakedTokensRow represents a single row of the node_staked_tokens table
-type NodeStakedTokensRow struct {
-	NodeId           string `db:"node_id"`
-	NodeStakedTokens uint64 `db:"node_staked_tokens"`
-	Height           int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeStakedTokensRow) Equal(w NodeStakedTokensRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.NodeStakedTokens == w.NodeStakedTokens &&
-		v.Height == w.Height
-}
-
-// NodeStakedTokensRow allows to build a new NodeStakedTokensRow
-func NewNodeStakedTokensRow(
-	nodeId string,
-	nodeStakedTokens uint64,
-	height int64) NodeStakedTokensRow {
-	return NodeStakedTokensRow{
-		NodeId:           nodeId,
-		NodeStakedTokens: nodeStakedTokens,
-		Height:           height,
-	}
-}
-
-// NodeRoleRow represents a single row of the node_role table
-type NodeRoleRow struct {
-	NodeId string `db:"node_id"`
-	Role   uint8  `db:"role"`
-	Height int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeRoleRow) Equal(w NodeRoleRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.Role == w.Role &&
-		v.Height == w.Height
-}
-
-// NodeRoleRow allows to build a new NodeRoleRow
-func NewNodeRoleRow(
-	nodeId string,
-	role uint8,
-	height int64) NodeRoleRow {
-	return NodeRoleRow{
-		NodeId: nodeId,
-		Role:   role,
-		Height: height,
-	}
-}
-
-// NodeRewardedTokensRow represents a single row of the node_rewarded_tokens table
-type NodeRewardedTokensRow struct {
-	NodeId             string `db:"node_id"`
-	NodeRewardedTokens uint64 `db:"node_rewarded_tokens"`
-	Height             int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeRewardedTokensRow) Equal(w NodeRewardedTokensRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.NodeRewardedTokens == w.NodeRewardedTokens &&
-		v.Height == w.Height
-}
-
-// NodeRewardedTokensRow allows to build a new NodeRewardedTokensRow
-func NewNodeRewardedTokensRow(
-	nodeId string,
-	nodeRewardedTokens uint64,
-	height int64) NodeRewardedTokensRow {
-	return NodeRewardedTokensRow{
-		NodeId:             nodeId,
-		NodeRewardedTokens: nodeRewardedTokens,
-		Height:             height,
-	}
-}
-
-// NodeNetworkingKeyRow represents a single row of the node_networking_key table
-type NodeNetworkingKeyRow struct {
-	NodeId        string `db:"node_id"`
-	NetworkingKey string `db:"networking_key"`
-	Height        int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeNetworkingKeyRow) Equal(w NodeNetworkingKeyRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.NetworkingKey == w.NetworkingKey &&
-		v.Height == w.Height
-}
-
-// NodeNetworkingKeyRow allows to build a new NodeNetworkingKeyRow
-func NewNodeNetworkingKeyRow(
-	nodeId string,
-	networkingKey string,
-	height int64) NodeNetworkingKeyRow {
-	return NodeNetworkingKeyRow{
-		NodeId:        nodeId,
-		NetworkingKey: networkingKey,
-		Height:        height,
-	}
-}
-
-// NodeNetworkingAddressRow represents a single row of the node_networking_address table
-type NodeNetworkingAddressRow struct {
-	NodeId            string `db:"node_id"`
-	NetworkingAddress string `db:"networking_address"`
-	Height            int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeNetworkingAddressRow) Equal(w NodeNetworkingAddressRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.NetworkingAddress == w.NetworkingAddress &&
-		v.Height == w.Height
-}
-
-// NodeNetworkingAddressRow allows to build a new NodeNetworkingAddressRow
-func NewNodeNetworkingAddressRow(
-	nodeId string,
-	networkingAddress string,
-	height int64) NodeNetworkingAddressRow {
-	return NodeNetworkingAddressRow{
-		NodeId:            nodeId,
-		NetworkingAddress: networkingAddress,
-		Height:            height,
-	}
-}
-
-// NodeInitialWeightRow represents a single row of the node_initial_weight table
-type NodeInitialWeightRow struct {
-	NodeId        string `db:"node_id"`
-	InitialWeight uint64 `db:"initial_weight"`
-	Height        int64  `db:"height"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v NodeInitialWeightRow) Equal(w NodeInitialWeightRow) bool {
-	return v.NodeId == w.NodeId &&
-		v.InitialWeight == w.InitialWeight &&
-		v.Height == w.Height
-}
-
-// NodeInitialWeightRow allows to build a new NodeInitialWeightRow
-func NewNodeInitialWeightRow(
-	nodeId string,
-	initialWeight uint64,
-	height int64) NodeInitialWeightRow {
-	return NodeInitialWeightRow{
-		NodeId:        nodeId,
-		InitialWeight: initialWeight,
-		Height:        height,
-	}
-}
-
 // NodeInfoFromNodeIDsRow represents a single row of the node_info_from_address table
 type NodeInfoFromAddressRow struct {
 	Address  string `db:"address"`
@@ -681,182 +421,54 @@ func NewDelegatorInfoFromAddressRow(
 	}
 }
 
-// DelegatorRequestRow represents a single row of the delegator_request table
-type DelegatorRequestRow struct {
-	RequestToUnstake uint64 `db:"request_to_unstake"`
-	Height           int64  `db:"height"`
-	NodeId           string `db:"node_id"`
-	DelegatorId      uint32 `db:"delegator_id"`
+// NodeTotalCommitmentRow represents a single row of the node_total_commitment table
+type NodeTotalCommitmentRow struct {
+	NodeId          string `db:"node_id"`
+	TotalCommitment uint64 `db:"total_commitment"`
+	Height          int64  `db:"height"`
 }
 
 // Equal tells whether v and w represent the same rows
-func (v DelegatorRequestRow) Equal(w DelegatorRequestRow) bool {
-	return v.RequestToUnstake == w.RequestToUnstake &&
-		v.Height == w.Height &&
-		v.NodeId == w.NodeId &&
-		v.DelegatorId == w.DelegatorId
+func (v NodeTotalCommitmentRow) Equal(w NodeTotalCommitmentRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.TotalCommitment == w.TotalCommitment &&
+		v.Height == w.Height
 }
 
-// DelegatorRequestRow allows to build a new DelegatorRequestRow
-func NewDelegatorRequestRow(
-	requestToUnstake uint64,
-	height int64,
+// NodeTotalCommitmentRow allows to build a new NodeTotalCommitmentRow
+func NewNodeTotalCommitmentRow(
 	nodeId string,
-	DelegatorId uint32) DelegatorRequestRow {
-	return DelegatorRequestRow{
-		RequestToUnstake: requestToUnstake,
-		Height:           height,
-		NodeId:           nodeId,
-		DelegatorId:      DelegatorId,
-	}
-}
+	totalCommitment uint64,
+	height int64) NodeTotalCommitmentRow {
+	return NodeTotalCommitmentRow{
+		NodeId:          nodeId,
+		TotalCommitment: totalCommitment,
+		Height:          height,
+	}}
 
-// DelegatorRewardedRow represents a single row of the delegator_rewarded table
-type DelegatorRewardedRow struct {
-	Rewarded    uint64 `db:"rewarded"`
-	Height      int64  `db:"height"`
-	NodeId      string `db:"node_id"`
-	DelegatorId uint32 `db:"delegator_id"`
+	// NodeTotalCommitmentWithoutDelegatorsRow represents a single row of the node_total_commitment_without_delegators table
+type NodeTotalCommitmentWithoutDelegatorsRow struct {
+	NodeId                           string `db:"node_id"`
+	TotalCommitmentWithoutDelegators uint64 `db:"total_commitment_without_delegators"`
+	Height                           int64  `db:"height"`
 }
 
 // Equal tells whether v and w represent the same rows
-func (v DelegatorRewardedRow) Equal(w DelegatorRewardedRow) bool {
-	return v.Rewarded == w.Rewarded &&
-		v.Height == w.Height &&
-		v.NodeId == w.NodeId &&
-		v.DelegatorId == w.DelegatorId
+func (v NodeTotalCommitmentWithoutDelegatorsRow) Equal(w NodeTotalCommitmentWithoutDelegatorsRow) bool {
+	return v.NodeId == w.NodeId &&
+		v.TotalCommitmentWithoutDelegators == w.TotalCommitmentWithoutDelegators &&
+		v.Height == w.Height
 }
 
-// DelegatorRewardedRow allows to build a new DelegatorRewardedRow
-func NewDelegatorRewardedRow(
-	rewarded uint64,
-	height int64,
+// NodeTotalCommitmentWithoutDelegatorsRow allows to build a new NodeTotalCommitmentWithoutDelegatorsRow
+func NewNodeTotalCommitmentWithoutDelegatorsRow(
 	nodeId string,
-	delegatorId uint32) DelegatorRewardedRow {
-	return DelegatorRewardedRow{
-		Rewarded:    rewarded,
-		Height:      height,
-		NodeId:      nodeId,
-		DelegatorId: delegatorId,
+	totalCommitmentWithoutDelegators uint64,
+	height int64) NodeTotalCommitmentWithoutDelegatorsRow {
+	return NodeTotalCommitmentWithoutDelegatorsRow{
+		NodeId:                           nodeId,
+		TotalCommitmentWithoutDelegators: totalCommitmentWithoutDelegators,
+		Height:                           height,
 	}
 }
 
-// DelegatorStakedRow represents a single row of the delegator_staked table
-type DelegatorStakedRow struct {
-	Staked      uint64 `db:"staked"`
-	Height      int64  `db:"height"`
-	NodeId      string `db:"node_id"`
-	DelegatorId uint32 `db:"delegator_id"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v DelegatorStakedRow) Equal(w DelegatorStakedRow) bool {
-	return v.Staked == w.Staked &&
-		v.Height == w.Height &&
-		v.NodeId == w.NodeId &&
-		v.DelegatorId == w.DelegatorId
-}
-
-// DelegatorStakedRow allows to build a new DelegatorStakedRow
-func NewDelegatorStakedRow(
-	staked uint64,
-	height int64,
-	nodeId string,
-	delegatorId uint32) DelegatorStakedRow {
-	return DelegatorStakedRow{
-		Staked:      staked,
-		Height:      height,
-		NodeId:      nodeId,
-		DelegatorId: delegatorId,
-	}
-}
-
-// DelegatorUnstakedRow represents a single row of the delegator_unstaked table
-type DelegatorUnstakedRow struct {
-	Unstaked    uint64 `db:"unstaked"`
-	Height      int64  `db:"height"`
-	NodeId      string `db:"node_id"`
-	DelegatorId uint32 `db:"delegator_id"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v DelegatorUnstakedRow) Equal(w DelegatorUnstakedRow) bool {
-	return v.Unstaked == w.Unstaked &&
-		v.Height == w.Height &&
-		v.NodeId == w.NodeId &&
-		v.DelegatorId == w.DelegatorId
-}
-
-// DelegatorUnstakedRow allows to build a new DelegatorUnstakedRow
-func NewDelegatorUnstakedRow(
-	unstaked uint64,
-	height int64,
-	nodeId string,
-	delegatorId uint32) DelegatorUnstakedRow {
-	return DelegatorUnstakedRow{
-		Unstaked:    unstaked,
-		Height:      height,
-		NodeId:      nodeId,
-		DelegatorId: delegatorId,
-	}
-}
-
-// DelegatorUnstakingRow represents a single row of the delegator_unstaking table
-type DelegatorUnstakingRow struct {
-	Unstaking   uint64 `db:"unstaking"`
-	Height      int64  `db:"height"`
-	NodeId      string `db:"node_id"`
-	DelegatorId uint32 `db:"delegator_id"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v DelegatorUnstakingRow) Equal(w DelegatorUnstakingRow) bool {
-	return v.Unstaking == w.Unstaking &&
-		v.Height == w.Height &&
-		v.NodeId == w.NodeId &&
-		v.DelegatorId == w.DelegatorId
-}
-
-// DelegatorUnstakingRow allows to build a new DelegatorUnstakingRow
-func NewDelegatorUnstakingRow(
-	unstaking uint64,
-	height int64,
-	nodeId string,
-	delegatorId uint32) DelegatorUnstakingRow {
-	return DelegatorUnstakingRow{
-		Unstaking:   unstaking,
-		Height:      height,
-		NodeId:      nodeId,
-		DelegatorId: delegatorId,
-	}
-}
-
-// DelegatorUnstakingRequestRow represents a single row of the delegator_unstaking_request table
-type DelegatorUnstakingRequestRow struct {
-	Unstaking   uint64 `db:"unstaking"`
-	Height      int64  `db:"height"`
-	NodeId      string `db:"node_id"`
-	DelegatorId uint32 `db:"delegator_id"`
-}
-
-// Equal tells whether v and w represent the same rows
-func (v DelegatorUnstakingRequestRow) Equal(w DelegatorUnstakingRequestRow) bool {
-	return v.Unstaking == w.Unstaking &&
-		v.Height == w.Height &&
-		v.NodeId == w.NodeId &&
-		v.DelegatorId == w.DelegatorId
-}
-
-// DelegatorUnstakingRequestRow allows to build a new DelegatorUnstakingRequestRow
-func NewDelegatorUnstakingRequestRow(
-	unstaking uint64,
-	height int64,
-	nodeId string,
-	delegatorId uint32) DelegatorUnstakingRequestRow {
-	return DelegatorUnstakingRequestRow{
-		Unstaking:   unstaking,
-		Height:      height,
-		NodeId:      nodeId,
-		DelegatorId: delegatorId,
-	}
-}
