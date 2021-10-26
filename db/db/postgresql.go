@@ -316,7 +316,7 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 			t[i] = id.String()
 		}
 
-		params = append(params, rows.Height, rows.Id, rows.Processed, rows.TransactionIds, pq.StringArray(t))
+		params = append(params, rows.Height, rows.Id, rows.Processed, pq.StringArray(t))
 
 	}
 	stmt = stmt[:len(stmt)-1]
