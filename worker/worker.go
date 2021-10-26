@@ -100,7 +100,26 @@ func (w Worker) process(height int64) error {
 		}
 	}
 
-	return w.ExportBlock(block, &txs)
+	err=w.ExportBlock(block)
+	if err!=nil{
+		return err
+	}
+
+	err=w.ExportTx(&txs)
+	if err!=nil{
+		return err
+	}
+
+	return nil
+}
+
+func (w Worker) ExportCollection(block *flow.Block) error {
+	collection:= w.cp.Collections(block)
+	err:=w.db.SaveCollection(collection)
+	if err!=nil{
+		return err
+	}
+	return nil
 }
 
 // getGenesisFromRPC returns the genesis read from the RPC endpoint
@@ -138,7 +157,7 @@ func (w Worker) getGenesisFromFilePath(path string) (*tmtypes.GenesisDoc, error)
 // ExportBlock accepts a finalized block and a corresponding set of transactions
 // and persists them to the database along with attributable metadata. An error
 // is returned if the write fails.
-func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs) error {
+func (w Worker) ExportBlock(b *flow.Block) error {
 	// Save all validators
 	/* err := w.SaveNodeInfos(vals.NodeInfos)
 	if err != nil {
@@ -152,8 +171,11 @@ func (w Worker) ExportBlock(b *flow.Block, txs *types.Txs) error {
 		return err
 	}
 
-	return w.ExportTx(txs)
+	return nil
 }
+
+
+
 
 // ExportTxs accepts a slice of transactions and persists then inside the database.
 // An error is returned if the write fails.

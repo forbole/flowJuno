@@ -64,3 +64,10 @@ CREATE TABLE pruning
 (
     last_pruned_height BIGINT NOT NULL
 );
+
+CREATE TABLE collection
+(  height BIGINT  NOT NULL ,
+  id TEXT  NOT NULL ,
+  processed BOOLEAN  NOT NULL ,
+  transaction_ids TEXT[]  NOT NULL
+);

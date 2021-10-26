@@ -47,6 +47,8 @@ type Database interface {
 	// An error is returned if the operation fails.
 	SaveEvents(events []types.Event) error
 
+	SaveCollection(collection []types.Collection) error
+
 	// Close closes the connection to the database
 	Close()
 }

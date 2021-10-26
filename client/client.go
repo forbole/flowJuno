@@ -191,19 +191,36 @@ func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEv
 	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
 } */
 
+// Collections get all the collection from block
+func (cp *Proxy) Collections(block *flow.Block) ([]types.Collection) {
+	collectionsID := block.CollectionGuarantees
+	collections:=make([]types.Collection,len(block.CollectionGuarantees))
+	for i, c := range collectionsID {
+		processed:=true
+		collection, err := cp.flowClient.GetCollection(cp.ctx, c.CollectionID)
+		
+		if err != nil {
+			processed=false
+		}
+		
+		collections[i]=types.NewCollection(block.Height,collection.ID().String(),processed,collection.TransactionIDs)
+	}
+	return collections
+}
+
+
+
+
+
 // Txs queries for all the transactions in a block. Transactions are returned
 // in the TransactionResult format which internally contains an array of Transactions. An error is
 // returned if any query fails.
 func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 	var transactionIDs []flow.Identifier
-	collectionsID := block.CollectionGuarantees
-	for _, c := range collectionsID {
-		c, err := cp.flowClient.GetCollection(cp.ctx, c.CollectionID)
-		if err != nil {
-			return nil, err
-		}
-		transactionIDs = append(transactionIDs, (c.TransactionIDs)...)
+	collections:=cp.Collections(block)
+	for _,collection:=range collections{
+		transactionIDs = append(transactionIDs, (collection.TransactionIds)...)
 	}
 
 	txResponses := make([]types.Tx, len(transactionIDs))

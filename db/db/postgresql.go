@@ -301,3 +301,31 @@ func (db *Database) SaveEvents(events []types.Event) error {
 	_, err := db.Sql.Exec(stmt, vparams...)
 	return err
 }
+
+func (db *Database) SaveCollection(collection []types.Collection) error {
+    stmt:= `INSERT INTO collection(height,id,processed,transaction_ids) VALUES `
+
+    var params []interface{}
+
+	  for i, rows := range collection{
+      ai := i * 4
+      stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4)
+
+	  t:=make([]string,len(rows.TransactionIds))
+	  for i,id:=range rows.TransactionIds{
+		t[i]=id.String()
+	  }
+      
+      params = append(params,rows.Height,rows.Id,rows.Processed,rows.TransactionIds,pq.StringArray(t))
+
+    }
+	  stmt = stmt[:len(stmt)-1]
+    stmt += ` ON CONFLICT DO NOTHING` 
+
+    _, err := db.Sql.Exec(stmt, params...)
+    if err != nil {
+      return err
+    }
+
+    return nil 
+    }
