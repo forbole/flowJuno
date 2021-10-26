@@ -212,7 +212,6 @@ func NewNodeTotalCommitmentWithoutDelegators(
 	}
 }
 
-
 type NodeInfoFromAddress struct {
 	Address  string
 	NodeInfo StakerNodeInfo
@@ -230,7 +229,6 @@ func NewNodeInfoFromAddress(
 		Height:   height,
 	}
 }
-
 
 type NodeCommittedTokens struct {
 	NodeId          string

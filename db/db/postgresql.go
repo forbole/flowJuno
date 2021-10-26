@@ -303,29 +303,29 @@ func (db *Database) SaveEvents(events []types.Event) error {
 }
 
 func (db *Database) SaveCollection(collection []types.Collection) error {
-    stmt:= `INSERT INTO collection(height,id,processed,transaction_ids) VALUES `
+	stmt := `INSERT INTO collection(height,id,processed,transaction_ids) VALUES `
 
-    var params []interface{}
+	var params []interface{}
 
-	  for i, rows := range collection{
-      ai := i * 4
-      stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4)
+	for i, rows := range collection {
+		ai := i * 4
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
 
-	  t:=make([]string,len(rows.TransactionIds))
-	  for i,id:=range rows.TransactionIds{
-		t[i]=id.String()
-	  }
-      
-      params = append(params,rows.Height,rows.Id,rows.Processed,rows.TransactionIds,pq.StringArray(t))
+		t := make([]string, len(rows.TransactionIds))
+		for i, id := range rows.TransactionIds {
+			t[i] = id.String()
+		}
 
-    }
-	  stmt = stmt[:len(stmt)-1]
-    stmt += ` ON CONFLICT DO NOTHING` 
+		params = append(params, rows.Height, rows.Id, rows.Processed, rows.TransactionIds, pq.StringArray(t))
 
-    _, err := db.Sql.Exec(stmt, params...)
-    if err != nil {
-      return err
-    }
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
 
-    return nil 
-    }
+	_, err := db.Sql.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -207,7 +207,6 @@ func (suite *DbTestSuite) TestBigDipperDb_CurrentTable() {
 
 }
 
-
 func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitment() {
 
 	// ------------------------------
@@ -269,8 +268,6 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitmentWithoutDelegators()
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
-
-
 
 func (suite *DbTestSuite) TestBigDipperDb_NodeInfoFromAddresses() {
 
@@ -353,7 +350,6 @@ func (suite *DbTestSuite) TestBigDipperDb_SaveNodeInfosFromTable() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 }
 
-
 func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 
 	// ------------------------------
@@ -383,8 +379,6 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
-
-
 
 func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfo() {
 
@@ -452,7 +446,3 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfoFromAddress() {
 	suite.Require().True(expectedRow.Equal(outputs[0]))
 
 }
-
-
-
-

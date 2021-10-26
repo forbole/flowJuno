@@ -444,9 +444,10 @@ func NewNodeTotalCommitmentRow(
 		NodeId:          nodeId,
 		TotalCommitment: totalCommitment,
 		Height:          height,
-	}}
+	}
+}
 
-	// NodeTotalCommitmentWithoutDelegatorsRow represents a single row of the node_total_commitment_without_delegators table
+// NodeTotalCommitmentWithoutDelegatorsRow represents a single row of the node_total_commitment_without_delegators table
 type NodeTotalCommitmentWithoutDelegatorsRow struct {
 	NodeId                           string `db:"node_id"`
 	TotalCommitmentWithoutDelegators uint64 `db:"total_commitment_without_delegators"`
@@ -471,4 +472,3 @@ func NewNodeTotalCommitmentWithoutDelegatorsRow(
 		Height:                           height,
 	}
 }
-

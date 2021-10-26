@@ -62,7 +62,7 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
 			// When validator exist 10000, cadence exceed computation limit. Wonfix atm
-			if strings.Contains(err.Error(),"computation limited exceeded: 100000"){
+			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
 				log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).Err(err)
 				continue
 			}
@@ -108,4 +108,3 @@ func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, b
 
 	return db.SaveNodeTotalCommitmentWithoutDelegators(totalStakeArr)
 }
-

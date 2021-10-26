@@ -23,11 +23,11 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 	log.Debug().Str("module", "staking").Msg("setting up periodic tasks")
 
 	if _, err := scheduler.Every(1).Week().Tuesday().At("15:00").StartImmediately().Do(func() {
-		utils.WatchMethod(func() error { return HandleStaking( db, flowClient) })
+		utils.WatchMethod(func() error { return HandleStaking(db, flowClient) })
 	}); err != nil {
 		return err
 	}
-	
+
 	return HandleStaking(db, flowClient)
 }
 

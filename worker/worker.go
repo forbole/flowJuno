@@ -60,6 +60,8 @@ func (w Worker) Start() {
 // process defines the job consumer workflow. It will fetch a block for a given
 // height and associated metadata and export it to a database. It returns an
 // error if any export process fails.
+// To get all transaction and event from the block, follow the order so that wont double call:
+// block -> collection_grauntee -> transaction -> event
 func (w Worker) process(height int64) error {
 	exists, err := w.db.HasBlock(height)
 	if err != nil {
@@ -71,7 +73,8 @@ func (w Worker) process(height int64) error {
 		return nil
 	}
 
-	//log.Debug().Int64("height", height).Msg("processing block")
+	// To get all transaction and event from the block, follow the order so that wont double call:
+	// block -> collection_grauntee -> transaction -> event
 
 	block, err := w.cp.Block(height)
 	if err != nil {
@@ -100,13 +103,18 @@ func (w Worker) process(height int64) error {
 		}
 	}
 
-	err=w.ExportBlock(block)
-	if err!=nil{
+	err = w.ExportCollection(block)
+	if err != nil {
 		return err
 	}
 
-	err=w.ExportTx(&txs)
-	if err!=nil{
+	err = w.ExportBlock(block)
+	if err != nil {
+		return err
+	}
+
+	err = w.ExportTx(&txs)
+	if err != nil {
 		return err
 	}
 
@@ -114,9 +122,9 @@ func (w Worker) process(height int64) error {
 }
 
 func (w Worker) ExportCollection(block *flow.Block) error {
-	collection:= w.cp.Collections(block)
-	err:=w.db.SaveCollection(collection)
-	if err!=nil{
+	collection := w.cp.Collections(block)
+	err := w.db.SaveCollection(collection)
+	if err != nil {
 		return err
 	}
 	return nil
@@ -173,9 +181,6 @@ func (w Worker) ExportBlock(b *flow.Block) error {
 
 	return nil
 }
-
-
-
 
 // ExportTxs accepts a slice of transactions and persists then inside the database.
 // An error is returned if the write fails.

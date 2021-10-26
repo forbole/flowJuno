@@ -263,7 +263,6 @@ func (db *Db) SaveDelegatorInfoFromAddress(delegatorInfoFromAddress []types.Dele
 	return nil
 }
 
-
 func (db *Db) SaveNodeUnstakingTokens(nodeUnstakingTokens []types.NodeUnstakingTokens) error {
 	stmt := `INSERT INTO node_unstaking_tokens(node_id,token_unstaking,height) VALUES `
 
@@ -286,4 +285,3 @@ func (db *Db) SaveNodeUnstakingTokens(nodeUnstakingTokens []types.NodeUnstakingT
 
 	return nil
 }
-

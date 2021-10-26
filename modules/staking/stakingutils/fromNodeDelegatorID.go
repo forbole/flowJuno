@@ -18,18 +18,16 @@ import (
 func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 
 	for _, node := range nodeInfo {
-		
+
 		_, err := getDelegatorInfo(node, block, db, flowClient)
 		if err != nil {
 			return err
 		}
-		
+
 	}
 
 	return nil
 }
-
-
 
 func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.DelegatorNodeInfo, error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
