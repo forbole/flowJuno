@@ -103,8 +103,6 @@ func (w Worker) process(height int64) error {
 		}
 	}
 
-
-
 	err = w.ExportBlock(block)
 	if err != nil {
 		return err
@@ -125,7 +123,7 @@ func (w Worker) process(height int64) error {
 
 func (w Worker) ExportCollection(block *flow.Block) error {
 	collection := w.cp.Collections(block)
-	if len(collection)==0{
+	if len(collection) == 0 {
 		return nil
 	}
 	err := w.db.SaveCollection(collection)

@@ -1,11 +1,10 @@
-package staking
+package token
 
 import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
-	"github.com/go-co-op/gocron"
 	"github.com/onflow/flow-go-sdk"
 
 	"github.com/forbole/flowJuno/client"
@@ -41,19 +40,10 @@ func NewModule(
 
 // Name implements modules.Module
 func (m *Module) Name() string {
-	return "staking"
+	return "token"
 }
 
 // HandleEvent implements modules.MessageModule
 func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs) error {
-	return nil //HandleBlock(block, m.messagesParser, m.db, int64(block.Height), m.flowClient)
-}
-
-// RegisterPeriodicOperations implements modules.Module
-func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
-	return nil //RegisterPeriodicOps(scheduler, m.db, m.flowClient)
-}
-
-func (m *Module) HandleEvent(index int, event types.Event, tx *types.Tx) error {
-	return nil /* HandleEvent(m.messagesParser, m.db, event, tx , m.flowClient) */
+	return HandleBlock(m.db, block.Height, m.flowClient)
 }
