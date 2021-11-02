@@ -11,8 +11,6 @@ import (
 type Txs []Tx
 
 type Tx struct {
-	//TransactionResult
-	Status        string
 	Height        uint64
 	TransactionID string
 
@@ -28,12 +26,11 @@ type Tx struct {
 	EnvelopeSignatures []byte
 }
 
-func NewTx(status string, height uint64, transactionID string,
+func NewTx( height uint64, transactionID string,
 	script []byte, arguments [][]byte, referenceBlockID string,
 	gasLimit uint64, proposalKey string, payer string, authorizers []string, payloadSignatures []byte,
 	envelopeSignatures []byte) Tx {
 	return Tx{
-		Status:        status,
 		Height:        height,
 		TransactionID: transactionID,
 
@@ -76,7 +73,7 @@ func NewEvent(height int, t string, transactionID string, transactionIndex int, 
 
 // Successful tells whether this tx is successful or not
 func (tx Tx) Successful() bool {
-	return tx.Status == flow.TransactionStatusSealed.String()
+	return true 
 }
 
 type Collection struct {

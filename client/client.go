@@ -221,11 +221,6 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 	txResponses := make([]types.Tx, len(transactionIDs))
 	for i, txID := range transactionIDs {
-		transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, txID)
-		if err != nil {
-			return nil, err
-		}
-		
 		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID)
 		if err != nil {
 			return nil, err
@@ -246,7 +241,7 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 			return nil, err
 		}
 
-		tx := types.NewTx(transactionResult.Status.String(), block.Height, txID.String(), transaction.Script, transaction.Arguments,
+		tx := types.NewTx(block.Height, txID.String(), transaction.Script, transaction.Arguments,
 			transaction.ReferenceBlockID.String(), transaction.GasLimit, transaction.ProposalKey.Address.String(), transaction.Payer.String(),
 			authoriser, payloadSignitures, envelopeSigniture)
 

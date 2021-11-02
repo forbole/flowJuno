@@ -1,22 +1,3 @@
-CREATE TABLE node_info
-(
-    id TEXT UNIQUE NOT NULL PRIMARY KEY,
-    role BIGINT NOT NULL,
-    networkingAddress TEXT NOT NULL,
-    networkingKey TEXT NOT NULL,
-    stakingKey TEXT NOT NULL,
-    tokensStaked NUMERIC NOT NULL,
-    tokensCommitted NUMERIC NOT NULL,
-    tokensUnstaking NUMERIC NOT NULL,
-    tokensUnstaked NUMERIC NOT NULL,
-    tokensRewarded NUMERIC NOT NULL,
-
-    delegators NUMERIC[] ,
-    delegatorIDCounter BIGINT NOT NULL,
-    tokensRequestedToUnstake NUMERIC NOT NULL,
-    initialWeight BIGINT NOT NULL
-);
-
 CREATE TABLE block
 (
     height           BIGINT UNIQUE PRIMARY KEY,
