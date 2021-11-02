@@ -30,12 +30,13 @@ CREATE TABLE transaction
 		envelope_signatures TEXT
 );
 
-CREATE TABLE transaction_result(
-        status TEXT NOT NULL,
-		height BIGINT NOT NULL,
-        transaction_id TEXT,
-        error TEXT
+CREATE TABLE transaction_result
+(  height BIGINT  NOT NULL ,
+  transaction_id TEXT  NOT NULL ,
+  status TEXT  NOT NULL ,
+  error TEXT 
 );
+
 
 CREATE TABLE event
 (

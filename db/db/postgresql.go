@@ -129,10 +129,10 @@ VALUES `
 
 	var vparams []interface{}
 	for i, tx := range txs {
-		vi := i * 12
+		vi := i * 11
 		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),`,
 			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11)
-		vparams = append(vparams,tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, pq.StringArray(tx.Authorizers),
+		vparams = append(vparams, tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, pq.StringArray(tx.Authorizers),
 			tx.PayloadSignatures, tx.EnvelopeSignatures)
 
 	}
@@ -317,6 +317,28 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 		}
 
 		params = append(params, rows.Height, rows.Id, rows.Processed, pq.StringArray(t))
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sql.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+func (db *Database) SaveTransactionResult(transactionResult []types.TransactionResult, height uint64) error {
+	stmt := `INSERT INTO transaction_result(height,transaction_id,status,error) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range transactionResult {
+		ai := i * 4
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
+
+		params = append(params, height, rows.TransactionId, rows.Status, rows.Error)
 
 	}
 	stmt = stmt[:len(stmt)-1]

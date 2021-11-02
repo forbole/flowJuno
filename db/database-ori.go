@@ -49,6 +49,7 @@ type Database interface {
 
 	SaveCollection(collection []types.Collection) error
 
+	SaveTransactionResult(txResults []types.TransactionResult, height uint64) error
 	// Close closes the connection to the database
 	Close()
 }

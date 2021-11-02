@@ -26,7 +26,7 @@ type Tx struct {
 	EnvelopeSignatures []byte
 }
 
-func NewTx( height uint64, transactionID string,
+func NewTx(height uint64, transactionID string,
 	script []byte, arguments [][]byte, referenceBlockID string,
 	gasLimit uint64, proposalKey string, payer string, authorizers []string, payloadSignatures []byte,
 	envelopeSignatures []byte) Tx {
@@ -73,7 +73,7 @@ func NewEvent(height int, t string, transactionID string, transactionIndex int, 
 
 // Successful tells whether this tx is successful or not
 func (tx Tx) Successful() bool {
-	return true 
+	return true
 }
 
 type Collection struct {
@@ -103,5 +103,30 @@ func NewCollection(
 		Id:             id,
 		Processed:      processed,
 		TransactionIds: transactionIds,
+	}
+}
+
+type TransactionResult struct {
+	TransactionId string
+	Status        string
+	Error         string
+}
+
+// Equal tells whether v and w represent the same rows
+func (v TransactionResult) Equal(w TransactionResult) bool {
+	return v.TransactionId == w.TransactionId &&
+		v.Status == w.Status &&
+		v.Error == w.Error
+}
+
+// TransactionResult allows to build a new TransactionResult
+func NewTransactionResult(
+	transactionId string,
+	status string,
+	error string) TransactionResult {
+	return TransactionResult{
+		TransactionId: transactionId,
+		Status:        status,
+		Error:         error,
 	}
 }

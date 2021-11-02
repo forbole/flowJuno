@@ -108,7 +108,7 @@ func (w Worker) process(height int64) error {
 		return err
 	}
 
-	_,err= w.ExportCollection(block)
+	collections, err := w.ExportCollection(block)
 	if err != nil {
 		return err
 	}
@@ -118,19 +118,45 @@ func (w Worker) process(height int64) error {
 		return err
 	}
 
+	if len(collections)==0{
+		return nil
+	}
+
+	var transactionIDs []flow.Identifier
+	for _, collection := range collections {
+		transactionIDs = append(transactionIDs, (collection.TransactionIds)...)
+	}
+
+	err=w.ExportTransactionResult(transactionIDs, height)
+	if err!=nil{
+		return err
+	}
+
+
 	return nil
 }
 
-func (w Worker) ExportCollection(block *flow.Block) ([]types.Collection,error) {
+func (w Worker) ExportTransactionResult(txids []flow.Identifier, height int64) error {
+	txResults, err := w.cp.TransactionResult(txids)
+	if len(txResults)==0{
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	return w.db.SaveTransactionResult(txResults, uint64(height))
+}
+
+func (w Worker) ExportCollection(block *flow.Block) ([]types.Collection, error) {
 	collections := w.cp.Collections(block)
 	if len(collections) == 0 {
-		return nil,nil
+		return nil, nil
 	}
 	err := w.db.SaveCollection(collections)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-	return collections,nil
+	return collections, nil
 }
 
 // getGenesisFromRPC returns the genesis read from the RPC endpoint
