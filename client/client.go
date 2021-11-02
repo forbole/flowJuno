@@ -225,6 +225,7 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 		if err != nil {
 			return nil, err
 		}
+		
 		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID)
 		if err != nil {
 			return nil, err
@@ -283,7 +284,7 @@ func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 	return event, nil
 }
 
-// Events get events in from a transaction ID
+// Events get events from a transaction ID
 func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error) {
 	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.HexToID(transactionID))
 	if err != nil {

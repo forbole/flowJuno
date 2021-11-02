@@ -35,7 +35,6 @@ CREATE TABLE block_seal
 
 CREATE TABLE transaction
 (
-   		status TEXT NOT NULL,
 		height BIGINT NOT NULL,
         transaction_id TEXT,
 
@@ -48,6 +47,13 @@ CREATE TABLE transaction
 		authorizers TEXT,
 		payload_signature TEXT,
 		envelope_signatures TEXT
+);
+
+CREATE TABLE transaction_result(
+        status TEXT NOT NULL,
+		height BIGINT NOT NULL,
+        transaction_id TEXT,
+        error TEXT
 );
 
 CREATE TABLE event
