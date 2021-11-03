@@ -63,8 +63,8 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 		if err != nil {
 			// When validator exist 10000, cadence exceed computation limit. It need to calculate in raw
 			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
-				nodeTotalCommitment,err:=getNodeTotalCommitmentRaw(id,block,db,flowClient)
-				if err!=nil{
+				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, block, db, flowClient)
+				if err != nil {
 					return err
 				}
 				totalStakeArr[i] = *nodeTotalCommitment
@@ -84,8 +84,8 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 	return db.SaveNodeTotalCommitment(totalStakeArr)
 }
 
-// getNodeTotalCommitmentRaw add up all delegator's delegatorFullCommittedBalance in a node 
-func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy)(*types.NodeTotalCommitment,error){
+// getNodeTotalCommitmentRaw add up all delegator's delegatorFullCommittedBalance in a node
+func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) (*types.NodeTotalCommitment, error) {
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(node:String,begin:UInt32,end:UInt32): UFix64{
@@ -118,21 +118,21 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, block *flow.Block,
 		args := []cadence.Value{cadence.NewString(nodeInfo.Id), cadence.NewUInt32(i), cadence.NewUInt32(end)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), args)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
 
-		val,err:=utils.CadenceConvertUint64(value)
-		if err!=nil{
-			return nil,err
+		val, err := utils.CadenceConvertUint64(value)
+		if err != nil {
+			return nil, err
 		}
 
-		totalCommit+=val
+		totalCommit += val
 
 	}
-	nodeTotalCommitment:=types.NewNodeTotalCommitment(nodeInfo.Id, totalCommit, int64(block.Height))
+	nodeTotalCommitment := types.NewNodeTotalCommitment(nodeInfo.Id, totalCommit, int64(block.Height))
 
-	return &nodeTotalCommitment,nil
-} 
+	return &nodeTotalCommitment, nil
+}
 
 func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).

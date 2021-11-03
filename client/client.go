@@ -251,19 +251,19 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 }
 
 func (cp *Proxy) TransactionResult(transactionIds []flow.Identifier) ([]types.TransactionResult, error) {
-	if len(transactionIds)==0{
-		return nil,nil
+	if len(transactionIds) == 0 {
+		return nil, nil
 	}
-	
+
 	txResults := make([]types.TransactionResult, len(transactionIds))
 	for i, txid := range transactionIds {
 		result, err := cp.flowClient.GetTransactionResult(cp.ctx, txid)
 		if err != nil {
 			return nil, err
 		}
-		errStr:=""
-		if result.Error!=nil{
-			errStr=result.Error.Error()
+		errStr := ""
+		if result.Error != nil {
+			errStr = result.Error.Error()
 		}
 		txResults[i] = types.NewTransactionResult(txid.String(), result.Status.String(), errStr)
 	}
