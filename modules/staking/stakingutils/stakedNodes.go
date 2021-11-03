@@ -93,11 +93,20 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, block *flow.Block,
 		
 		var i:UInt32 = begin
 
-		while i<end {
+		if (begin==0){
+			let nodeInfo = FlowIDTableStaking.NodeInfo(nodeID: node)
+			totalCommit=totalCommit+nodeInfo.totalCommittedWithoutDelegators()
+		}
+
+		while i<=end {
 			i=i+1
 
 			var delegator=FlowIDTableStaking.DelegatorInfo(nodeID: node, delegatorID: i)
-			totalCommit=totalCommit+delegator.tokensCommitted+delegator.tokensStaked-delegator.tokensRequestedToUnstake
+			if (delegator.tokensCommitted + delegator.tokensStaked) < delegator.tokensRequestedToUnstake{
+				totalCommit=totalCommit+UFix64(0)
+			}else{
+				totalCommit=totalCommit+delegator.tokensCommitted+delegator.tokensStaked-delegator.tokensRequestedToUnstake
+			}
 		}
 			
 		return totalCommit
