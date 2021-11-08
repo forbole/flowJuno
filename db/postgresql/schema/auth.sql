@@ -2,8 +2,8 @@ CREATE TABLE account(
     address TEXT UNIQUE PRIMARY KEY NOT NULL,
     balance BIGINT NOT NULL,
     code TEXT NOT NULL,
-    keys_list TEXT,
-    contract_map TEXT
+    keys_list JSON,
+    contract_map JSON
 );
 
 CREATE TABLE locked_account(
