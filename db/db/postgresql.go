@@ -309,7 +309,7 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 
 	i := 0
 	for _, rows := range collection {
-		for _, txid:=range rows.TransactionIds{
+		for _, txid := range rows.TransactionIds {
 			ai := i * 4
 			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
 			params = append(params, rows.Height, rows.Id, rows.Processed, txid.String())

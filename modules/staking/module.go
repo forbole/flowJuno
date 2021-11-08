@@ -51,7 +51,7 @@ func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs) error {
 
 // RegisterPeriodicOperations implements modules.Module
 func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
-	return nil //RegisterPeriodicOps(scheduler, m.db, m.flowClient)
+	return RegisterPeriodicOps(scheduler, m.db, m.flowClient)
 }
 
 func (m *Module) HandleEvent(index int, event types.Event, tx *types.Tx) error {

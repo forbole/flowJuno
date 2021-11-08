@@ -56,7 +56,7 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 	var i uint32
 	delegatorNum := nodeInfo.DelegatorIDCounter - 1
 	var delegatorInfoArray []types.DelegatorNodeInfo
-	for i = 0; i <= delegatorNum; i = i + 4000 {
+	for i = 0; i < delegatorNum; i = i + 4001 {
 		end := i + 4000
 		if end > delegatorNum {
 			end = delegatorNum
@@ -83,6 +83,9 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 
 	for _, arr := range splittedDelegatorInfos {
 		fmt.Println(len(arr))
+		if len(arr)==0{
+			continue
+		}
 		err := db.SaveDelegatorInfo(arr, block.Height)
 		if err != nil {
 			return nil, err

@@ -58,11 +58,11 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 	totalStakeArr := make([]types.NodeTotalCommitment, len(nodeInfos))
 	for i, id := range nodeInfos {
 		nodeId := []cadence.Value{cadence.NewString(id.Id)}
-		fmt.Println(id.Id)
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
 			// When validator exist 10000, cadence exceed computation limit. It need to calculate in raw
 			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
+				fmt.Println(id.Id)
 				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, block, db, flowClient)
 				if err != nil {
 					return err
@@ -116,7 +116,7 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, block *flow.Block,
 	var i uint32
 	delegatorNum := nodeInfo.DelegatorIDCounter - 1
 	var totalCommit uint64
-	for i = 0; i <= delegatorNum; i = i + 4000 {
+	for i = 0; i < delegatorNum; i = i + 4001 {
 		end := i + 4000
 		if end > delegatorNum {
 			end = delegatorNum
