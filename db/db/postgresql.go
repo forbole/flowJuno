@@ -303,21 +303,16 @@ func (db *Database) SaveEvents(events []types.Event) error {
 }
 
 func (db *Database) SaveCollection(collection []types.Collection) error {
-	stmt := `INSERT INTO collection(height,id,processed,transaction_ids) VALUES `
+	stmt := `INSERT INTO collection(height,id,processed,transaction_id) VALUES `
 
 	var params []interface{}
 
 	for i, rows := range collection {
-		ai := i * 4
-		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
-
-		t := make([]string, len(rows.TransactionIds))
-		for i, id := range rows.TransactionIds {
-			t[i] = id.String()
+		for _, txid:=range rows.TransactionIds{
+			ai := i * 4
+			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
+			params = append(params, rows.Height, rows.Id, rows.Processed, txid)
 		}
-
-		params = append(params, rows.Height, rows.Id, rows.Processed, pq.StringArray(t))
-
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`

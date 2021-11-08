@@ -44,7 +44,7 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 		
 		var i:UInt32 = begin
 
-		while i<end {
+		while i<=end {
 			i=i+1
 			delegatorInfoArray.append(FlowIDTableStaking.DelegatorInfo(nodeID: node, delegatorID: i))
 		}
