@@ -3,7 +3,7 @@ CREATE TABLE block
     height           BIGINT UNIQUE PRIMARY KEY,
     id               TEXT NOT NULL,
     parent_id        TEXT NOT NULL,
-    collection_guarantees TEXT NOT NULL,
+    collection_guarantees JSONB NOT NULL,
     timestamp        TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
@@ -27,14 +27,14 @@ CREATE TABLE transaction
         transaction_id TEXT NOT NULL REFERENCES collection (transaction_id),
 
 		script TEXT ,
-		arguments TEXT,
+		arguments TEXT[],
 		reference_block_id TEXT,
 		gas_limit BIGINT,
 		proposal_key TEXT,
 		payer TEXT,
-		authorizers TEXT,
-		payload_signature TEXT,
-		envelope_signatures TEXT
+		authorizers TEXT[],
+		payload_signature JSONB,
+		envelope_signatures JSONB
 );
 
 CREATE TABLE transaction_result

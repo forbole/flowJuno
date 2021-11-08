@@ -118,7 +118,7 @@ func (w Worker) process(height int64) error {
 		return err
 	}
 
-	if len(collections)==0{
+	if len(collections) == 0 {
 		return nil
 	}
 
@@ -127,18 +127,17 @@ func (w Worker) process(height int64) error {
 		transactionIDs = append(transactionIDs, (collection.TransactionIds)...)
 	}
 
-	err=w.ExportTransactionResult(transactionIDs, height)
-	if err!=nil{
+	err = w.ExportTransactionResult(transactionIDs, height)
+	if err != nil {
 		return err
 	}
-
 
 	return nil
 }
 
 func (w Worker) ExportTransactionResult(txids []flow.Identifier, height int64) error {
 	txResults, err := w.cp.TransactionResult(txids)
-	if len(txResults)==0{
+	if len(txResults) == 0 {
 		return nil
 	}
 	if err != nil {
