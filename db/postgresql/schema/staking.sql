@@ -26,23 +26,21 @@ CREATE INDEX weekly_payout_index ON weekly_payout (height);
 
 CREATE TABLE total_stake
 (  height BIGINT  NOT NULL ,
-  total_stake TEXT NOT NULL
+  total_stake BIGINT NOT NULL
 );
 
 CREATE INDEX total_stake_index ON total_stake (height);
 
-
 CREATE TABLE staking_table
-(  height BIGINT  NOT NULL ,
-  staking_table TEXT NOT NULL
+(  
+  node_id TEXT NOT NULL UNIQUE PRIMARY KEY
 );
 
-CREATE INDEX staking_table_index ON staking_table (height);
 
 
 CREATE TABLE proposed_table
 (  height BIGINT  NOT NULL ,
-  proposed_table TEXT NOT NULL
+  proposed_table TEXT[] NOT NULL
 );
 
 CREATE INDEX proposed_table_index ON proposed_table (height);
@@ -50,14 +48,14 @@ CREATE INDEX proposed_table_index ON proposed_table (height);
 
 CREATE TABLE current_table
 (  height BIGINT  NOT NULL ,
-  current_table TEXT NOT NULL
+  current_table TEXT[] NOT NULL
 );
 
 CREATE INDEX current_table_index ON current_table (height);
 
-
+/* Start from here node id is needed */
 CREATE TABLE node_total_commitment
-(  node_id TEXT NOT NULL ,
+(  node_id TEXT NOT NULL REFERENCES staking_table (node_id),
   total_commitment TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
@@ -66,7 +64,7 @@ CREATE INDEX node_total_commitment_index ON node_total_commitment (height);
 
 
 CREATE TABLE node_total_commitment_without_delegators
-(  node_id TEXT NOT NULL ,
+(  node_id TEXT NOT NULL REFERENCES staking_table (node_id),
   total_commitment_without_delegators TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
@@ -75,7 +73,7 @@ CREATE INDEX node_total_commitment_without_delegators_index ON node_total_commit
 
 
 CREATE TABLE node_infos_from_table
-(  id TEXT  NOT NULL ,
+(  id TEXT  NOT NULL REFERENCES staking_table (node_id),
   role BIGINT  NOT NULL ,
   networking_address TEXT  NOT NULL ,
   networking_key TEXT  NOT NULL ,
@@ -105,7 +103,7 @@ CREATE INDEX cut_percentage_index ON cut_percentage (height);
 
 CREATE TABLE delegator_info
 (  id TEXT NOT NULL ,
-  node_id TEXT NOT NULL ,
+  node_id TEXT NOT NULL REFERENCES staking_table (node_id),
   tokens_committed TEXT NOT NULL ,
   tokens_staked TEXT NOT NULL ,
   tokens_unstaking TEXT NOT NULL ,

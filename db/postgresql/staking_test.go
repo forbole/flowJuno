@@ -144,12 +144,17 @@ func (suite *DbTestSuite) TestBigDipperDb_StakingTable() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedRow := dbtypes.NewStakingTableRow(10, `["abc","efg"]`)
+	expectedRow := []dbtypes.StakingTableRow{
+		dbtypes.NewStakingTableRow("abc"),
+		dbtypes.NewStakingTableRow("efg"),
+	}
 	var outputs []dbtypes.StakingTableRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM staking_table`)
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
-	suite.Require().True(expectedRow.Equal(outputs[0]))
+	for i,row :=range expectedRow{
+		suite.Require().True(row.Equal(outputs[i]))
+	}
 
 }
 

@@ -73,39 +73,41 @@ func (db *Db) SaveTotalStake(totalStake types.TotalStake) error {
 }
 
 func (db *Db) SaveStakingTable(stakingTable types.StakingTable) error {
-	stmt := `INSERT INTO staking_table(height,staking_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+    stmt:= `INSERT INTO staking_table(node_id) VALUES `
 
-	nodeInfoList, err := json.Marshal(stakingTable.StakingTable)
-	if err != nil {
-		return err
-	}
-	_, err = db.Sql.Exec(stmt, stakingTable.Height,
-		string(nodeInfoList))
-	return err
-}
+    var params []interface{}
+
+	  for i, rows := range stakingTable.StakingTable{
+      ai := i * 1
+      stmt += fmt.Sprintf("($%d),", ai+1)
+      
+      params = append(params,rows)
+
+    }
+	  stmt = stmt[:len(stmt)-1]
+    stmt += ` ON CONFLICT DO NOTHING` 
+
+    _, err := db.Sqlx.Exec(stmt, params...)
+    if err != nil {
+      return err
+    }
+
+    return nil 
+    }
 
 func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
 	stmt := `INSERT INTO proposed_table(height,proposed_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
 
-	table, err := json.Marshal(proposedTable.ProposedTable)
-	if err != nil {
-		return err
-	}
-	_, err = db.Sql.Exec(stmt, proposedTable.Height,
-		table)
+	_, err := db.Sql.Exec(stmt, proposedTable.Height,
+		pq.StringArray(proposedTable.ProposedTable))
 	return err
 }
 
 func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
 	stmt := `INSERT INTO current_table(height,current_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
 
-	table, err := json.Marshal(currentTable.Table)
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Sql.Exec(stmt, currentTable.Height,
-		table)
+	_, err := db.Sql.Exec(stmt, currentTable.Height,
+		pq.StringArray(currentTable.Table))
 	return err
 }
 
