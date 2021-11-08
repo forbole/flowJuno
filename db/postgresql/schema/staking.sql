@@ -4,36 +4,57 @@ CREATE TABLE total_stake_by_type
 	total_stake TEXT NOT NULL
   );
 
+CREATE INDEX total_stake_by_type_index ON total_stake_by_type (height);
+
+
 CREATE TABLE stake_requirements
 (  height BIGINT  NOT NULL ,
   role TEXT NOT NULL ,
   requirements TEXT NOT NULL 
 );
 
+CREATE INDEX stake_requirements_index ON stake_requirements (height);
+
+
 CREATE TABLE weekly_payout
 (  height BIGINT  NOT NULL ,
   payout TEXT NOT NULL
 );
+
+CREATE INDEX weekly_payout_index ON weekly_payout (height);
+
 
 CREATE TABLE total_stake
 (  height BIGINT  NOT NULL ,
   total_stake TEXT NOT NULL
 );
 
+CREATE INDEX total_stake_index ON total_stake (height);
+
+
 CREATE TABLE staking_table
 (  height BIGINT  NOT NULL ,
   staking_table TEXT NOT NULL
 );
+
+CREATE INDEX staking_table_index ON staking_table (height);
+
 
 CREATE TABLE proposed_table
 (  height BIGINT  NOT NULL ,
   proposed_table TEXT NOT NULL
 );
 
+CREATE INDEX proposed_table_index ON proposed_table (height);
+
+
 CREATE TABLE current_table
 (  height BIGINT  NOT NULL ,
   current_table TEXT NOT NULL
 );
+
+CREATE INDEX current_table_index ON current_table (height);
+
 
 CREATE TABLE node_total_commitment
 (  node_id TEXT NOT NULL ,
@@ -41,11 +62,17 @@ CREATE TABLE node_total_commitment
   height BIGINT  NOT NULL
 );
 
+CREATE INDEX node_total_commitment_index ON node_total_commitment (height);
+
+
 CREATE TABLE node_total_commitment_without_delegators
 (  node_id TEXT NOT NULL ,
   total_commitment_without_delegators TEXT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE INDEX node_total_commitment_without_delegators_index ON node_total_commitment_without_delegators (height);
+
 
 CREATE TABLE node_infos_from_table
 (  id TEXT  NOT NULL ,
@@ -65,10 +92,16 @@ CREATE TABLE node_infos_from_table
   height BIGINT  NOT NULL
 );
 
+CREATE INDEX node_infos_from_table_index ON node_infos_from_table (height);
+
+
 CREATE TABLE cut_percentage
 (  cut_percentage BIGINT NOT NULL ,
   height BIGINT  NOT NULL
 );
+
+CREATE INDEX cut_percentage_index ON cut_percentage (height);
+
 
 CREATE TABLE delegator_info
 (  id TEXT NOT NULL ,
@@ -82,15 +115,23 @@ CREATE TABLE delegator_info
   height TEXT NOT NULL
 );
 
+CREATE INDEX delegator_info_index ON delegator_info (height);
+
+
 CREATE TABLE delegator_info_from_address
 (  delegator_info TEXT NOT NULL ,
   height BIGINT  NOT NULL ,
   address TEXT NOT NULL
 );
 
+CREATE INDEX delegator_info_from_address_index ON delegator_info_from_address (height);
+
+
 CREATE TABLE node_info_from_address
 (
   address TEXT NOT NULL,
   node_info TEXT NOT NULL,
   height BIGINT  NOT NULL 
-)
+);
+
+CREATE INDEX node_info_from_address_index ON node_info_from_address (height);
