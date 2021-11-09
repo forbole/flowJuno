@@ -4,8 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
-	"github.com/forbole/flowJuno/types"
-	"github.com/onflow/flow-go-sdk"
+	"github.com/go-co-op/gocron"
 
 	"github.com/forbole/flowJuno/client"
 	db "github.com/forbole/flowJuno/db/postgresql"
@@ -13,7 +12,6 @@ import (
 
 var (
 	_ modules.Module      = &Module{}
-	_ modules.BlockModule = &Module{}
 )
 
 // Module represents the x/auth module
@@ -43,7 +41,7 @@ func (m *Module) Name() string {
 	return "token"
 }
 
-// HandleEvent implements modules.MessageModule
-func (m *Module) HandleBlock(block *flow.Block, _ *types.Txs) error {
-	return HandleBlock(m.db, block.Height, m.flowClient)
+// RegisterPeriodicOperations implements modules.Module
+func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
+	return RegisterPeriodicOps(scheduler, m.db, m.flowClient)
 }

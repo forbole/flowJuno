@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/rs/zerolog/log"
+	"github.com/go-co-op/gocron"
+
 
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/modules/utils"
@@ -11,26 +13,31 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func HandleBlock(db *database.Db, height uint64, flowClient client.Proxy) error {
+func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClient client.Proxy) error {
 	log.Debug().Str("module", "token").Msg("Get token info from cadence")
 
-	err := getCurrentSupply(db, height, flowClient)
-	if err != nil {
+	if _, err := scheduler.Every(1).Week().Tuesday().At("15:00").StartImmediately().Do(func() {
+		utils.WatchMethod(func() error { return getCurrentSupply(db,  flowClient)
+		})
+	}); err != nil {
 		return err
 	}
-	return nil
+	return getCurrentSupply(db,  flowClient)
 }
 
-func getCurrentSupply(db *database.Db, height uint64, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+func getCurrentSupply(db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "token").
 		Msg("updating get ProposedTable")
 
-	script := fmt.Sprintf(`
-import FlowToken from %s
-pub fun main(): UFix64 {
-	let supply = FlowToken.totalSupply
-	return supply
-}`, flowClient.Contract().FlowToken)
+	block,err:=flowClient.Client().GetLatestBlockHeader(flowClient.Ctx(),true)
+
+	height:=block.Height
+		script := fmt.Sprintf(`
+	import FlowToken from %s
+	pub fun main(): UFix64 {
+		let supply = FlowToken.totalSupply
+		return supply
+	}`, flowClient.Contract().FlowToken)
 
 	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
 	if err != nil {
