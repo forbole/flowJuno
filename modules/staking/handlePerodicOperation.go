@@ -98,6 +98,10 @@ func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]st
 		return nil, err
 	}
 
+	if len(table)==0{
+		return nil,nil
+	}
+
 	return table, db.SaveStakingTable(types.NewStakingTable(int64(block.Height), table))
 
 }
@@ -123,6 +127,10 @@ func getNodeInfosFromTable(block *flow.Block, db *database.Db, flowClient client
 	stakingKeys, err := types.NewStakerNodeInfoArrayFromCadence(value)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(stakingKeys)==0{
+		return nil,nil
 	}
 
 	return stakingKeys, db.SaveNodeInfosFromTable(stakingKeys, block.Height)

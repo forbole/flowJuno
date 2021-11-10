@@ -42,6 +42,10 @@ func getNodeUnstakingTokens(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 		totalStakeArr[i] = types.NewNodeUnstakingTokens(id.Id, id.TokensUnstaking, int64(block.Height))
 	}
 
+	if len(totalStakeArr)==0{
+		return nil
+	}
+
 	return db.SaveNodeUnstakingTokens(totalStakeArr)
 }
 
@@ -79,6 +83,10 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 		}
 
 		totalStakeArr[i] = types.NewNodeTotalCommitment(id.Id, totalCommit, int64(block.Height))
+	}
+
+	if len(totalStakeArr)==0{
+		return nil
 	}
 
 	return db.SaveNodeTotalCommitment(totalStakeArr)
@@ -167,6 +175,10 @@ func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, b
 		}
 
 		totalStakeArr[i] = types.NewNodeTotalCommitmentWithoutDelegators(id.Id, tokensUnstaking, int64(block.Height))
+	}
+
+	if len(totalStakeArr)==0{
+		return nil
 	}
 
 	return db.SaveNodeTotalCommitmentWithoutDelegators(totalStakeArr)
