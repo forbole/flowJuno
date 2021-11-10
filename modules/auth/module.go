@@ -8,6 +8,7 @@ import (
 
 	"github.com/forbole/flowJuno/client"
 	db "github.com/forbole/flowJuno/db/postgresql"
+	"github.com/go-co-op/gocron"
 )
 
 var (
@@ -45,4 +46,9 @@ func (m *Module) Name() string {
 // HandleEvent implements modules.MessageModule
 func (m *Module) HandleTx(index int, tx *types.Tx) error {
 	return HandleTxs(m.messagesParser, m.encodingConfig.Marshaler, m.db, int64(tx.Height), m.flowClient, tx)
+}
+
+// RegisterPeriodicOperations implements modules.Module
+func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
+	return RegisterPeriodicOps(scheduler, m.db, m.flowClient)
 }

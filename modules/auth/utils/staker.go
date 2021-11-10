@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/modules/utils"
 	"github.com/onflow/cadence"
 	"github.com/onflow/flow-go-sdk"
 
@@ -13,18 +14,18 @@ import (
 
 // GetLockedTokenAccounts return information of an array of locked token accounts
 // if the account do not have associated locked account, it would ignore the account
-func GetStakerAccounts(addresses []string, height int64, client client.Proxy) ([]types.StakerAccount, error) {
+func GetStakerAccounts(addresses []string, height int64, client client.Proxy) ([]types.StakerNodeId, error) {
 	catchError := `Could not borrow a reference to public LockedAccountInfo`
 	catchError2 := `unexpectedly found nil while forcing an Optional value`
 
-	var stakerAccounts []types.StakerAccount
+	var stakerAccounts []types.StakerNodeId
 
 	for _, address := range addresses {
 		if address == "" {
 			continue
 		}
 
-		stakerNodeId, err := getStakerNodeID(address, height, client)
+		stakerNodeInfos, err := getStakerNodeId(address, height, client)
 		if err != nil {
 			if strings.Contains(err.Error(), catchError) || strings.Contains(err.Error(), catchError2) {
 				continue
@@ -32,59 +33,24 @@ func GetStakerAccounts(addresses []string, height int64, client client.Proxy) ([
 			return nil, err
 		}
 
-		stakerNodeInfo, err := getStakerNodeInfo(address, height, client)
-		if err != nil {
-			if strings.Contains(err.Error(), catchError) || strings.Contains(err.Error(), catchError2) {
-				continue
-			}
-			return nil, err
+		for _,nodeinfo:=range stakerNodeInfos{
+			stakerAccounts = append(stakerAccounts,types.NewStakerNodeId(address,nodeinfo))
 		}
-
-		stakerAccounts = append(stakerAccounts, types.NewStakerAccount(address, stakerNodeId, stakerNodeInfo))
-
 	}
 	return stakerAccounts, nil
 }
-
-func getStakerNodeID(address string, height int64, client client.Proxy) (string, error) {
-	script := fmt.Sprintf(`
-	import LockedTokens from %s
-	pub fun main(account: Address): String {
-		let lockedAccountInfoRef = getAccount(account)
-			.getCapability<&LockedTokens.TokenHolder{LockedTokens.LockedAccountInfo}>(LockedTokens.LockedAccountInfoPublicPath)!
-			.borrow() ?? panic("Could not borrow a reference to public LockedAccountInfo")
-	
-		return lockedAccountInfoRef.getNodeID()!
-	}
-	`, client.Contract().LockedTokens)
-
-	flowAddress := flow.HexToAddress(address)
-	candanceAddress := cadence.Address(flowAddress)
-	//val,err:=cadence.NewValue(candanceAddress)
-	candenceArr := []cadence.Value{candanceAddress}
-
-	value, err := client.Client().ExecuteScriptAtLatestBlock(client.Ctx(), []byte(script), candenceArr)
-	if err != nil {
-		return "", err
-	}
-
-	fmt.Println("Locked Account" + value.String())
-
-	return value.String(), nil
-}
-
 // Danger zone
 
-func getStakerNodeInfo(address string, height int64, client client.Proxy) (types.StakerNodeInfo, error) {
+func getStakerNodeId(address string, height int64, client client.Proxy) ([]string, error) {
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	import LockedTokens from %s
-	// Returns an array of NodeInfo objects that the account controls
+	// Returns an array of node_info_id string that the account controls
 	// in its normal account and shared account
 	
-	pub fun main(account: Address): [FlowIDTableStaking.NodeInfo] {
+	pub fun main(account: Address): [String] {
 	
-		let nodeInfoArray: [FlowIDTableStaking.NodeInfo] = []
+		let nodeInfoArray: [String] = []
 	
 		let pubAccount = getAccount(account)
 	
@@ -92,7 +58,7 @@ func getStakerNodeInfo(address string, height int64, client client.Proxy) (types
 			.borrow()
 	
 		if let nodeRef = nodeStaker {
-			nodeInfoArray.append(FlowIDTableStaking.NodeInfo(nodeID: nodeRef.id))
+			nodeInfoArray.append(nodeRef.id!)
 		}
 	
 		let lockedAccountInfoCap = pubAccount
@@ -110,7 +76,7 @@ func getStakerNodeInfo(address string, height int64, client client.Proxy) (types
 				return nodeInfoArray
 			}
 	
-			nodeInfoArray.append(FlowIDTableStaking.NodeInfo(nodeID: lockedAccountInfoRef.getNodeID()!))
+			nodeInfoArray.append(FlowIDTableStaking.NodeInfo(lockedAccountInfoRef.getNodeID()!)
 		}
 		
 		log(nodeInfoArray)
@@ -125,15 +91,14 @@ func getStakerNodeInfo(address string, height int64, client client.Proxy) (types
 
 	value, err := client.Client().ExecuteScriptAtLatestBlock(client.Ctx(), []byte(script), candenceArr)
 	if err != nil {
-		return types.StakerNodeInfo{}, err
+		return nil, err
 	}
 
-	stakerNodeInfo, err := types.NewStakerNodeInfoArrayFromCadence(value)
+	stakerNodeInfo, err := utils.CadenceConvertStringArray(value)
 	if err != nil {
-		return types.StakerNodeInfo{}, err
+		return nil, err
 	}
 
-	fmt.Println("Locked Account" + value.String())
 
-	return stakerNodeInfo[0], nil
+	return stakerNodeInfo, nil
 }

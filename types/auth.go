@@ -16,20 +16,40 @@ func NewAccount(address string) Account {
 		Address: address,
 	}
 }
+type LockedAccount struct { 
+	Address string
+	LockedAddress string
+	NodeId string
+	DelegatorId uint64
+  }
 
-type LockedAccount struct {
-	Address       string
+   // LockedAccount allows to build a new LockedAccount
+  func NewLockedAccount( 
+	address string,
+	lockedAddress string,
+	nodeId string,
+	delegatorId uint64) LockedAccount{
+   return LockedAccount{
+   Address:address,
+   LockedAddress:lockedAddress,
+   NodeId:nodeId,
+   DelegatorId:delegatorId,
+  }
+  }
+
+type LockedAccountBalance struct {
 	LockedAddress string
 	Balance       uint64
 	UnlockLimit   uint64
+	Height uint64
 }
 
-func NewLockedAccount(address string, lockedAddress string, balance, unlockLimit uint64) LockedAccount {
-	return LockedAccount{
-		Address:       address,
+func NewLockedAccountBalance(lockedAddress string, balance, unlockLimit uint64,height uint64) LockedAccountBalance {
+	return LockedAccountBalance{
 		LockedAddress: lockedAddress,
 		Balance:       balance,
 		UnlockLimit:   unlockLimit,
+		Height:height,
 	}
 }
 
@@ -37,15 +57,13 @@ type DelegatorAccount struct {
 	Address           string
 	DelegatorId       int64
 	DelegatorNodeId   string
-	DelegatorNodeInfo DelegatorNodeInfo
 }
 
-func NewDelegatorAccount(address string, delegatorId int64, delegatorNodeId string, delegatorNodeInfo DelegatorNodeInfo) DelegatorAccount {
+func NewDelegatorAccount(address string, delegatorId int64, delegatorNodeId string) DelegatorAccount {
 	return DelegatorAccount{
 		Address:           address,
 		DelegatorId:       delegatorId,
 		DelegatorNodeId:   delegatorNodeId,
-		DelegatorNodeInfo: delegatorNodeInfo,
 	}
 }
 
@@ -306,3 +324,23 @@ func NewStakerNodeInfo(id string, role uint8, networkingAddress string, networki
 		InitialWeight:            initialWeight,
 	}
 }
+
+type StakerNodeId struct { 
+	Address string
+	NodeId string
+  }
+  
+  // Equal tells whether v and w represent the same rows
+  func (v StakerNodeId) Equal(w StakerNodeId)bool{
+	return v.Address==w.Address && 
+  v.NodeId==w.NodeId }
+  
+   // StakerNodeId allows to build a new StakerNodeId
+  func NewStakerNodeId( 
+	address string,
+	nodeId string) StakerNodeId{
+   return StakerNodeId{
+   Address:address,
+   NodeId:nodeId,
+  }
+  }

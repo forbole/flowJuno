@@ -61,74 +61,41 @@ func (db *Db) saveAccounts(accounts []flow.Account) error {
 	return nil
 }
 
-func (db *Db) SaveLockedTokenAccounts(accounts []types.LockedAccount) error {
+func (db *Db) SaveLockedAccountBalance(accounts []types.LockedAccountBalance) error {
 	if len(accounts) == 0 {
 		return nil
 	}
-	stmt := `INSERT INTO locked_account (account_address,locked_address,balance,unlock_limit) VALUES `
+	stmt := `INSERT INTO locked_account_balance (locked_address,balance,unlock_limit,height) VALUES `
 	var params []interface{}
 
 	for i, account := range accounts {
 		ai := i * 4
 		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
 
-		params = append(params, account.Address, account.LockedAddress, account.Balance, account.UnlockLimit)
+		params = append(params, account.LockedAddress, account.Balance, account.UnlockLimit,account.Height)
 
 	}
 
 	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT (account_address) DO NOTHING"
+	stmt += " ON CONFLICT (account_address) DO NOTHING "
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
 func (db *Db) SaveDelegatorAccounts(accounts []types.DelegatorAccount) error {
 	if len(accounts) == 0 {
 		return nil
 	}
-	stmt := `INSERT INTO delegator_account (account_address,delegator_id,delegator_node_id ,delegator_node_info) VALUES `
+	stmt := `INSERT INTO delegator_account (account_address,delegator_id,delegator_node_id ) VALUES `
 	var params []interface{}
 
 	for i, account := range accounts {
 		ai := i * 4
-		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
-
-		delegatorNodeInfo, err := json.Marshal(account.DelegatorNodeInfo)
-		if err != nil {
-			return err
-		}
-		params = append(params, account.Address, account.DelegatorId, account.DelegatorNodeId, string(delegatorNodeInfo))
-
-	}
-
-	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT (account_address) DO NOTHING"
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (db *Db) SaveStakerAccounts(accounts []types.StakerAccount) error {
-	if len(accounts) == 0 {
-		return nil
-	}
-	stmt := `INSERT INTO staker_account (account_address,staker_node_id,staker_node_info) VALUES `
-	var params []interface{}
-
-	for i, account := range accounts {
-		ai := i * 3
 		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
 
-		nodeInfo, err := json.Marshal(account.StakerNodeInfo)
-		if err != nil {
-			return err
-		}
-		params = append(params, account.Address, account.StakerNodeId, nodeInfo)
+		params = append(params, account.Address, account.DelegatorId, account.DelegatorNodeId)
 
 	}
 
@@ -155,3 +122,49 @@ func (db *Db) GetAccounts() ([]types.Account, error) {
 	}
 	return returnRows, nil
 }
+
+func (db *Db) SaveLockedAccount(lockedAccount []types.LockedAccount) error {
+    stmt:= `INSERT INTO locked_account(address,locked_address,node_id,delegator_id) VALUES `
+
+    var params []interface{}
+
+	  for i, rows := range lockedAccount{
+      ai := i * 4
+      stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4)
+      
+      params = append(params,rows.Address,rows.LockedAddress,rows.NodeId,rows.DelegatorId)
+
+    }
+	  stmt = stmt[:len(stmt)-1]
+    stmt += ` ON CONFLICT DO NOTHING` 
+
+    _, err := db.Sqlx.Exec(stmt, params...)
+    if err != nil {
+      return err
+    }
+
+    return nil 
+    }
+
+	func (db *Db) SaveStakerNodeId(stakerNodeId []types.StakerNodeId) error {
+		stmt:= `INSERT INTO staker_node_id(address,node_id) VALUES `
+	
+		var params []interface{}
+	
+		  for i, rows := range stakerNodeId{
+		  ai := i * 2
+		  stmt += fmt.Sprintf("($%d,$%d),", ai+1,ai+2)
+		  
+		  params = append(params,rows.Address,rows.NodeId)
+	
+		}
+		  stmt = stmt[:len(stmt)-1]
+		stmt += ` ON CONFLICT DO NOTHING` 
+	
+		_, err := db.Sqlx.Exec(stmt, params...)
+		if err != nil {
+		  return err
+		}
+	
+		return nil 
+		}

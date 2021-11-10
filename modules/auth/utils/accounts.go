@@ -77,27 +77,33 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	lockedAccount, err := GetLockedTokenAccounts(addresses, height, client)
-	if err != nil {
-		return err
-	}
-
-	delegatorAccount, err := GetDelegatorAccounts(addresses, height, client)
-	if err != nil {
-		return err
-	}
-
-	stakerAccount, err := GetStakerAccounts(addresses, height, client)
-	if err != nil {
-		return err
-	}
-
 	err = db.SaveAccounts(accounts)
 	if err != nil {
 		return err
 	}
 
-	err = db.SaveLockedTokenAccounts(lockedAccount)
+	lockedAccount, err := GetLockedAccount(addresses, height, client)
+	if err != nil {
+		return err
+	}
+
+	err=db.SaveLockedAccount(lockedAccount)
+	if err!=nil{
+		return err
+	}
+
+	LockedAccountBalance, err := GetLockedAccountBalance(addresses, height, client)
+	if err != nil {
+		return err
+	}
+
+	err = db.SaveLockedAccountBalance(LockedAccountBalance)
+	if err != nil {
+		return err
+	}
+
+
+	delegatorAccount, err := GetDelegatorAccounts(addresses, height, client)
 	if err != nil {
 		return err
 	}
@@ -107,6 +113,11 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	err = db.SaveStakerAccounts(stakerAccount)
-	return nil
+	stakerAccount, err := GetStakerAccounts(addresses, height, client)
+	if err != nil {
+		return err
+	}
+	err = db.SaveStakerNodeId(stakerAccount)
+	
+	return err
 }

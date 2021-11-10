@@ -29,27 +29,27 @@ func (a AccountRow) Equal(b AccountRow) bool {
 		a.KeysList == b.KeysList)
 }
 
-type LockedAccountRow struct {
-	AccountAddress string `db:"account_address"`
+type LockedAccountBalanceRow struct {
 	LockedAddress  string `db:"locked_address"`
 	Balance        int    `db:"balance"`
 	UnlockLimit    int    `db:"unlock_limit"`
+	Height int `db:"height"`
 }
 
-func NewLockedAccountRow(accountAddress string, lockedAddress string, balance, unlockLimit int) LockedAccountRow {
-	return LockedAccountRow{
-		AccountAddress: accountAddress,
+func NewLockedAccountBalanceRow( lockedAddress string, balance, unlockLimit,height int) LockedAccountBalanceRow {
+	return LockedAccountBalanceRow{
 		LockedAddress:  lockedAddress,
 		Balance:        balance,
 		UnlockLimit:    unlockLimit,
+		Height:height,
 	}
 }
 
-func (a LockedAccountRow) Equal(b LockedAccountRow) bool {
-	return (a.AccountAddress == b.AccountAddress &&
-		a.Balance == b.Balance &&
+func (a LockedAccountBalanceRow) Equal(b LockedAccountBalanceRow) bool {
+	return (a.Balance == b.Balance &&
 		a.LockedAddress == b.LockedAddress &&
-		a.UnlockLimit == b.UnlockLimit)
+		a.UnlockLimit == b.UnlockLimit &&
+		a.Height==b.Height)
 }
 
 type DelegatorAccountRow struct {
