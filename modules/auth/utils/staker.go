@@ -78,9 +78,7 @@ func getStakerNodeId(address string, height int64, client client.Proxy) ([]strin
 	
 			nodeInfoArray.append(FlowIDTableStaking.NodeInfo(lockedAccountInfoRef.getNodeID()!)
 		}
-		
-		log(nodeInfoArray)
-		
+				
 		return nodeInfoArray
      }`, client.Contract().StakingTable, client.Contract().LockedTokens)
 

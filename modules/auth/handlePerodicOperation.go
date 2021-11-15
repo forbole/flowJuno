@@ -49,6 +49,10 @@ func HandleAccounts(db *db.Db, flowClient client.Proxy) error {
 		return err
 	}
 
+	if len(lockedAccountBalances)==0{
+		return nil
+	}
+
 	err=db.SaveLockedAccountBalance(lockedAccountBalances)
 	if err!=nil{
 		return err
