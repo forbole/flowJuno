@@ -1,19 +1,72 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 
 	"github.com/onflow/cadence"
+	"github.com/onflow/flow-go-sdk"
 )
 
 type Account struct {
-	Address string
+	Address   string
+	Balance   uint64
+	Code      []byte
+	Keys      []AccountKeyList
+	Contracts []byte
 }
 
-func NewAccount(address string) Account {
+func NewAccount(account flow.Account) (Account, error) {
+	keys := make([]AccountKeyList, len(account.Keys))
+	for i, key := range account.Keys {
+		keys[i] = NewAccountKeyList(account.Address.String(), key.Index, key.Weight, key.Revoked,
+			key.SigAlgo.String(), key.HashAlgo.String(), key.PublicKey.String(), key.SequenceNumber)
+	}
+	contracts, err := json.Marshal(account.Contracts)
+	if err != nil {
+		return Account{}, fmt.Errorf("cannot marshal Flow account contracts %s", err)
+	}
+
 	return Account{
-		Address: address,
+		Address:   account.Address.String(),
+		Balance:   account.Balance,
+		Code:      account.Code,
+		Keys:      keys,
+		Contracts: contracts,
+	}, nil
+}
+
+type AccountKeyList struct {
+	Address        string
+	Index          int
+	Weight         int
+	Revoked        bool
+	SigAlgo        string
+	HashAlgo       string
+	PublicKey      string
+	SequenceNumber uint64
+}
+
+// AccountKeyList allows to build a new AccountKeyList
+func NewAccountKeyList(
+	address string,
+	index int,
+	weight int,
+	revoked bool,
+	sigAlgo string,
+	hashAlgo string,
+	publicKey string,
+	sequenceNumber uint64) AccountKeyList {
+	return AccountKeyList{
+		Address:        address,
+		Index:          index,
+		Weight:         weight,
+		Revoked:        revoked,
+		SigAlgo:        sigAlgo,
+		HashAlgo:       hashAlgo,
+		PublicKey:      publicKey,
+		SequenceNumber: sequenceNumber,
 	}
 }
 

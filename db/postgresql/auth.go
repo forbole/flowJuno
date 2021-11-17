@@ -1,17 +1,15 @@
 package postgresql
 
 import (
-	"encoding/json"
 	"fmt"
 
 	dbtypes "github.com/forbole/flowJuno/db/types"
 	dbutils "github.com/forbole/flowJuno/db/utils"
 	"github.com/forbole/flowJuno/types"
-	"github.com/onflow/flow-go-sdk"
 )
 
 // SaveAccounts saves the given accounts inside the database
-func (db *Db) SaveAccounts(accounts []flow.Account) error {
+func (db *Db) SaveAccounts(accounts []types.Account, height uint64) error {
 	paramsNumber := 1
 	slices := dbutils.SplitAccounts(accounts, paramsNumber)
 	for _, accounts := range slices {
@@ -20,7 +18,7 @@ func (db *Db) SaveAccounts(accounts []flow.Account) error {
 		}
 
 		// Store up-to-date data
-		err := db.saveAccounts(accounts)
+		err := db.saveAccounts(accounts, height)
 		if err != nil {
 			return fmt.Errorf("error while storing accounts: %s", err)
 		}
@@ -29,7 +27,7 @@ func (db *Db) SaveAccounts(accounts []flow.Account) error {
 	return nil
 }
 
-func (db *Db) saveAccounts(accounts []flow.Account) error {
+func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 	if len(accounts) == 0 {
 		return nil
 	}
@@ -50,34 +48,48 @@ func (db *Db) saveAccounts(accounts []flow.Account) error {
 
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
-		return err
+		return fmt.Errorf("fail to insert into account: %s",err)
 	}
 
-	stmt = `INSERT INTO account_balance (address,balance,code,keys_list,contract_map) VALUES `
+	stmt = `INSERT INTO account_balance (address,balance,code,contract_map,height) VALUES `
 	var params2 []interface{}
 
 	for i, account := range accounts {
-		ai := i * 5
+		ai := i * 6
 		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
 
-		keys, err := json.Marshal(account.Keys)
-		if err != nil {
-			return err
-		}
-
-		contracts, err := json.Marshal(account.Contracts)
-		if err != nil {
-			return err
-		}
-		params2 = append(params2, account.Address.String(), account.Balance, account.Code, keys, contracts)
+		params2 = append(params2, account.Address, account.Balance, account.Code, account.Contracts,height)
 	}
 	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT (address) DO UPDATE excluded. "
+	stmt += " ON CONFLICT (address) DO NOTHING "
 	_, err = db.Sqlx.Exec(stmt, params2...)
 	if err != nil {
-		fmt.Println(stmt)
-		return err
+		return fmt.Errorf("fail to insert into account_balance: %s",err)
 	}
+
+	stmt = `INSERT INTO account_key_list(address,index,weight,revoked,sig_algo,hash_algo,public_key,sequence_number) VALUES `
+
+	var params3 []interface{}
+
+	i := 0
+	for _, rows := range accounts {
+		for _, accountKey := range rows.Keys {
+			ai := i * 8
+			i++
+			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8)
+			params3 = append(params3, rows.Address, accountKey.HashAlgo, accountKey.Weight, accountKey.Revoked, accountKey.SigAlgo, accountKey.HashAlgo, accountKey.PublicKey, accountKey.SequenceNumber)
+
+		}
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err = db.Sqlx.Exec(stmt, params3...)
+	if err != nil {
+		return fmt.Errorf("fail to insert into account_key_list: %s",err)
+	}
+
 	return nil
 }
 
@@ -152,22 +164,23 @@ func (db *Db) SaveDelegatorAccounts(accounts []types.DelegatorAccount) error {
 	return nil
 }
 
-// GetAccounts returns all the accounts that are currently stored inside the database.
-func (db *Db) GetAccounts() ([]types.Account, error) {
+// GetAccounts returns all the addresses that are currently stored inside the database.
+func (db *Db) GetAddresses() ([]string, error) {
 	var rows []dbtypes.AccountRow
 	err := db.Sqlx.Select(&rows, `SELECT address FROM account`)
 	if err != nil {
 		return nil, err
 	}
 
-	returnRows := make([]types.Account, len(rows))
-	for i, row := range rows {
-		returnRows[i] = types.NewAccount(row.Address)
+	addresses := make([]string, len(rows))
+	for i, rows := range rows {
+		addresses[i] = rows.Address
 	}
-	return returnRows, nil
+
+	return addresses, nil
 }
 
-func (db *Db) SaveLockedAccountDelegator(lockedAccount []types.LockedAccount) error {
+func (db *Db) SaveLockedAccountDelegator(lockedAccount []types.LockedAccountDelegator) error {
 	stmt := `INSERT INTO locked_account(locked_address,node_id,delegator_id) VALUES `
 
 	var params []interface{}

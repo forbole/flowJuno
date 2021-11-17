@@ -71,22 +71,15 @@ func GetLockedAccount(addresses []string, height int64, client client.Proxy) ([]
 			return nil, err
 		}
 		fmt.Println("Get Locked Address!:" + lockedAddress)
-
-		nodeInfo, err := getLockedAccountNodeInfo(address, height, client)
-		if err != nil {
-			if strings.Contains(err.Error(), catchError) {
-				continue
-			}
-			return nil, err
-		}
-
-		if len(nodeInfo) == 0 {
-			lockedAccount = append(lockedAccount, types.NewLockedAccount(address, lockedAddress, "", 0))
-		} else {
-			for _, node := range nodeInfo {
-				lockedAccount = append(lockedAccount, types.NewLockedAccount(address, lockedAddress, node.NodeID, uint64(node.Id)))
-			}
-		}
+		/*
+			nodeInfo, err := getLockedAccountNodeInfo(address, height, client)
+			if err != nil {
+				if strings.Contains(err.Error(), catchError) {
+					continue
+				}
+				return nil, err
+			} */
+		lockedAccount = append(lockedAccount, types.NewLockedAccount(address, lockedAddress))
 
 	}
 	return lockedAccount, nil

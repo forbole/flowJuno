@@ -1,16 +1,16 @@
 package utils
 
 import (
-	"github.com/onflow/flow-go-sdk"
+	"github.com/forbole/flowJuno/types"
 )
 
 const (
 	maxPostgreSQLParams = 65535
 )
 
-func SplitAccounts(accounts []flow.Account, paramsNumber int) [][]flow.Account {
+func SplitAccounts(accounts []types.Account, paramsNumber int) [][]types.Account {
 	maxBalancesPerSlice := maxPostgreSQLParams / paramsNumber
-	slices := make([][]flow.Account, len(accounts)/maxBalancesPerSlice+1)
+	slices := make([][]types.Account, len(accounts)/maxBalancesPerSlice+1)
 
 	sliceIndex := 0
 	for index, account := range accounts {

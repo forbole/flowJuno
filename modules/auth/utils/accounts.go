@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/types"
 	"github.com/onflow/flow-go-sdk"
 
 	"github.com/rs/zerolog/log"
@@ -40,9 +41,9 @@ func GetGenesisAccounts(appState map[string]json.RawMessage, cdc codec.Marshaler
 // --------------------------------------------------------------------------------------------------------------------
 
 // GetAccounts returns the account data for the given addresses
-func GetAccounts(addresses []string, height int64, client client.Proxy) ([]flow.Account, error) {
+func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types.Account, error) {
 	log.Debug().Str("module", "auth").Str("operation", "accounts").Int("height", int(height)).Msg("getting accounts data")
-	var accounts []flow.Account
+	var accounts []types.Account
 
 	for _, address := range addresses {
 		fmt.Println("GetAccounts:" + address)
@@ -62,7 +63,9 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]flow.
 			return nil, fmt.Errorf("address is not valid and cannot get details")
 		}
 
-		accounts = append(accounts, *account)
+		newAccount, err := types.NewAccount(*account)
+
+		accounts = append(accounts, newAccount)
 
 	}
 
@@ -77,36 +80,36 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	err = db.SaveAccounts(accounts)
+	err = db.SaveAccounts(accounts, uint64(height))
 	if err != nil {
 		return err
 	}
 
-	err = UpdateLockedAccount(addresses, height, client, db)
-	if err != nil {
-		return err
-	}
+	/* 	err = UpdateLockedAccount(addresses, height, client, db)
+	   	if err != nil {
+	   		return err
+	   	}
 
-	delegatorAccount, err := GetDelegatorAccounts(addresses, height, client)
-	if err != nil {
-		return err
-	}
+	   	delegatorAccount, err := GetDelegatorAccounts(addresses, height, client)
+	   	if err != nil {
+	   		return err
+	   	}
 
-	if len(delegatorAccount) != 0 {
-		err = db.SaveDelegatorAccounts(delegatorAccount)
-		if err != nil {
-			return err
-		}
-	}
+	   	if len(delegatorAccount) != 0 {
+	   		err = db.SaveDelegatorAccounts(delegatorAccount)
+	   		if err != nil {
+	   			return err
+	   		}
+	   	}
 
-	stakerAccount, err := GetStakerAccounts(addresses, height, client)
-	if err != nil {
-		return err
-	}
-	if len(stakerAccount) != 0 {
-		err = db.SaveStakerNodeId(stakerAccount)
-	}
-
+	   	stakerAccount, err := GetStakerAccounts(addresses, height, client)
+	   	if err != nil {
+	   		return err
+	   	}
+	   	if len(stakerAccount) != 0 {
+	   		err = db.SaveStakerNodeId(stakerAccount)
+	   	}
+	*/
 	return err
 }
 

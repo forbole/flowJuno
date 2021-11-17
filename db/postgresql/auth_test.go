@@ -9,8 +9,19 @@ import (
 	"github.com/forbole/flowJuno/types"
 )
 
-func (suite *DbTestSuite) AddAccount() {
+func (suite *DbTestSuite) AddAccount(address string) {
+	_, err := suite.database.Sqlx.Exec(
+		`INSERT INTO account(address) VALUES ($1)`, address)
+	suite.Require().NoError(err)
+}
 
+func (suite *DbTestSuite) AddLockedAccount(address, lockedAddress string) {
+	_, err := suite.database.Sqlx.Exec(
+		`INSERT INTO account(address) VALUES ($1)`, address)
+	suite.Require().NoError(err)
+	_, err = suite.database.Sqlx.Exec(
+		`INSERT INTO locked_account(address,locked_address) VALUES ($1,$2)`, address, lockedAddress)
+	suite.Require().NoError(err)
 }
 
 func (suite *DbTestSuite) TestSaveAccount() {
@@ -91,7 +102,7 @@ func (suite *DbTestSuite) SaveAccount() []flow.Account {
 	return accounts
 }
 
-func (suite *DbTestSuite) TestSaveLockedAccount() {
+func (suite *DbTestSuite) TestSaveLockedAccountBalance() {
 	baseAccount := suite.SaveAccount()
 	address := baseAccount[0].Address
 	lockedAddress := flow.HexToAddress("0x2")

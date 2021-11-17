@@ -26,22 +26,17 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 
 func HandleAccounts(db *db.Db, flowClient client.Proxy) error {
 	//get Accounts
-	account, err := db.GetAccounts()
+	accountStringArray, err := db.GetAddresses()
 	if err != nil {
 		return err
 	}
-	if len(account) == 0 {
+	if len(accountStringArray) == 0 {
 		return nil
 	}
 
 	height, err := flowClient.LatestHeight()
 	if err != nil {
 		return err
-	}
-
-	accountStringArray := make([]string, len(account))
-	for i, acc := range account {
-		accountStringArray[i] = acc.Address
 	}
 
 	lockedAccountBalances, err := authutils.GetLockedAccountBalance(accountStringArray, height, flowClient)

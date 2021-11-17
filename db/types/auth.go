@@ -1,7 +1,25 @@
 package types
 
-// AccountRow represents a single row inside the account table
+// AccountRow represents a single row of the account table
 type AccountRow struct {
+	Address string `db:"address"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v AccountRow) Equal(w AccountRow) bool {
+	return v.Address == w.Address
+}
+
+// AccountRow allows to build a new AccountRow
+func NewAccountRow(
+	address string) AccountRow {
+	return AccountRow{
+		Address: address,
+	}
+}
+
+// AccountBalanceRow represents a single row inside the account table
+type AccountBalanceRow struct {
 	Address     string  `db:"address"`
 	Balance     float64 `db:"balance"`
 	Code        string  `db:"code"`
@@ -9,9 +27,9 @@ type AccountRow struct {
 	ContractMap string  `db:"contract_map"`
 }
 
-// NewAccountRow allows to easily build a new AccountRow
-func NewAccountRow(address string, balance float64, code, keysList, contractMap string) AccountRow {
-	return AccountRow{
+// NewAccountBalanceRow allows to easily build a new AccountBalanceRow
+func NewAccountBalanceRow(address string, balance float64, code, keysList, contractMap string) AccountBalanceRow {
+	return AccountBalanceRow{
 		Address:     address,
 		Balance:     balance,
 		Code:        code,
@@ -21,12 +39,34 @@ func NewAccountRow(address string, balance float64, code, keysList, contractMap 
 }
 
 // Equal tells whether a and b contain the same data
-func (a AccountRow) Equal(b AccountRow) bool {
+func (a AccountBalanceRow) Equal(b AccountBalanceRow) bool {
 	return (a.Address == b.Address &&
 		a.Balance == b.Balance &&
 		a.Code == b.Code &&
 		a.ContractMap == b.ContractMap &&
 		a.KeysList == b.KeysList)
+}
+
+// LockedAccountRow represents a single row of the locked_account table
+type LockedAccountRow struct {
+	Address       string `db:"address"`
+	LockedAddress string `db:"locked_address"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v LockedAccountRow) Equal(w LockedAccountRow) bool {
+	return v.Address == w.Address &&
+		v.LockedAddress == w.LockedAddress
+}
+
+// LockedAccountRow allows to build a new LockedAccountRow
+func NewLockedAccountRow(
+	address string,
+	lockedAddress string) LockedAccountRow {
+	return LockedAccountRow{
+		Address:       address,
+		LockedAddress: lockedAddress,
+	}
 }
 
 type LockedAccountBalanceRow struct {
