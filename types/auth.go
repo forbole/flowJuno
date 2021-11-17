@@ -20,6 +20,9 @@ type Account struct {
 func NewAccount(account flow.Account) (Account, error) {
 	keys := make([]AccountKeyList, len(account.Keys))
 	for i, key := range account.Keys {
+		if key==nil{
+			return Account{},fmt.Errorf("key is nil")
+		}
 		keys[i] = NewAccountKeyList(account.Address.String(), key.Index, key.Weight, key.Revoked,
 			key.SigAlgo.String(), key.HashAlgo.String(), key.PublicKey.String(), key.SequenceNumber)
 	}

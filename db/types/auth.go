@@ -23,17 +23,15 @@ type AccountBalanceRow struct {
 	Address     string  `db:"address"`
 	Balance     float64 `db:"balance"`
 	Code        string  `db:"code"`
-	KeysList    string  `db:"keys_list"`
 	ContractMap string  `db:"contract_map"`
 }
 
 // NewAccountBalanceRow allows to easily build a new AccountBalanceRow
-func NewAccountBalanceRow(address string, balance float64, code, keysList, contractMap string) AccountBalanceRow {
+func NewAccountBalanceRow(address string, balance float64, code,contractMap string) AccountBalanceRow {
 	return AccountBalanceRow{
 		Address:     address,
 		Balance:     balance,
 		Code:        code,
-		KeysList:    keysList,
 		ContractMap: contractMap,
 	}
 }
@@ -43,8 +41,7 @@ func (a AccountBalanceRow) Equal(b AccountBalanceRow) bool {
 	return (a.Address == b.Address &&
 		a.Balance == b.Balance &&
 		a.Code == b.Code &&
-		a.ContractMap == b.ContractMap &&
-		a.KeysList == b.KeysList)
+		a.ContractMap == b.ContractMap )
 }
 
 // LockedAccountRow represents a single row of the locked_account table
@@ -146,3 +143,48 @@ func NewStakerAccountRow(
 		StakerNodeInfo: stakerNodeInfo,
 	}
 }
+
+// AccountKeyListRow represents a single row of the account_key_list table
+type AccountKeyListRow struct { 
+	Address string `db:"address"`
+	Index int `db:"index"`
+	Weight int `db:"weight"`
+	Revoked bool `db:"revoked"`
+	SigAlgo string `db:"sig_algo"`
+	HashAlgo string `db:"hash_algo"`
+	PublicKey string `db:"public_key"`
+	SequenceNumber uint64 `db:"sequence_number"`
+  }
+  
+	 // Equal tells whether v and w represent the same rows
+  func (v AccountKeyListRow) Equal(w AccountKeyListRow)bool{
+	return v.Address==w.Address && 
+  v.Index==w.Index && 
+  v.Weight==w.Weight && 
+  v.Revoked==w.Revoked && 
+  v.SigAlgo==w.SigAlgo && 
+  v.HashAlgo==w.HashAlgo && 
+  v.PublicKey==w.PublicKey && 
+  v.SequenceNumber==w.SequenceNumber }
+  
+	  // AccountKeyListRow allows to build a new AccountKeyListRow
+  func NewAccountKeyListRow( 
+	address string,
+	index int,
+	weight int,
+	revoked bool,
+	sigAlgo string,
+	hashAlgo string,
+	publicKey string,
+	sequenceNumber uint64) AccountKeyListRow{
+   return AccountKeyListRow{
+   Address:address,
+   Index:index,
+   Weight:weight,
+   Revoked:revoked,
+   SigAlgo:sigAlgo,
+   HashAlgo:hashAlgo,
+   PublicKey:publicKey,
+   SequenceNumber:sequenceNumber,
+  }
+  }

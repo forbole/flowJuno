@@ -54,5 +54,5 @@ CREATE TABLE account_key_list(
   sig_algo TEXT  NOT NULL ,
   hash_algo TEXT  NOT NULL ,
   public_key TEXT  NOT NULL ,
-  sequence_number TEXT  NOT NULL
+  sequence_number BIGINT  NOT NULL
 );
