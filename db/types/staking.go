@@ -109,7 +109,7 @@ type StakingTableRow struct {
 
 // Equal tells whether v and w represent the same rows
 func (v StakingTableRow) Equal(w StakingTableRow) bool {
-	return v.NodeId == w.NodeId 
+	return v.NodeId == w.NodeId
 }
 
 // StakingTableRow allows to build a new StakingTableRow

@@ -14,9 +14,9 @@ func CadenceConvertStringArray(value cadence.Value) ([]string, error) {
 
 	table := make([]string, len(valueArray.Values))
 	for i, val := range valueArray.Values {
-		strvalue, err :=  CadanceConvertString(val)
-		if err!=nil{
-			return nil,err
+		strvalue, err := CadanceConvertString(val)
+		if err != nil {
+			return nil, err
 		}
 		table[i] = strvalue
 
@@ -42,11 +42,11 @@ func CadenceConvertUint8(value cadence.Value) (uint8, error) {
 	return val, nil
 }
 
-func CadanceConvertString(val cadence.Value) (string, error){
+func CadanceConvertString(val cadence.Value) (string, error) {
 	strvalue, ok := val.ToGoValue().(string)
 	if !ok {
 		return "", fmt.Errorf("the cadance value is not a string value")
 	}
 
-	return strvalue,nil
+	return strvalue, nil
 }

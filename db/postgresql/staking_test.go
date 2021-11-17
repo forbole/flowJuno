@@ -152,7 +152,7 @@ func (suite *DbTestSuite) TestBigDipperDb_StakingTable() {
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM staking_table`)
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
-	for i,row :=range expectedRow{
+	for i, row := range expectedRow {
 		suite.Require().True(row.Equal(outputs[i]))
 	}
 
@@ -185,8 +185,8 @@ func (suite *DbTestSuite) TestBigDipperDb_ProposedTable() {
 
 }
 
-func (suite *DbTestSuite) insertCurrentTable(height uint64,nodeId []string){
-		// ------------------------------
+func (suite *DbTestSuite) insertCurrentTable(height uint64, nodeId []string) {
+	// ------------------------------
 	// --- Prepare the data
 	// ------------------------------
 
@@ -221,13 +221,12 @@ func (suite *DbTestSuite) TestBigDipperDb_CurrentTable() {
 	expectedRows := []dbtypes.CurrentTableRow{
 		dbtypes.NewCurrentTableRow(10, "abc"),
 		dbtypes.NewCurrentTableRow(10, "efg"),
-
 	}
 	var outputs []dbtypes.CurrentTableRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM current_table`)
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
-	for i,row:=range expectedRows{
+	for i, row := range expectedRows {
 		suite.Require().True(row.Equal(outputs[i]))
 
 	}

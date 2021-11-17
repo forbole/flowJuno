@@ -45,7 +45,7 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	if err != nil {
 		return err
 	}
- 
+
 	nodeInfo, err := getNodeInfosFromTable(block, db, flowClient)
 	if err != nil {
 		return err
@@ -69,7 +69,7 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	if err != nil {
 		return err
 	}
- 
+
 	err = stakingutils.GetDataFromNodeDelegatorID(nodeInfo, block, db, flowClient)
 	if err != nil {
 		return err

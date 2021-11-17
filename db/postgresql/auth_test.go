@@ -9,7 +9,7 @@ import (
 	"github.com/forbole/flowJuno/types"
 )
 
-func (suite *DbTestSuite) AddAccount(){
+func (suite *DbTestSuite) AddAccount() {
 
 }
 
@@ -99,7 +99,7 @@ func (suite *DbTestSuite) TestSaveLockedAccount() {
 	unlockLimit := uint64(20)
 
 	accounts := []types.LockedAccountBalance{
-		types.NewLockedAccountBalance(lockedAddress.String(), balance, unlockLimit,10),
+		types.NewLockedAccountBalance(lockedAddress.String(), balance, unlockLimit, 10),
 	}
 
 	// ------------------------------
@@ -115,7 +115,7 @@ func (suite *DbTestSuite) TestSaveLockedAccount() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedAccountRow := dbtypes.NewLockedAccountBalanceRow(lockedAddress.String(), int(balance), int(unlockLimit),10)
+	expectedAccountRow := dbtypes.NewLockedAccountBalanceRow(lockedAddress.String(), int(balance), int(unlockLimit), 10)
 
 	var accountRows []dbtypes.LockedAccountBalanceRow
 	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM locked_account`)
@@ -164,37 +164,35 @@ func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 
 }
 
-
-func (suite *DbTestSuite) TestBigDipperDb_StakerNodeId(){
+func (suite *DbTestSuite) TestBigDipperDb_StakerNodeId() {
 
 	// ------------------------------
-	  // --- Prepare the data
-	  // ------------------------------
-  
+	// --- Prepare the data
+	// ------------------------------
+
 	suite.Require().NoError(err)
-  
+
 	/*  TODO: Prepare parameter    */
-  
-	input:=[]types.StakerNodeId{
-		  types.NewStakerNodeId(/*    TODO: Add parameter      */),
-	  }
-  
-  
-	  // ------------------------------
-	  // --- Save the data
-	  // ------------------------------
-  
+
+	input := []types.StakerNodeId{
+		types.NewStakerNodeId( /*    TODO: Add parameter      */ ),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
 	err := suite.database.SaveStakerNodeId(input)
 	suite.Require().NoError(err)
-  
+
 	// ------------------------------
-	  // --- Verify the data
-	  // ------------------------------
-	  expectedRow := dbtypes.NewStakerNodeIdRow(/*    TODO: Add parameter      */)
+	// --- Verify the data
+	// ------------------------------
+	expectedRow := dbtypes.NewStakerNodeIdRow( /*    TODO: Add parameter      */ )
 	var outputs []dbtypes.StakerNodeIdRow
-	  err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM staker_node_id`)
-	  suite.Require().NoError(err)
-	  suite.Require().Len(outputs, 1, "should contain only one row")
+	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM staker_node_id`)
+	suite.Require().NoError(err)
+	suite.Require().Len(outputs, 1, "should contain only one row")
 	suite.Require().True(expectedRow.Equal(outputs[0]))
-  
-  }
+
+}

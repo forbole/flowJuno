@@ -47,15 +47,14 @@ func GetLockedAccountBalance(addresses []string, height int64, client client.Pro
 			return nil, err
 		}
 
-		lockedAccountBalances = append(lockedAccountBalances, types.NewLockedAccountBalance(lockedAddress, balance, unlockLimit,uint64(height)))
+		lockedAccountBalances = append(lockedAccountBalances, types.NewLockedAccountBalance(lockedAddress, balance, unlockLimit, uint64(height)))
 
 	}
 	return lockedAccountBalances, nil
 }
 
-
 // GetLockedAccount return an array of locked account limit which is network constant
-func GetLockedAccount(addresses []string, height int64, client client.Proxy)([]types.LockedAccount,error){
+func GetLockedAccount(addresses []string, height int64, client client.Proxy) ([]types.LockedAccount, error) {
 	catchError := `Could not borrow a reference to public LockedAccountInfo`
 	var lockedAccount []types.LockedAccount
 
@@ -71,7 +70,7 @@ func GetLockedAccount(addresses []string, height int64, client client.Proxy)([]t
 			}
 			return nil, err
 		}
-		fmt.Println("Get Locked Address!:"+lockedAddress)
+		fmt.Println("Get Locked Address!:" + lockedAddress)
 
 		nodeInfo, err := getLockedAccountNodeInfo(address, height, client)
 		if err != nil {
@@ -81,11 +80,11 @@ func GetLockedAccount(addresses []string, height int64, client client.Proxy)([]t
 			return nil, err
 		}
 
-		if len(nodeInfo)==0{
-			lockedAccount = append(lockedAccount, types.NewLockedAccount(address,lockedAddress,"",0))
-		}else{
-			for _,node:=range nodeInfo{
-				lockedAccount = append(lockedAccount, types.NewLockedAccount(address,lockedAddress,node.NodeID,uint64(node.Id)))
+		if len(nodeInfo) == 0 {
+			lockedAccount = append(lockedAccount, types.NewLockedAccount(address, lockedAddress, "", 0))
+		} else {
+			for _, node := range nodeInfo {
+				lockedAccount = append(lockedAccount, types.NewLockedAccount(address, lockedAddress, node.NodeID, uint64(node.Id)))
 			}
 		}
 
@@ -121,9 +120,9 @@ func getLockedTokenAccountBalance(address string, height int64, client client.Pr
 	if err != nil {
 		return 0, err
 	}
-	balance,err:=utils.CadenceConvertUint64(value)
-	if err!=nil{
-		return 0,err
+	balance, err := utils.CadenceConvertUint64(value)
+	if err != nil {
+		return 0, err
 	}
 	return balance, nil
 }
@@ -194,14 +193,13 @@ func getLockedTokenAccountAddress(address string, height int64, client client.Pr
 	}
 
 	fmt.Println("Get Locked Account" + value.String())
-	val,err:=utils.CadanceConvertString(value)
-	if err!=nil{
-		return "",err
+	val, err := utils.CadanceConvertString(value)
+	if err != nil {
+		return "", err
 	}
 
 	return val, nil
 }
-
 
 func getLockedAccountNodeInfo(address string, height int64, client client.Proxy) ([]types.DelegatorNodeInfo, error) {
 	script := fmt.Sprintf(`
@@ -246,6 +244,5 @@ func getLockedAccountNodeInfo(address string, height int64, client client.Proxy)
 		return nil, err
 	}
 
-	
 	return nodeInfos, nil
 }

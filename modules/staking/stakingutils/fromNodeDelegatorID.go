@@ -83,7 +83,7 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 
 	for _, arr := range splittedDelegatorInfos {
 		fmt.Println(len(arr))
-		if len(arr)==0{
+		if len(arr) == 0 {
 			continue
 		}
 		err := db.SaveDelegatorInfo(arr, block.Height)

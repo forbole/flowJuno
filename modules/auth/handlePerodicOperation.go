@@ -26,35 +26,35 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 
 func HandleAccounts(db *db.Db, flowClient client.Proxy) error {
 	//get Accounts
-	account,err:=db.GetAccounts()
-	if err!=nil{
+	account, err := db.GetAccounts()
+	if err != nil {
 		return err
 	}
-	if len(account)==0{
+	if len(account) == 0 {
 		return nil
 	}
 
-	height,err:=flowClient.LatestHeight()
-	if err!=nil{
+	height, err := flowClient.LatestHeight()
+	if err != nil {
 		return err
 	}
 
-	accountStringArray:=make([]string,len(account))
-	for i,acc:=range account{
-		accountStringArray[i]=acc.Address
+	accountStringArray := make([]string, len(account))
+	for i, acc := range account {
+		accountStringArray[i] = acc.Address
 	}
 
-	lockedAccountBalances,err:=authutils.GetLockedAccountBalance(accountStringArray,height,flowClient)
-	if err!=nil{
+	lockedAccountBalances, err := authutils.GetLockedAccountBalance(accountStringArray, height, flowClient)
+	if err != nil {
 		return err
 	}
 
-	if len(lockedAccountBalances)==0{
+	if len(lockedAccountBalances) == 0 {
 		return nil
 	}
 
-	err=db.SaveLockedAccountBalance(lockedAccountBalances)
-	if err!=nil{
+	err = db.SaveLockedAccountBalance(lockedAccountBalances)
+	if err != nil {
 		return err
 	}
 

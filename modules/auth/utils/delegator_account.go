@@ -41,7 +41,6 @@ func GetDelegatorAccounts(addresses []string, height int64, client client.Proxy)
 			return nil, err
 		}
 
-
 		delegatorAccount = append(delegatorAccount, types.NewDelegatorAccount(address, delegatorId, delegatorNodeId))
 
 	}
@@ -113,12 +112,10 @@ func getDelegatorNodeID(address string, height int64, client client.Proxy) (stri
 		return "", err
 	}
 
-	nodeId,err:=utils.CadanceConvertString(value)
-	if err!=nil{
-		return "",err
+	nodeId, err := utils.CadanceConvertString(value)
+	if err != nil {
+		return "", err
 	}
 
 	return nodeId, nil
 }
-
-

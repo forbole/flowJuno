@@ -73,27 +73,27 @@ func (db *Db) SaveTotalStake(totalStake types.TotalStake) error {
 }
 
 func (db *Db) SaveStakingTable(stakingTable types.StakingTable) error {
-    stmt:= `INSERT INTO staking_table(node_id) VALUES `
+	stmt := `INSERT INTO staking_table(node_id) VALUES `
 
-    var params []interface{}
+	var params []interface{}
 
-	  for i, rows := range stakingTable.StakingTable{
-      ai := i * 1
-      stmt += fmt.Sprintf("($%d),", ai+1)
-      
-      params = append(params,rows)
+	for i, rows := range stakingTable.StakingTable {
+		ai := i * 1
+		stmt += fmt.Sprintf("($%d),", ai+1)
 
-    }
-	  stmt = stmt[:len(stmt)-1]
-    stmt += ` ON CONFLICT DO NOTHING` 
+		params = append(params, rows)
 
-    _, err := db.Sqlx.Exec(stmt, params...)
-    if err != nil {
-      return err
-    }
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
 
-    return nil 
-    }
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
 	stmt := `INSERT INTO proposed_table(height,proposed_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`

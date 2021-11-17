@@ -33,12 +33,13 @@ func GetStakerAccounts(addresses []string, height int64, client client.Proxy) ([
 			return nil, err
 		}
 
-		for _,nodeinfo:=range stakerNodeInfos{
-			stakerAccounts = append(stakerAccounts,types.NewStakerNodeId(address,nodeinfo))
+		for _, nodeinfo := range stakerNodeInfos {
+			stakerAccounts = append(stakerAccounts, types.NewStakerNodeId(address, nodeinfo))
 		}
 	}
 	return stakerAccounts, nil
 }
+
 // Danger zone
 
 func getStakerNodeId(address string, height int64, client client.Proxy) ([]string, error) {
@@ -96,7 +97,6 @@ func getStakerNodeId(address string, height int64, client client.Proxy) ([]strin
 	if err != nil {
 		return nil, err
 	}
-
 
 	return stakerNodeInfo, nil
 }

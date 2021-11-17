@@ -82,8 +82,8 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	err=UpdateLockedAccount(addresses, height, client,db)
-	if err!=nil{
+	err = UpdateLockedAccount(addresses, height, client, db)
+	if err != nil {
 		return err
 	}
 
@@ -92,7 +92,7 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	if len(delegatorAccount)!=0{
+	if len(delegatorAccount) != 0 {
 		err = db.SaveDelegatorAccounts(delegatorAccount)
 		if err != nil {
 			return err
@@ -103,25 +103,25 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 	if err != nil {
 		return err
 	}
-	if len(stakerAccount)!=0{
+	if len(stakerAccount) != 0 {
 		err = db.SaveStakerNodeId(stakerAccount)
-	}	
+	}
 
 	return err
 }
 
-func UpdateLockedAccount(addresses []string, height int64, client client.Proxy ,db *db.Db)error{
+func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, db *db.Db) error {
 	lockedAccount, err := GetLockedAccount(addresses, height, client)
 	if err != nil {
 		return err
 	}
 
-	if len(lockedAccount)==0{
+	if len(lockedAccount) == 0 {
 		return nil
 	}
 
-	err=db.SaveLockedAccount(lockedAccount)
-	if err!=nil{
+	err = db.SaveLockedAccount(lockedAccount)
+	if err != nil {
 		return err
 	}
 
