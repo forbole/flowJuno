@@ -1,26 +1,37 @@
-CREATE TABLE account(
-    address TEXT UNIQUE PRIMARY KEY NOT NULL,
+CREATE TABLE account
+(
+    address TEXT UNIQUE PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE account_balance(
+    address TEXT UNIQUE PRIMARY KEY NOT NULL REFERENCES account(address),
     balance BIGINT NOT NULL,
     code TEXT NOT NULL,
     keys_list JSONB,
     contract_map JSONB
 );
 
+CREATE TABLE locked_account
+(
+    address TEXT  NOT NULL NOT NULL REFERENCES account(address),
+    locked_address TEXT  NOT NULL UNIQUE
+);
+
 CREATE TABLE locked_account_delegator
-(  address TEXT  NOT NULL NOT NULL REFERENCES account(address),
-  locked_address TEXT  NOT NULL UNIQUE,
-  node_id TEXT  NOT NULL UNIQUE ,
-  delegator_id BIGINT  NOT NULL UNIQUE
+(  
+  locked_address TEXT  NOT NULL REFERENCES locked_account(locked_address),
+  node_id TEXT  NOT NULL  ,
+  delegator_id BIGINT  NOT NULL ,
 );
 
 CREATE TABLE locked_account_staker
 (
-    address TEXT  NOT NULL NOT NULL REFERENCES account(address),
+    locked_address TEXT  NOT NULL NOT NULL REFERENCES locked_account(locked_address),
     node_id TEXT  NOT NULL 
 );
 
 CREATE TABLE locked_account_balance(
-    locked_address TEXT NOT NULL REFERENCES locked_account_delegator(locked_address),
+    locked_address TEXT NOT NULL REFERENCES locked_account(locked_address),
     balance BIGINT NOT NULL,
     unlock_limit BIGINT NOT NULL,
     height BIGINT NOT NULL

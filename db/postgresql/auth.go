@@ -33,8 +33,28 @@ func (db *Db) saveAccounts(accounts []flow.Account) error {
 	if len(accounts) == 0 {
 		return nil
 	}
-	stmt := `INSERT INTO account (address,balance,code,keys_list,contract_map) VALUES `
-	var params []interface{}
+
+	stmt := `INSERT INTO account(address) VALUES `
+
+    var params []interface{}
+
+	  for i, rows := range accounts{
+      ai := i * 1
+      stmt += fmt.Sprintf("($%d),", ai+1)
+      
+      params = append(params,rows.Address)
+
+    }
+	  stmt = stmt[:len(stmt)-1]
+    stmt += ` ON CONFLICT DO NOTHING` 
+
+    _, err := db.Sqlx.Exec(stmt, params...)
+    if err != nil {
+      return err
+    }
+
+	stmt = `INSERT INTO account_balance (address,balance,code,keys_list,contract_map) VALUES `
+	var params2 []interface{}
 
 	for i, account := range accounts {
 		ai := i * 5
@@ -49,11 +69,11 @@ func (db *Db) saveAccounts(accounts []flow.Account) error {
 		if err != nil {
 			return err
 		}
-		params = append(params, account.Address.String(), account.Balance, account.Code, keys, contracts)
+		params2 = append(params2, account.Address.String(), account.Balance, account.Code, keys, contracts)
 	}
 	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT (address) DO NOTHING "
-	_, err := db.Sqlx.Exec(stmt, params...)
+	stmt += " ON CONFLICT (address) DO UPDATE excluded. "
+	_, err = db.Sqlx.Exec(stmt, params2...)
 	if err != nil {
 		fmt.Println(stmt)
 		return err
@@ -65,25 +85,46 @@ func (db *Db) SaveLockedAccountBalance(accounts []types.LockedAccountBalance) er
 	if len(accounts) == 0 {
 		return nil
 	}
-	stmt := `INSERT INTO locked_account_balance (locked_address,balance,unlock_limit,height) VALUES `
-	var params []interface{}
+
+	stmt:= `INSERT INTO locked_account(address,locked_address) VALUES `
+
+    var params []interface{}
+
+	  for i, rows := range accounts{
+      ai := i * 2
+      stmt += fmt.Sprintf("($%d,$%d),", ai+1,ai+2)
+      
+      params = append(params,rows.Address,rows.LockedAddress)
+
+    }
+	  stmt = stmt[:len(stmt)-1]
+    stmt += ` ON CONFLICT DO NOTHING` 
+
+    _, err := db.Sqlx.Exec(stmt, params...)
+    if err != nil {
+      return err
+    }
+
+	stmt = `INSERT INTO locked_account_balance (locked_address,balance,unlock_limit,height) VALUES `
+	var params2 []interface{}
 
 	for i, account := range accounts {
 		ai := i * 4
 		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
 
-		params = append(params, account.LockedAddress, account.Balance, account.UnlockLimit,account.Height)
+		params2 = append(params2, account.LockedAddress, account.Balance, account.UnlockLimit,account.Height)
 
 	}
 
 	stmt = stmt[:len(stmt)-1]
 	stmt += " ON CONFLICT (account_address) DO NOTHING "
-	_, err := db.Sqlx.Exec(stmt, params...)
+	_, err = db.Sqlx.Exec(stmt, params2...)
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
 func (db *Db) SaveDelegatorAccounts(accounts []types.DelegatorAccount) error {
 	if len(accounts) == 0 {
 		return nil
@@ -124,15 +165,15 @@ func (db *Db) GetAccounts() ([]types.Account, error) {
 }
 
 func (db *Db) SaveLockedAccount(lockedAccount []types.LockedAccount) error {
-    stmt:= `INSERT INTO locked_account(address,locked_address,node_id,delegator_id) VALUES `
+    stmt:= `INSERT INTO locked_account(locked_address,node_id,delegator_id) VALUES `
 
     var params []interface{}
 
 	  for i, rows := range lockedAccount{
-      ai := i * 4
-      stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1,ai+2,ai+3,ai+4)
+      ai := i * 3
+      stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1,ai+2,ai+3)
       
-      params = append(params,rows.Address,rows.LockedAddress,rows.NodeId,rows.DelegatorId)
+      params = append(params,rows.LockedAddress,rows.NodeId,rows.DelegatorId)
 
     }
 	  stmt = stmt[:len(stmt)-1]
@@ -168,3 +209,4 @@ func (db *Db) SaveLockedAccount(lockedAccount []types.LockedAccount) error {
 	
 		return nil 
 		}
+

@@ -117,7 +117,7 @@ func UpdateLockedAccount(addresses []string, height int64, client client.Proxy ,
 	}
 
 	if len(lockedAccount)==0{
-		return err
+		return nil
 	}
 
 	err=db.SaveLockedAccount(lockedAccount)
