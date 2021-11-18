@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	dbtypes "github.com/forbole/flowJuno/db/types"
+	"github.com/forbole/flowJuno/db/utils"
 	dbutils "github.com/forbole/flowJuno/db/utils"
 	"github.com/forbole/flowJuno/types"
 )
@@ -73,21 +74,30 @@ func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 
 	i := 0
 	for _, rows := range accounts {
-		for _, accountKey := range rows.Keys {
-			ai := i * 8
-			i++
-			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8)
-			params3 = append(params3, rows.Address, accountKey.Index, accountKey.Weight, accountKey.Revoked, accountKey.SigAlgo, accountKey.HashAlgo, accountKey.PublicKey, accountKey.SequenceNumber)
+		splitedAccountKeyList:=utils.SplitAccountKeyList(rows.Keys,8)
+		for _,keyList:=range splitedAccountKeyList{
+			stmt = `INSERT INTO account_key_list(address,index,weight,revoked,sig_algo,hash_algo,public_key,sequence_number) VALUES `
+			
+			for _, accountKey := range keyList {
+				ai := i * 8
+				i++
+				stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8)
+				params3 = append(params3, rows.Address, accountKey.Index, accountKey.Weight, accountKey.Revoked, accountKey.SigAlgo, accountKey.HashAlgo, accountKey.PublicKey, accountKey.SequenceNumber)
+			}
+
+			stmt = stmt[:len(stmt)-1]
+			stmt += ` ON CONFLICT DO NOTHING`
+		
+			_, err = db.Sqlx.Exec(stmt, params3...)
+			if err != nil {
+				return fmt.Errorf("fail to insert into account_key_list: %s",err)
+			}
+			params3=make([]interface{},0)
 		}
+		
+		
 	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err = db.Sqlx.Exec(stmt, params3...)
-	if err != nil {
-		return fmt.Errorf("fail to insert into account_key_list: %s",err)
-	}
-
+	
 	return nil
 }
 

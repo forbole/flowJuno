@@ -85,11 +85,11 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	/* 	err = UpdateLockedAccount(addresses, height, client, db)
-	   	if err != nil {
-	   		return err
-	   	}
-
+	err = UpdateLockedAccount(addresses, height, client, db)
+	if err != nil {
+		return err
+	}
+/*
 	   	delegatorAccount, err := GetDelegatorAccounts(addresses, height, client)
 	   	if err != nil {
 	   		return err
@@ -127,7 +127,7 @@ func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, 
 	if err != nil {
 		return err
 	}
-
+/* 
 	LockedAccountBalance, err := GetLockedAccountBalance(addresses, height, client)
 	if err != nil {
 		return err
@@ -137,6 +137,6 @@ func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, 
 	if err != nil {
 		return err
 	}
-
+ */
 	return nil
 }
