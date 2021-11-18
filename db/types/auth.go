@@ -24,15 +24,18 @@ type AccountBalanceRow struct {
 	Balance     float64 `db:"balance"`
 	Code        string  `db:"code"`
 	ContractMap string  `db:"contract_map"`
+	Height uint64 `db:"height"`
+
 }
 
 // NewAccountBalanceRow allows to easily build a new AccountBalanceRow
-func NewAccountBalanceRow(address string, balance float64, code,contractMap string) AccountBalanceRow {
+func NewAccountBalanceRow(address string, balance float64, code,contractMap string,height uint64) AccountBalanceRow {
 	return AccountBalanceRow{
 		Address:     address,
 		Balance:     balance,
 		Code:        code,
 		ContractMap: contractMap,
+		Height:height,
 	}
 }
 
@@ -41,7 +44,8 @@ func (a AccountBalanceRow) Equal(b AccountBalanceRow) bool {
 	return (a.Address == b.Address &&
 		a.Balance == b.Balance &&
 		a.Code == b.Code &&
-		a.ContractMap == b.ContractMap )
+		a.ContractMap == b.ContractMap &&
+		a.Height==b.Height)
 }
 
 // LockedAccountRow represents a single row of the locked_account table

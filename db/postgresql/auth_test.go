@@ -2,8 +2,10 @@ package postgresql_test
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/onflow/flow-go-sdk"
+	"github.com/onflow/flow-go-sdk/crypto"
 
 	dbtypes "github.com/forbole/flowJuno/db/types"
 	"github.com/forbole/flowJuno/types"
@@ -25,12 +27,16 @@ func (suite *DbTestSuite) AddLockedAccount(address, lockedAddress string) {
 }
 
 func (suite *DbTestSuite) TestSaveAccount() {
+	pubkeyString:="d0d45a9f40dc5e7440c71fcbc1a7836e7b38cc7874ac2875c5475fe550f582e005a5ed864c779d413fe49f58d3451c24ccf2cc12b9495c2baeeb0752538a0bcb"
+	pubkey,err:=crypto.DecodePublicKeyHex(crypto.ECDSA_P256,pubkeyString)
+	suite.Require().NoError(err)
+
 	emptyContracts := make(map[string][]byte)
+	key:=flow.NewAccountKey().SetWeight(1000).SetSigAlgo(crypto.ECDSA_P256).SetHashAlgo(crypto.SHA2_256).SetPublicKey(pubkey)
+
 	accountKey :=
 		[]*flow.AccountKey{
-			flow.NewAccountKey().SetWeight(1000).SetSigAlgo(2).SetHashAlgo(1).SetWeight(1),
-			flow.NewAccountKey().SetWeight(1000).SetSigAlgo(2).SetHashAlgo(1).SetWeight(2),
-
+			key,
 		}
 	address := flow.HexToAddress("0x1")
 	balance := uint64(10)
@@ -64,6 +70,7 @@ func (suite *DbTestSuite) TestSaveAccount() {
 	// ------------------------------
 	expectedEmptyContracts, err := json.Marshal(emptyContracts)
 	suite.Require().NoError(err)
+
 	// Get Accounts row
 	var accountRows []dbtypes.AccountRow
 	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM account`)
@@ -75,19 +82,24 @@ func (suite *DbTestSuite) TestSaveAccount() {
 
 	// Get Account Balance Row 
 	var accountBalanceRows []dbtypes.AccountBalanceRow
-	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM account_balance`)
+	err = suite.database.Sqlx.Select(&accountBalanceRows, `SELECT * FROM account_balance`)
 	suite.Require().NoError(err)
-	suite.Require().Len(accountRows, 1, "account table should contain only one row")
+	suite.Require().Len(accountBalanceRows, 1, "account table should contain only one row")
 
-	// Account Balance Row
+	// Test Account Balance Row
 	expectedAccountBalanceRow := dbtypes.NewAccountBalanceRow(address.String(), float64(balance), "",
-		string(expectedEmptyContracts))
+		string(expectedEmptyContracts),1)
 	suite.Require().True(expectedAccountBalanceRow.Equal(accountBalanceRows[0]))
 
+	// Test Account Key List Row
+	expectedAccountKeyList := dbtypes.NewAccountKeyListRow(address.String(),0,1000,false,"ECDSA_P256","SHA2_256","0x"+pubkeyString,key.SequenceNumber)
 	var accountKeyList []dbtypes.AccountKeyListRow
 	err = suite.database.Sqlx.Select(&accountKeyList, `SELECT * FROM account_key_list`)
 	suite.Require().NoError(err)
-	suite.Require().Len(accountRows, 1, "account table should contain only one row")
+	suite.Require().Len(accountKeyList, 1, "account table should contain only one row")
+	fmt.Println(accountKeyList)
+	suite.Require().True(expectedAccountKeyList.Equal(accountKeyList[0]))
+
 }
 
 

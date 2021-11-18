@@ -48,11 +48,12 @@ CREATE TABLE delegator_account(
 
 CREATE TABLE account_key_list( 
   address TEXT  NOT NULL REFERENCES account(address),
-  index TEXT NOT NULL ,
+  index BIGINT NOT NULL UNIQUE,
   weight TEXT  NOT NULL ,
   revoked BOOLEAN  NOT NULL ,
   sig_algo TEXT  NOT NULL ,
   hash_algo TEXT  NOT NULL ,
   public_key TEXT  NOT NULL ,
-  sequence_number BIGINT  NOT NULL
+  sequence_number BIGINT  NOT NULL,
+  PRIMARY KEY (address,index)
 );

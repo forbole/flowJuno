@@ -77,10 +77,8 @@ func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 			ai := i * 8
 			i++
 			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8)
-			params3 = append(params3, rows.Address, accountKey.HashAlgo, accountKey.Weight, accountKey.Revoked, accountKey.SigAlgo, accountKey.HashAlgo, accountKey.PublicKey, accountKey.SequenceNumber)
-
+			params3 = append(params3, rows.Address, accountKey.Index, accountKey.Weight, accountKey.Revoked, accountKey.SigAlgo, accountKey.HashAlgo, accountKey.PublicKey, accountKey.SequenceNumber)
 		}
-
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
