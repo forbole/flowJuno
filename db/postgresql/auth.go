@@ -56,7 +56,7 @@ func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 	var params2 []interface{}
 
 	for i, account := range accounts {
-		ai := i * 6
+		ai := i * 5
 		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
 
 		params2 = append(params2, account.Address, account.Balance, account.Code, account.Contracts,height)
@@ -94,8 +94,6 @@ func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 			}
 			params3=make([]interface{},0)
 		}
-		
-		
 	}
 	
 	return nil

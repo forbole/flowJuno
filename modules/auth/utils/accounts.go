@@ -127,7 +127,7 @@ func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, 
 	if err != nil {
 		return err
 	}
-/* 
+
 	LockedAccountBalance, err := GetLockedAccountBalance(addresses, height, client)
 	if err != nil {
 		return err
@@ -137,6 +137,6 @@ func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, 
 	if err != nil {
 		return err
 	}
- */
+ 
 	return nil
 }

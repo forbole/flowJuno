@@ -68,17 +68,9 @@ func GetLockedAccount(addresses []string, height int64, client client.Proxy) ([]
 			if strings.Contains(err.Error(), catchError) {
 				continue
 			}
-			return nil, err
+			return nil, fmt.Errorf("fail to get locked account address :%s",err)
 		}
-		fmt.Println("Get Locked Address!:" + lockedAddress)
-		/*
-			nodeInfo, err := getLockedAccountNodeInfo(address, height, client)
-			if err != nil {
-				if strings.Contains(err.Error(), catchError) {
-					continue
-				}
-				return nil, err
-			} */
+
 		lockedAccount = append(lockedAccount, types.NewLockedAccount(address, lockedAddress))
 
 	}
