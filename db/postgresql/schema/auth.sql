@@ -13,7 +13,7 @@ CREATE TABLE account_balance(
 
 CREATE TABLE locked_account
 (
-    address TEXT  NOT NULL NOT NULL REFERENCES account(address),
+    address TEXT  NOT NULL NOT NULL UNIQUE REFERENCES account(address),
     locked_address TEXT  NOT NULL UNIQUE
 );
 

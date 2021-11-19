@@ -185,13 +185,12 @@ func getLockedTokenAccountAddress(address string, height int64, client client.Pr
 		return "", err
 	}
 
-	fmt.Println("Get Locked Account" + value.String())
-	val, err := utils.CadanceConvertString(value)
-	if err != nil {
-		return "", err
+	val,ok:=value.(cadence.Address)
+	if !ok{
+		return "",fmt.Errorf("Not a cadence address")
 	}
 
-	return val, nil
+	return val.String(), nil
 }
 
 func getLockedAccountNodeInfo(address string, height int64, client client.Proxy) ([]types.DelegatorNodeInfo, error) {
