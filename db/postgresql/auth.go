@@ -68,16 +68,13 @@ func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 		return fmt.Errorf("fail to insert into account_balance: %s",err)
 	}
 
-	stmt = `INSERT INTO account_key_list(address,index,weight,revoked,sig_algo,hash_algo,public_key,sequence_number) VALUES `
-
 	var params3 []interface{}
 
-	i := 0
 	for _, rows := range accounts {
 		splitedAccountKeyList:=utils.SplitAccountKeyList(rows.Keys,8)
 		for _,keyList:=range splitedAccountKeyList{
 			stmt = `INSERT INTO account_key_list(address,index,weight,revoked,sig_algo,hash_algo,public_key,sequence_number) VALUES `
-			
+			i := 0
 			for _, accountKey := range keyList {
 				ai := i * 8
 				i++
@@ -162,10 +159,10 @@ func (db *Db) SaveDelegatorAccounts(accounts []types.DelegatorAccount) error {
 	}
 
 	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT (account_address) DO NOTHING"
+	stmt += " ON CONFLICT DO NOTHING"
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
-		return err
+		return fmt.Errorf("fail to save into psql table delegator_account: %s",err)
 	}
 	return nil
 }

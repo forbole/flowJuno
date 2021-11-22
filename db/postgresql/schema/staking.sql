@@ -48,7 +48,7 @@ CREATE INDEX proposed_table_index ON proposed_table (height);
 
 CREATE TABLE current_table
 (  height BIGINT  NOT NULL ,
-  current_table TEXT[] NOT NULL
+  current_table TEXT NOT NULL
 );
 
 CREATE INDEX current_table_index ON current_table (height);

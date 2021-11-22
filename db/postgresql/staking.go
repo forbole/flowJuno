@@ -98,29 +98,44 @@ func (db *Db) SaveStakingTable(stakingTable types.StakingTable) error {
 func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
 	stmt := `INSERT INTO proposed_table(height,proposed_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
 
-	_, err := db.Sql.Exec(stmt, proposedTable.Height,
-		pq.StringArray(proposedTable.ProposedTable))
-	return err
-}
-
-func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
-	stmt := `INSERT INTO current_table(height,current_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
-
 	var params []interface{}
 
-	for i, rows := range currentTable.Table {
+	for i, rows := range proposedTable.ProposedTable {
 		ai := i * 2
 		stmt += fmt.Sprintf("($%d,$%d),", ai+1, ai+2)
+		fmt.Println(rows)
 
-		params = append(params, currentTable.Height, rows)
-
+		params = append(params, proposedTable.Height, rows)
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
 
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
-		return err
+		return fmt.Errorf("fail to insert into current table: %s",err)
+	}
+
+	return err
+}
+
+func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
+	stmt := `INSERT INTO current_table(height,current_table) VALUES `
+
+	var params []interface{}
+
+	for i, rows := range currentTable.Table {
+		ai := i * 2
+		stmt += fmt.Sprintf("($%d,$%d),", ai+1, ai+2)
+		fmt.Println(rows)
+
+		params = append(params, currentTable.Height, rows)
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return fmt.Errorf("fail to insert into current table: %s",err)
 	}
 
 	return nil
