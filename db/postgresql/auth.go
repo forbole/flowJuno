@@ -138,10 +138,10 @@ func (db *Db) SaveLockedAccountBalance(accounts []types.LockedAccountBalance) er
 	}
 
 	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT (account_address) DO NOTHING "
+	stmt += " ON CONFLICT DO NOTHING "
 	_, err := db.Sqlx.Exec(stmt, params2...)
 	if err != nil {
-		return err
+		return fmt.Errorf("psql error on locked_account_balance: %s",err)
 	}
 	return nil
 }

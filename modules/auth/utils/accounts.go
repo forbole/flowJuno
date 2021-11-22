@@ -137,6 +137,26 @@ func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, 
 	if err != nil {
 		return err
 	}
- 
+
+	var delegatorsAccounts []types.DelegatorAccount
+	for _,address:=range addresses{
+		accountdelegators,err:=getDelegatorNodeInfo(address,height,client)
+		if err!=nil{
+			return fmt.Errorf("cannot get delegators from address: %s",err)
+		}
+		if accountdelegators==nil{
+			continue
+		}
+
+		for _,delegator:=range accountdelegators{
+			delegatorsAccounts=append(delegatorsAccounts,types.NewDelegatorAccount(address,int64(delegator.Id),delegator.NodeID))
+		}
+	}
+
+	err=db.SaveDelegatorAccounts(delegatorsAccounts)
+	if err!=nil{
+		return fmt.Errorf("cannot save delegators from address: %s",err)
+	}
+	
 	return nil
 }
