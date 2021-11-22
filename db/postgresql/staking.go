@@ -106,9 +106,24 @@ func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
 func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
 	stmt := `INSERT INTO current_table(height,current_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
 
-	_, err := db.Sql.Exec(stmt, currentTable.Height,
-		pq.StringArray(currentTable.Table))
-	return err
+	var params []interface{}
+
+	for i, rows := range currentTable.Table {
+		ai := i * 2
+		stmt += fmt.Sprintf("($%d,$%d),", ai+1, ai+2)
+
+		params = append(params, currentTable.Height, rows)
+
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (db *Db) SaveNodeTotalCommitment(nodeTotalCommitment []types.NodeTotalCommitment) error {
