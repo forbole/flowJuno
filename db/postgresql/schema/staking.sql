@@ -40,7 +40,7 @@ CREATE TABLE staking_table
 
 CREATE TABLE proposed_table
 (  height BIGINT  NOT NULL ,
-  proposed_table TEXT[] NOT NULL
+  proposed_table TEXT NOT NULL
 );
 
 CREATE INDEX proposed_table_index ON proposed_table (height);

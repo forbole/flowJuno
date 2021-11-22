@@ -96,7 +96,7 @@ func (db *Db) SaveStakingTable(stakingTable types.StakingTable) error {
 }
 
 func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
-	stmt := `INSERT INTO proposed_table(height,proposed_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+	stmt := `INSERT INTO proposed_table(height,proposed_table) VALUES`
 
 	var params []interface{}
 
@@ -112,7 +112,7 @@ func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
 
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
-		return fmt.Errorf("fail to insert into current table: %s",err)
+		return fmt.Errorf("fail to insert into proposed table: %s",err)
 	}
 
 	return err
