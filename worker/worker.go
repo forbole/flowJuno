@@ -234,7 +234,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 		for _, event := range events {
 			for _, module := range w.modules {
 				if messageModule, ok := module.(modules.MessageModule); ok {
-					err = messageModule.HandleEvent(int(event.Height), event, &tx)
+					err = messageModule.HandleEvent(event.Height, event, &tx)
 					if err != nil {
 						return err
 					}

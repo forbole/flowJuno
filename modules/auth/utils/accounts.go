@@ -64,6 +64,9 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types
 		}
 
 		newAccount, err := types.NewAccount(*account)
+		if err != nil {
+			return nil, fmt.Errorf("Cannot Get Account: %s", err)
+		}
 
 		accounts = append(accounts, newAccount)
 
