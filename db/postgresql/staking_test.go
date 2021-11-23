@@ -151,8 +151,7 @@ func (suite *DbTestSuite) TestBigDipperDb_StakingTable() {
 	var outputs []dbtypes.StakingTableRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM staking_table`)
 	suite.Require().NoError(err)
-	suite.Require().Len(outputs, 1, "should contain only one row")
-	for i,row :=range expectedRow{
+	for i, row := range expectedRow {
 		suite.Require().True(row.Equal(outputs[i]))
 	}
 
@@ -164,7 +163,7 @@ func (suite *DbTestSuite) TestBigDipperDb_ProposedTable() {
 	// --- Prepare the data
 	// ------------------------------
 
-	input := types.NewProposedTable(10, []string{"abc", "efg"})
+	input := types.NewProposedTable(10, []string{"abc", "def"})
 
 	// ------------------------------
 	// --- Save the data
@@ -176,13 +175,32 @@ func (suite *DbTestSuite) TestBigDipperDb_ProposedTable() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedRow := dbtypes.NewProposedTableRow(10, `["abc","efg"]`)
+	expectedRow := []dbtypes.ProposedTableRow{
+		dbtypes.NewProposedTableRow(10, "abc"),
+		dbtypes.NewProposedTableRow(10, "def"),
+
+	}   
 	var outputs []dbtypes.ProposedTableRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM proposed_table`)
 	suite.Require().NoError(err)
-	suite.Require().Len(outputs, 1, "should contain only one row")
-	suite.Require().True(expectedRow.Equal(outputs[0]))
+	for i,rows:=range expectedRow{
+		suite.Require().True(rows.Equal(outputs[i]))
+	}
+}
 
+func (suite *DbTestSuite) insertCurrentTable(height uint64, nodeId []string) {
+	// ------------------------------
+	// --- Prepare the data
+	// ------------------------------
+
+	input := types.NewCurrentTable(10, nodeId)
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err := suite.database.SaveCurrentTable(input)
+	suite.Require().NoError(err)
 }
 
 func (suite *DbTestSuite) TestBigDipperDb_CurrentTable() {
@@ -191,7 +209,8 @@ func (suite *DbTestSuite) TestBigDipperDb_CurrentTable() {
 	// --- Prepare the data
 	// ------------------------------
 
-	input := types.NewCurrentTable(10, []string{"abc", "efg"})
+	
+	input := types.NewCurrentTable(10, []string([]string{"abc","def"}))
 
 	// ------------------------------
 	// --- Save the data
@@ -203,12 +222,17 @@ func (suite *DbTestSuite) TestBigDipperDb_CurrentTable() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedRow := dbtypes.NewCurrentTableRow(10, `["abc","efg"]`)
+	expectedRows := []dbtypes.CurrentTableRow{
+		dbtypes.NewCurrentTableRow(10, "abc"),
+		dbtypes.NewCurrentTableRow(10, "def"),
+	}
 	var outputs []dbtypes.CurrentTableRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM current_table`)
 	suite.Require().NoError(err)
-	suite.Require().Len(outputs, 1, "should contain only one row")
-	suite.Require().True(expectedRow.Equal(outputs[0]))
+	suite.Require().Len(outputs, 2, "should contain two rows")
+	for i, row := range expectedRows {
+		suite.Require().True(row.Equal(outputs[i]))
+	}
 
 }
 
@@ -224,11 +248,14 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitment() {
 		types.NewNodeTotalCommitment("0x1", 100000008, 1),
 	}
 
+	err:=suite.InsertIntoStakingTable(1,"0x1")
+	suite.Require().NoError(err)
+
 	// ------------------------------
 	// --- Save the data
 	// ------------------------------
 
-	err := suite.database.SaveNodeTotalCommitment(input)
+	err = suite.database.SaveNodeTotalCommitment(input)
 	suite.Require().NoError(err)
 
 	// ------------------------------
@@ -255,11 +282,14 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitmentWithoutDelegators()
 		types.NewNodeTotalCommitmentWithoutDelegators("0x1", 100000008, 1),
 	}
 
+	err:=suite.InsertIntoStakingTable(1,"0x1")
+	suite.Require().NoError(err)
+
 	// ------------------------------
 	// --- Save the data
 	// ------------------------------
 
-	err := suite.database.SaveNodeTotalCommitmentWithoutDelegators(input)
+	err = suite.database.SaveNodeTotalCommitmentWithoutDelegators(input)
 	suite.Require().NoError(err)
 
 	// ------------------------------
@@ -332,11 +362,14 @@ func (suite *DbTestSuite) TestBigDipperDb_SaveNodeInfosFromTable() {
 		stakerNodeInfo,
 	}
 
+	err:=suite.InsertIntoStakingTable(1,id)
+	suite.Require().NoError(err)
+
 	// ------------------------------
 	// --- Save the data
 	// ------------------------------
 
-	err := suite.database.SaveNodeInfosFromTable(input, 1)
+	err = suite.database.SaveNodeInfosFromTable(input, 1)
 	suite.Require().NoError(err)
 
 	// ------------------------------
@@ -385,6 +418,11 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 
 }
 
+func (suite *DbTestSuite) InsertIntoStakingTable(height uint64,nodeId string)error{
+	_, err := suite.database.Sqlx.Exec(
+		`INSERT INTO staking_table(node_id) VALUES ($1)`, nodeId)
+	return err
+	}
 func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfo() {
 
 	// ------------------------------
@@ -400,11 +438,14 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfo() {
 		nodeInfo,
 	}
 
+	err:=suite.InsertIntoStakingTable(1,delegatorNodeId)
+	suite.Require().NoError(err)
+
 	// ------------------------------
 	// --- Save the data
 	// ------------------------------
 
-	err := suite.database.SaveDelegatorInfo(input, 1)
+	err = suite.database.SaveDelegatorInfo(input, 1)
 	suite.Require().NoError(err)
 
 	// ------------------------------

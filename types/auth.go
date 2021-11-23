@@ -1,51 +1,134 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 
 	"github.com/onflow/cadence"
+	"github.com/onflow/flow-go-sdk"
 )
 
 type Account struct {
-	Address string
+	Address   string
+	Balance   uint64
+	Code      []byte
+	Keys      []AccountKeyList
+	Contracts []byte
 }
 
-func NewAccount(address string) Account {
+func NewAccount(account flow.Account) (Account, error) {
+	keys := make([]AccountKeyList, len(account.Keys))
+	for i, key := range account.Keys {
+		keys[i] = NewAccountKeyList(account.Address.String(), key.Index, key.Weight, key.Revoked,
+			key.SigAlgo.String(), key.HashAlgo.String(), key.PublicKey.String(), key.SequenceNumber)
+	}
+	contracts, err := json.Marshal(account.Contracts)
+	if err != nil {
+		return Account{}, fmt.Errorf("cannot marshal Flow account contracts %s", err)
+	}
+
 	return Account{
-		Address: address,
+		Address:   account.Address.String(),
+		Balance:   account.Balance,
+		Code:      account.Code,
+		Keys:      keys,
+		Contracts: contracts,
+	}, nil
+}
+
+type AccountKeyList struct {
+	Address        string
+	Index          int
+	Weight         int
+	Revoked        bool
+	SigAlgo        string
+	HashAlgo       string
+	PublicKey      string
+	SequenceNumber uint64
+}
+
+// AccountKeyList allows to build a new AccountKeyList
+func NewAccountKeyList(
+	address string,
+	index int,
+	weight int,
+	revoked bool,
+	sigAlgo string,
+	hashAlgo string,
+	publicKey string,
+	sequenceNumber uint64) AccountKeyList {
+	return AccountKeyList{
+		Address:        address,
+		Index:          index,
+		Weight:         weight,
+		Revoked:        revoked,
+		SigAlgo:        sigAlgo,
+		HashAlgo:       hashAlgo,
+		PublicKey:      publicKey,
+		SequenceNumber: sequenceNumber,
 	}
 }
 
 type LockedAccount struct {
 	Address       string
 	LockedAddress string
-	Balance       uint64
-	UnlockLimit   uint64
 }
 
-func NewLockedAccount(address string, lockedAddress string, balance, unlockLimit uint64) LockedAccount {
+// LockedAccount allows to build a new LockedAccount
+func NewLockedAccount(
+	address string,
+	lockedAddress string,
+) LockedAccount {
 	return LockedAccount{
 		Address:       address,
 		LockedAddress: lockedAddress,
+	}
+}
+
+type LockedAccountDelegator struct {
+	LockedAddress string
+	NodeId        string
+	DelegatorId   uint64
+}
+
+// LockedAccount allows to build a new LockedAccount
+func NewLockedAccountDelegator(lockedAddress string,
+	nodeId string, delegatorId uint64) LockedAccountDelegator {
+	return LockedAccountDelegator{
+		LockedAddress: lockedAddress,
+		NodeId:        nodeId,
+		DelegatorId:   delegatorId,
+	}
+}
+
+type LockedAccountBalance struct {
+	LockedAddress string
+	Balance       uint64
+	UnlockLimit   uint64
+	Height        uint64
+}
+
+func NewLockedAccountBalance(lockedAddress string, balance, unlockLimit uint64, height uint64) LockedAccountBalance {
+	return LockedAccountBalance{
+		LockedAddress: lockedAddress,
 		Balance:       balance,
 		UnlockLimit:   unlockLimit,
+		Height:        height,
 	}
 }
 
 type DelegatorAccount struct {
-	Address           string
-	DelegatorId       int64
-	DelegatorNodeId   string
-	DelegatorNodeInfo DelegatorNodeInfo
+	Address         string
+	DelegatorId     int64
+	DelegatorNodeId string
 }
 
-func NewDelegatorAccount(address string, delegatorId int64, delegatorNodeId string, delegatorNodeInfo DelegatorNodeInfo) DelegatorAccount {
+func NewDelegatorAccount(address string, delegatorId int64, delegatorNodeId string) DelegatorAccount {
 	return DelegatorAccount{
-		Address:           address,
-		DelegatorId:       delegatorId,
-		DelegatorNodeId:   delegatorNodeId,
-		DelegatorNodeInfo: delegatorNodeInfo,
+		Address:         address,
+		DelegatorId:     delegatorId,
+		DelegatorNodeId: delegatorNodeId,
 	}
 }
 
@@ -304,5 +387,26 @@ func NewStakerNodeInfo(id string, role uint8, networkingAddress string, networki
 		DelegatorIDCounter:       delegatorIDCounter,
 		TokensRequestedToUnstake: tokensRequestedToUnstake,
 		InitialWeight:            initialWeight,
+	}
+}
+
+type StakerNodeId struct {
+	Address string
+	NodeId  string
+}
+
+// Equal tells whether v and w represent the same rows
+func (v StakerNodeId) Equal(w StakerNodeId) bool {
+	return v.Address == w.Address &&
+		v.NodeId == w.NodeId
+}
+
+// StakerNodeId allows to build a new StakerNodeId
+func NewStakerNodeId(
+	address string,
+	nodeId string) StakerNodeId {
+	return StakerNodeId{
+		Address: address,
+		NodeId:  nodeId,
 	}
 }

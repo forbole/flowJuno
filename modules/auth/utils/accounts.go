@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/types"
 	"github.com/onflow/flow-go-sdk"
 
 	"github.com/rs/zerolog/log"
@@ -40,9 +41,9 @@ func GetGenesisAccounts(appState map[string]json.RawMessage, cdc codec.Marshaler
 // --------------------------------------------------------------------------------------------------------------------
 
 // GetAccounts returns the account data for the given addresses
-func GetAccounts(addresses []string, height int64, client client.Proxy) ([]flow.Account, error) {
+func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types.Account, error) {
 	log.Debug().Str("module", "auth").Str("operation", "accounts").Int("height", int(height)).Msg("getting accounts data")
-	var accounts []flow.Account
+	var accounts []types.Account
 
 	for _, address := range addresses {
 		fmt.Println("GetAccounts:" + address)
@@ -62,7 +63,9 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]flow.
 			return nil, fmt.Errorf("address is not valid and cannot get details")
 		}
 
-		accounts = append(accounts, *account)
+		newAccount, err := types.NewAccount(*account)
+
+		accounts = append(accounts, newAccount)
 
 	}
 
@@ -77,12 +80,12 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	lockedAccount, err := GetLockedTokenAccounts(addresses, height, client)
+	err = db.SaveAccounts(accounts, uint64(height))
 	if err != nil {
 		return err
 	}
 
-	delegatorAccount, err := GetDelegatorAccounts(addresses, height, client)
+	err = UpdateLockedAccount(addresses, height, client, db)
 	if err != nil {
 		return err
 	}
@@ -92,21 +95,57 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 		return err
 	}
 
-	err = db.SaveAccounts(accounts)
+	if len(stakerAccount) != 0 {
+		err = db.SaveStakerNodeId(stakerAccount)
+	}
+	
+	return err
+}
+
+func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, db *db.Db) error {
+	lockedAccount, err := GetLockedAccount(addresses, height, client)
 	if err != nil {
 		return err
 	}
 
-	err = db.SaveLockedTokenAccounts(lockedAccount)
+	if len(lockedAccount) == 0 {
+		return nil
+	}
+
+	err = db.SaveLockedAccount(lockedAccount)
 	if err != nil {
 		return err
 	}
 
-	err = db.SaveDelegatorAccounts(delegatorAccount)
+	LockedAccountBalance, err := GetLockedAccountBalance(addresses, height, client)
 	if err != nil {
 		return err
 	}
 
-	err = db.SaveStakerAccounts(stakerAccount)
+	err = db.SaveLockedAccountBalance(LockedAccountBalance)
+	if err != nil {
+		return err
+	}
+
+	var delegatorsAccounts []types.DelegatorAccount
+	for _,address:=range addresses{
+		accountdelegators,err:=getDelegatorNodeInfo(address,height,client)
+		if err!=nil{
+			return fmt.Errorf("cannot get delegators from address: %s",err)
+		}
+		if accountdelegators==nil{
+			continue
+		}
+
+		for _,delegator:=range accountdelegators{
+			delegatorsAccounts=append(delegatorsAccounts,types.NewDelegatorAccount(address,int64(delegator.Id),delegator.NodeID))
+		}
+	}
+
+	err=db.SaveDelegatorAccounts(delegatorsAccounts)
+	if err!=nil{
+		return fmt.Errorf("cannot save delegators from address: %s",err)
+	}
+
 	return nil
 }

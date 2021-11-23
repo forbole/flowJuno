@@ -5,17 +5,18 @@ import (
 	"strings"
 
 	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/modules/utils"
 	"github.com/onflow/cadence"
 	"github.com/onflow/flow-go-sdk"
 
 	"github.com/forbole/flowJuno/types"
 )
 
-// GetLockedTokenAccounts return information of an array of locked token accounts
-// if the account do not have associated locked account, it would ignore the account
-func GetLockedTokenAccounts(addresses []string, height int64, client client.Proxy) ([]types.LockedAccount, error) {
+// GetLockedAccountBalance return information of an array of locked token accounts
+// contain balance unlock limit which is variable of locked account
+func GetLockedAccountBalance(addresses []string, height int64, client client.Proxy) ([]types.LockedAccountBalance, error) {
 	catchError := `Could not borrow a reference to public LockedAccountInfo`
-	var lockedAccounts []types.LockedAccount
+	var lockedAccountBalances []types.LockedAccountBalance
 
 	for _, address := range addresses {
 		if address == "" {
@@ -46,10 +47,35 @@ func GetLockedTokenAccounts(addresses []string, height int64, client client.Prox
 			return nil, err
 		}
 
-		lockedAccounts = append(lockedAccounts, types.NewLockedAccount(address, lockedAddress, balance, unlockLimit))
+		lockedAccountBalances = append(lockedAccountBalances, types.NewLockedAccountBalance(lockedAddress, balance, unlockLimit, uint64(height)))
 
 	}
-	return lockedAccounts, nil
+	return lockedAccountBalances, nil
+}
+
+// GetLockedAccount return an array of locked account limit which is network constant
+func GetLockedAccount(addresses []string, height int64, client client.Proxy) ([]types.LockedAccount, error) {
+	catchError := `Could not borrow a reference to public LockedAccountInfo`
+	var lockedAccount []types.LockedAccount
+
+	for _, address := range addresses {
+		if address == "" {
+			continue
+		}
+
+		lockedAddress, err := getLockedTokenAccountAddress(address, height, client)
+		if err != nil {
+			if strings.Contains(err.Error(), catchError) {
+				continue
+			}
+			return nil, fmt.Errorf("fail to get locked account address :%s",err)
+		}
+
+		lockedAccount = append(lockedAccount, types.NewLockedAccount(address, lockedAddress))
+
+	}
+	return lockedAccount, nil
+
 }
 
 // getLockedTokenAccountBalance get the account balance by address
@@ -75,17 +101,14 @@ func getLockedTokenAccountBalance(address string, height int64, client client.Pr
 	//val,err:=cadence.NewValue(candanceAddress)
 	candenceArr := []cadence.Value{candanceAddress}
 
-	var balance uint64
 	value, err := client.Client().ExecuteScriptAtLatestBlock(client.Ctx(), []byte(script), candenceArr)
 	if err != nil {
 		return 0, err
 	}
-	balance, ok := value.ToGoValue().(uint64)
-	if !ok {
-		return 0, fmt.Errorf("cadence script does not return a uint64 value")
+	balance, err := utils.CadenceConvertUint64(value)
+	if err != nil {
+		return 0, err
 	}
-	fmt.Printf("Locked Account Unlock Limit! %d", balance)
-
 	return balance, nil
 }
 
@@ -154,7 +177,62 @@ func getLockedTokenAccountAddress(address string, height int64, client client.Pr
 		return "", err
 	}
 
-	fmt.Println("Locked Account" + value.String())
+	val,ok:=value.(cadence.Address)
+	if !ok{
+		return "",fmt.Errorf("Not a cadence address")
+	}
 
-	return value.String(), nil
+	return val.String(), nil
+}
+
+// getDelegatorNodeInfo get delegator info associated to the address
+func getDelegatorNodeInfo (address string, height int64, client client.Proxy) ([]types.DelegatorNodeInfo, error) {
+	script := fmt.Sprintf(`
+	import FlowIDTableStaking from %s
+	import LockedTokens from %s
+	// Returns an array of DelegatorInfo objects that the account controls
+	// in its normal account and shared account
+	pub fun main(account: Address): [FlowIDTableStaking.DelegatorInfo] {
+		let delegatorInfoArray: [FlowIDTableStaking.DelegatorInfo] = []
+		let pubAccount = getAccount(account)
+		let delegator = pubAccount.getCapability<&{FlowIDTableStaking.NodeDelegatorPublic}>(/public/flowStakingDelegator)!
+			.borrow()
+		if let delegatorRef = delegator {
+			delegatorInfoArray.append(FlowIDTableStaking.DelegatorInfo(nodeID: delegatorRef.nodeID, delegatorID: delegatorRef.id))
+		}
+		let lockedAccountInfoCap = pubAccount
+			.getCapability
+			<&LockedTokens.TokenHolder{LockedTokens.LockedAccountInfo}>
+			(LockedTokens.LockedAccountInfoPublicPath)
+		if lockedAccountInfoCap == nil || !(lockedAccountInfoCap!.check()) {
+			return delegatorInfoArray
+		}
+		let lockedAccountInfo = lockedAccountInfoCap!.borrow()
+		if let lockedAccountInfoRef = lockedAccountInfo {
+			let nodeID = lockedAccountInfoRef.getDelegatorNodeID()
+			let delegatorID = lockedAccountInfoRef.getDelegatorID()
+			if (nodeID == nil || delegatorID == nil) {
+				return delegatorInfoArray
+			}
+			delegatorInfoArray.append(FlowIDTableStaking.DelegatorInfo(nodeID: nodeID!, delegatorID: delegatorID!))
+		}
+		return delegatorInfoArray
+	}`, client.Contract().StakingTable, client.Contract().LockedTokens)
+
+	flowAddress := flow.HexToAddress(address)
+	candanceAddress := cadence.Address(flowAddress)
+	//val,err:=cadence.NewValue(candanceAddress)
+	candenceArr := []cadence.Value{candanceAddress}
+
+	value, err := client.Client().ExecuteScriptAtLatestBlock(client.Ctx(), []byte(script), candenceArr)
+	if err != nil {
+		return nil, err
+	}
+
+	nodeInfos, err := types.DelegatorNodeInfoArrayFromCadence(value)
+	if err != nil {
+		return nil, err
+	}
+
+	return nodeInfos, nil
 }

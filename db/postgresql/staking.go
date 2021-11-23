@@ -73,42 +73,72 @@ func (db *Db) SaveTotalStake(totalStake types.TotalStake) error {
 }
 
 func (db *Db) SaveStakingTable(stakingTable types.StakingTable) error {
-    stmt:= `INSERT INTO staking_table(node_id) VALUES `
+	stmt := `INSERT INTO staking_table(node_id) VALUES `
 
-    var params []interface{}
+	var params []interface{}
 
-	  for i, rows := range stakingTable.StakingTable{
-      ai := i * 1
-      stmt += fmt.Sprintf("($%d),", ai+1)
-      
-      params = append(params,rows)
+	for i, rows := range stakingTable.StakingTable {
+		ai := i * 1
+		stmt += fmt.Sprintf("($%d),", ai+1)
 
-    }
-	  stmt = stmt[:len(stmt)-1]
-    stmt += ` ON CONFLICT DO NOTHING` 
+		params = append(params, rows)
 
-    _, err := db.Sqlx.Exec(stmt, params...)
-    if err != nil {
-      return err
-    }
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
 
-    return nil 
-    }
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
-	stmt := `INSERT INTO proposed_table(height,proposed_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+	stmt := `INSERT INTO proposed_table(height,proposed_table) VALUES`
 
-	_, err := db.Sql.Exec(stmt, proposedTable.Height,
-		pq.StringArray(proposedTable.ProposedTable))
+	var params []interface{}
+
+	for i, rows := range proposedTable.ProposedTable {
+		ai := i * 2
+		stmt += fmt.Sprintf("($%d,$%d),", ai+1, ai+2)
+		fmt.Println(rows)
+
+		params = append(params, proposedTable.Height, rows)
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return fmt.Errorf("fail to insert into proposed table: %s",err)
+	}
+
 	return err
 }
 
 func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
-	stmt := `INSERT INTO current_table(height,current_table) VALUES ($1,$2) ON CONFLICT DO NOTHING`
+	stmt := `INSERT INTO current_table(height,current_table) VALUES `
 
-	_, err := db.Sql.Exec(stmt, currentTable.Height,
-		pq.StringArray(currentTable.Table))
-	return err
+	var params []interface{}
+
+	for i, rows := range currentTable.Table {
+		ai := i * 2
+		stmt += fmt.Sprintf("($%d,$%d),", ai+1, ai+2)
+		fmt.Println(rows)
+
+		params = append(params, currentTable.Height, rows)
+	}
+	stmt = stmt[:len(stmt)-1]
+	stmt += ` ON CONFLICT DO NOTHING`
+
+	_, err := db.Sqlx.Exec(stmt, params...)
+	if err != nil {
+		return fmt.Errorf("fail to insert into current table: %s",err)
+	}
+
+	return nil
 }
 
 func (db *Db) SaveNodeTotalCommitment(nodeTotalCommitment []types.NodeTotalCommitment) error {

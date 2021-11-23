@@ -39,10 +39,6 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		return nil, err
 	}
 
-	grpcConnection, err := CreateGrpcConnection(cfg)
-	if err != nil {
-		return nil, err
-	}
 
 	contracts := MainnetContracts()
 	if cfg.GetRPCConfig().GetContracts() == "Mainnet" {
@@ -55,8 +51,8 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		encodingConfig:  encodingConfig,
 		ctx:             context.Background(),
 		flowClient:      *flowClient,
-		grpConnection:   grpcConnection,
-		txServiceClient: tx.NewServiceClient(grpcConnection),
+		grpConnection:   nil,
+		txServiceClient: nil,
 		contract:        contracts,
 		genesisHeight:   cfg.GetCosmosConfig().GetGenesisHeight(),
 	}, nil
@@ -309,7 +305,6 @@ func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error)
 
 	ev := make([]types.Event, len(transactionResult.Events))
 	for i, event := range transactionResult.Events {
-		fmt.Println("Event TxID:" + event.TransactionID.String())
 		ev[i] = types.NewEvent(height, event.Type, event.TransactionID.String(), event.TransactionIndex,
 			event.EventIndex, event.Value)
 	}
