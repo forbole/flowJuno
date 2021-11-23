@@ -57,3 +57,8 @@ CREATE TABLE account_key_list(
   sequence_number BIGINT  NOT NULL,
   PRIMARY KEY (address,index)
 );
+
+CREATE TABLE staker_node_id(
+    address TEXT  NOT NULL REFERENCES account(address),
+    node_id TEXT NOT NULL UNIQUE 
+)

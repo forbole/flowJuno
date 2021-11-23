@@ -89,27 +89,16 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 	if err != nil {
 		return err
 	}
-/*
-	   	delegatorAccount, err := GetDelegatorAccounts(addresses, height, client)
-	   	if err != nil {
-	   		return err
-	   	}
 
-	   	if len(delegatorAccount) != 0 {
-	   		err = db.SaveDelegatorAccounts(delegatorAccount)
-	   		if err != nil {
-	   			return err
-	   		}
-	   	}
+	stakerAccount, err := GetStakerAccounts(addresses, height, client)
+	if err != nil {
+		return err
+	}
 
-	   	stakerAccount, err := GetStakerAccounts(addresses, height, client)
-	   	if err != nil {
-	   		return err
-	   	}
-	   	if len(stakerAccount) != 0 {
-	   		err = db.SaveStakerNodeId(stakerAccount)
-	   	}
-	*/
+	if len(stakerAccount) != 0 {
+		err = db.SaveStakerNodeId(stakerAccount)
+	}
+	
 	return err
 }
 
@@ -157,6 +146,6 @@ func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, 
 	if err!=nil{
 		return fmt.Errorf("cannot save delegators from address: %s",err)
 	}
-	
+
 	return nil
 }
