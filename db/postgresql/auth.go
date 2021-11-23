@@ -49,7 +49,7 @@ func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
-		return fmt.Errorf("fail to insert into account: %s",err)
+		return fmt.Errorf("fail to insert into account: %s", err)
 	}
 
 	stmt = `INSERT INTO account_balance (address,balance,code,contract_map,height) VALUES `
@@ -59,20 +59,20 @@ func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 		ai := i * 5
 		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
 
-		params2 = append(params2, account.Address, account.Balance, account.Code, account.Contracts,height)
+		params2 = append(params2, account.Address, account.Balance, account.Code, account.Contracts, height)
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += " ON CONFLICT (address) DO NOTHING "
 	_, err = db.Sqlx.Exec(stmt, params2...)
 	if err != nil {
-		return fmt.Errorf("fail to insert into account_balance: %s",err)
+		return fmt.Errorf("fail to insert into account_balance: %s", err)
 	}
 
 	var params3 []interface{}
 
 	for _, rows := range accounts {
-		splitedAccountKeyList:=utils.SplitAccountKeyList(rows.Keys,8)
-		for _,keyList:=range splitedAccountKeyList{
+		splitedAccountKeyList := utils.SplitAccountKeyList(rows.Keys, 8)
+		for _, keyList := range splitedAccountKeyList {
 			stmt = `INSERT INTO account_key_list(address,index,weight,revoked,sig_algo,hash_algo,public_key,sequence_number) VALUES `
 			i := 0
 			for _, accountKey := range keyList {
@@ -84,15 +84,15 @@ func (db *Db) saveAccounts(accounts []types.Account, height uint64) error {
 
 			stmt = stmt[:len(stmt)-1]
 			stmt += ` ON CONFLICT DO NOTHING`
-		
+
 			_, err = db.Sqlx.Exec(stmt, params3...)
 			if err != nil {
-				return fmt.Errorf("fail to insert into account_key_list: %s",err)
+				return fmt.Errorf("fail to insert into account_key_list: %s", err)
 			}
-			params3=make([]interface{},0)
+			params3 = make([]interface{}, 0)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -138,7 +138,7 @@ func (db *Db) SaveLockedAccountBalance(accounts []types.LockedAccountBalance) er
 	stmt += " ON CONFLICT (locked_address,height) DO NOTHING "
 	_, err := db.Sqlx.Exec(stmt, params2...)
 	if err != nil {
-		return fmt.Errorf("psql error on locked_account_balance: %s",err)
+		return fmt.Errorf("psql error on locked_account_balance: %s", err)
 	}
 	return nil
 }
@@ -162,7 +162,7 @@ func (db *Db) SaveDelegatorAccounts(accounts []types.DelegatorAccount) error {
 	stmt += " ON CONFLICT (delegator_id,delegator_node_id ) DO NOTHING"
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
-		return fmt.Errorf("fail to save into psql table delegator_account: %s",err)
+		return fmt.Errorf("fail to save into psql table delegator_account: %s", err)
 	}
 	return nil
 }

@@ -98,7 +98,7 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 	if len(stakerAccount) != 0 {
 		err = db.SaveStakerNodeId(stakerAccount)
 	}
-	
+
 	return err
 }
 
@@ -128,23 +128,23 @@ func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, 
 	}
 
 	var delegatorsAccounts []types.DelegatorAccount
-	for _,address:=range addresses{
-		accountdelegators,err:=getDelegatorNodeInfo(address,height,client)
-		if err!=nil{
-			return fmt.Errorf("cannot get delegators from address: %s",err)
+	for _, address := range addresses {
+		accountdelegators, err := getDelegatorNodeInfo(address, height, client)
+		if err != nil {
+			return fmt.Errorf("cannot get delegators from address: %s", err)
 		}
-		if accountdelegators==nil{
+		if accountdelegators == nil {
 			continue
 		}
 
-		for _,delegator:=range accountdelegators{
-			delegatorsAccounts=append(delegatorsAccounts,types.NewDelegatorAccount(address,int64(delegator.Id),delegator.NodeID))
+		for _, delegator := range accountdelegators {
+			delegatorsAccounts = append(delegatorsAccounts, types.NewDelegatorAccount(address, int64(delegator.Id), delegator.NodeID))
 		}
 	}
 
-	err=db.SaveDelegatorAccounts(delegatorsAccounts)
-	if err!=nil{
-		return fmt.Errorf("cannot save delegators from address: %s",err)
+	err = db.SaveDelegatorAccounts(delegatorsAccounts)
+	if err != nil {
+		return fmt.Errorf("cannot save delegators from address: %s", err)
 	}
 
 	return nil

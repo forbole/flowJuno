@@ -145,7 +145,7 @@ func NewProposedTableRow(
 // CurrentTableRow represents a single row of the current_table table
 type CurrentTableRow struct {
 	Height int64  `db:"height"`
-	NodeId  string `db:"node_id"`
+	NodeId string `db:"node_id"`
 }
 
 // Equal tells whether v and w represent the same rows
@@ -160,7 +160,7 @@ func NewCurrentTableRow(
 	nodeId string) CurrentTableRow {
 	return CurrentTableRow{
 		Height: height,
-		NodeId:  nodeId,
+		NodeId: nodeId,
 	}
 }
 

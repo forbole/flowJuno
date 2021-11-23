@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	_ modules.Module      = &Module{}
+	_ modules.Module = &Module{}
 )
 
 // Module represents the x/auth module
@@ -40,6 +40,7 @@ func NewModule(
 func (m *Module) Name() string {
 	return "staking"
 }
+
 // RegisterPeriodicOperations implements modules.Module
 func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
 	return RegisterPeriodicOps(scheduler, m.db, m.flowClient)

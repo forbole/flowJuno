@@ -14,8 +14,6 @@ func TestProxyTestSuite(t *testing.T) {
 	suite.Run(t, new(ProxyTestSuite))
 }
 
-
-
 type ProxyTestSuite struct {
 	suite.Suite
 
@@ -23,16 +21,15 @@ type ProxyTestSuite struct {
 }
 
 func (suite *ProxyTestSuite) SetupTest() {
-	rpcConfig:=types.NewRPCConfig("","access.mainnet.nodes.onflow.org:9000","Mainnet")
-	modules:=[]string{
-		"auth","messages","staking","consensus","token"}
-	cosmosConfig:=types.NewCosmosConfig("",modules,19050753)
+	rpcConfig := types.NewRPCConfig("", "access.mainnet.nodes.onflow.org:9000", "Mainnet")
+	modules := []string{
+		"auth", "messages", "staking", "consensus", "token"}
+	cosmosConfig := types.NewCosmosConfig("", modules, 19050753)
 
-	config:=types.NewConfig(rpcConfig,nil,cosmosConfig,nil,nil,nil,nil)
+	config := types.NewConfig(rpcConfig, nil, cosmosConfig, nil, nil, nil, nil)
 
-	proxy,err := client.NewClientProxy(config,nil)
+	proxy, err := client.NewClientProxy(config, nil)
 	suite.Require().NoError(err)
 
 	suite.Proxy = proxy
 }
-

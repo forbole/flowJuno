@@ -112,7 +112,7 @@ func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
 
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
-		return fmt.Errorf("fail to insert into proposed table: %s",err)
+		return fmt.Errorf("fail to insert into proposed table: %s", err)
 	}
 
 	return err
@@ -135,7 +135,7 @@ func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
 
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
-		return fmt.Errorf("fail to insert into current table: %s",err)
+		return fmt.Errorf("fail to insert into current table: %s", err)
 	}
 
 	return nil

@@ -24,18 +24,17 @@ type AccountBalanceRow struct {
 	Balance     float64 `db:"balance"`
 	Code        string  `db:"code"`
 	ContractMap string  `db:"contract_map"`
-	Height uint64 `db:"height"`
-
+	Height      uint64  `db:"height"`
 }
 
 // NewAccountBalanceRow allows to easily build a new AccountBalanceRow
-func NewAccountBalanceRow(address string, balance float64, code,contractMap string,height uint64) AccountBalanceRow {
+func NewAccountBalanceRow(address string, balance float64, code, contractMap string, height uint64) AccountBalanceRow {
 	return AccountBalanceRow{
 		Address:     address,
 		Balance:     balance,
 		Code:        code,
 		ContractMap: contractMap,
-		Height:height,
+		Height:      height,
 	}
 }
 
@@ -45,7 +44,7 @@ func (a AccountBalanceRow) Equal(b AccountBalanceRow) bool {
 		a.Balance == b.Balance &&
 		a.Code == b.Code &&
 		a.ContractMap == b.ContractMap &&
-		a.Height==b.Height)
+		a.Height == b.Height)
 }
 
 // LockedAccountRow represents a single row of the locked_account table
@@ -94,26 +93,27 @@ func (a LockedAccountBalanceRow) Equal(b LockedAccountBalanceRow) bool {
 }
 
 type DelegatorAccountRow struct {
-	AccountAddress    string `db:"account_address"`
-	DelegatorId       int64  `db:"delegator_id"`
-	DelegatorNodeId   string `db:"delegator_node_id"`
+	AccountAddress  string `db:"account_address"`
+	DelegatorId     int64  `db:"delegator_id"`
+	DelegatorNodeId string `db:"delegator_node_id"`
 }
 
 // Equal tells whether v and w represent the same rows
 func (v DelegatorAccountRow) Equal(w DelegatorAccountRow) bool {
 	return v.AccountAddress == w.AccountAddress &&
 		v.DelegatorId == w.DelegatorId &&
-		v.DelegatorNodeId == w.DelegatorNodeId }
+		v.DelegatorNodeId == w.DelegatorNodeId
+}
 
 // DelegatorAccountRow allows to build a new DelegatorAccountRow
 func NewDelegatorAccountRow(
 	accountAddress string,
 	delegatorId int64,
-	delegatorNodeId string,) DelegatorAccountRow {
+	delegatorNodeId string) DelegatorAccountRow {
 	return DelegatorAccountRow{
-		AccountAddress:    accountAddress,
-		DelegatorId:       delegatorId,
-		DelegatorNodeId:   delegatorNodeId,
+		AccountAddress:  accountAddress,
+		DelegatorId:     delegatorId,
+		DelegatorNodeId: delegatorNodeId,
 	}
 }
 
@@ -144,30 +144,31 @@ func NewStakerAccountRow(
 }
 
 // AccountKeyListRow represents a single row of the account_key_list table
-type AccountKeyListRow struct { 
-	Address string `db:"address"`
-	Index int `db:"index"`
-	Weight int `db:"weight"`
-	Revoked bool `db:"revoked"`
-	SigAlgo string `db:"sig_algo"`
-	HashAlgo string `db:"hash_algo"`
-	PublicKey string `db:"public_key"`
+type AccountKeyListRow struct {
+	Address        string `db:"address"`
+	Index          int    `db:"index"`
+	Weight         int    `db:"weight"`
+	Revoked        bool   `db:"revoked"`
+	SigAlgo        string `db:"sig_algo"`
+	HashAlgo       string `db:"hash_algo"`
+	PublicKey      string `db:"public_key"`
 	SequenceNumber uint64 `db:"sequence_number"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v AccountKeyListRow) Equal(w AccountKeyListRow)bool{
-	return v.Address==w.Address && 
-  v.Index==w.Index && 
-  v.Weight==w.Weight && 
-  v.Revoked==w.Revoked && 
-  v.SigAlgo==w.SigAlgo && 
-  v.HashAlgo==w.HashAlgo && 
-  v.PublicKey==w.PublicKey && 
-  v.SequenceNumber==w.SequenceNumber }
-  
-	  // AccountKeyListRow allows to build a new AccountKeyListRow
-  func NewAccountKeyListRow( 
+}
+
+// Equal tells whether v and w represent the same rows
+func (v AccountKeyListRow) Equal(w AccountKeyListRow) bool {
+	return v.Address == w.Address &&
+		v.Index == w.Index &&
+		v.Weight == w.Weight &&
+		v.Revoked == w.Revoked &&
+		v.SigAlgo == w.SigAlgo &&
+		v.HashAlgo == w.HashAlgo &&
+		v.PublicKey == w.PublicKey &&
+		v.SequenceNumber == w.SequenceNumber
+}
+
+// AccountKeyListRow allows to build a new AccountKeyListRow
+func NewAccountKeyListRow(
 	address string,
 	index int,
 	weight int,
@@ -175,15 +176,15 @@ type AccountKeyListRow struct {
 	sigAlgo string,
 	hashAlgo string,
 	publicKey string,
-	sequenceNumber uint64) AccountKeyListRow{
-   return AccountKeyListRow{
-   Address:address,
-   Index:index,
-   Weight:weight,
-   Revoked:revoked,
-   SigAlgo:sigAlgo,
-   HashAlgo:hashAlgo,
-   PublicKey:publicKey,
-   SequenceNumber:sequenceNumber,
-  }
-  }
+	sequenceNumber uint64) AccountKeyListRow {
+	return AccountKeyListRow{
+		Address:        address,
+		Index:          index,
+		Weight:         weight,
+		Revoked:        revoked,
+		SigAlgo:        sigAlgo,
+		HashAlgo:       hashAlgo,
+		PublicKey:      publicKey,
+		SequenceNumber: sequenceNumber,
+	}
+}

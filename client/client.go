@@ -39,7 +39,6 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		return nil, err
 	}
 
-
 	contracts := MainnetContracts()
 	if cfg.GetRPCConfig().GetContracts() == "Mainnet" {
 		contracts = MainnetContracts()

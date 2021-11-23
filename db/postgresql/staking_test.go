@@ -178,12 +178,11 @@ func (suite *DbTestSuite) TestBigDipperDb_ProposedTable() {
 	expectedRow := []dbtypes.ProposedTableRow{
 		dbtypes.NewProposedTableRow(10, "abc"),
 		dbtypes.NewProposedTableRow(10, "def"),
-
-	}   
+	}
 	var outputs []dbtypes.ProposedTableRow
 	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM proposed_table`)
 	suite.Require().NoError(err)
-	for i,rows:=range expectedRow{
+	for i, rows := range expectedRow {
 		suite.Require().True(rows.Equal(outputs[i]))
 	}
 }
@@ -209,8 +208,7 @@ func (suite *DbTestSuite) TestBigDipperDb_CurrentTable() {
 	// --- Prepare the data
 	// ------------------------------
 
-	
-	input := types.NewCurrentTable(10, []string([]string{"abc","def"}))
+	input := types.NewCurrentTable(10, []string([]string{"abc", "def"}))
 
 	// ------------------------------
 	// --- Save the data
@@ -248,7 +246,7 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitment() {
 		types.NewNodeTotalCommitment("0x1", 100000008, 1),
 	}
 
-	err:=suite.InsertIntoStakingTable(1,"0x1")
+	err := suite.InsertIntoStakingTable(1, "0x1")
 	suite.Require().NoError(err)
 
 	// ------------------------------
@@ -282,7 +280,7 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitmentWithoutDelegators()
 		types.NewNodeTotalCommitmentWithoutDelegators("0x1", 100000008, 1),
 	}
 
-	err:=suite.InsertIntoStakingTable(1,"0x1")
+	err := suite.InsertIntoStakingTable(1, "0x1")
 	suite.Require().NoError(err)
 
 	// ------------------------------
@@ -362,7 +360,7 @@ func (suite *DbTestSuite) TestBigDipperDb_SaveNodeInfosFromTable() {
 		stakerNodeInfo,
 	}
 
-	err:=suite.InsertIntoStakingTable(1,id)
+	err := suite.InsertIntoStakingTable(1, id)
 	suite.Require().NoError(err)
 
 	// ------------------------------
@@ -418,11 +416,11 @@ func (suite *DbTestSuite) TestBigDipperDb_CutPercentage() {
 
 }
 
-func (suite *DbTestSuite) InsertIntoStakingTable(height uint64,nodeId string)error{
+func (suite *DbTestSuite) InsertIntoStakingTable(height uint64, nodeId string) error {
 	_, err := suite.database.Sqlx.Exec(
 		`INSERT INTO staking_table(node_id) VALUES ($1)`, nodeId)
 	return err
-	}
+}
 func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfo() {
 
 	// ------------------------------
@@ -438,7 +436,7 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfo() {
 		nodeInfo,
 	}
 
-	err:=suite.InsertIntoStakingTable(1,delegatorNodeId)
+	err := suite.InsertIntoStakingTable(1, delegatorNodeId)
 	suite.Require().NoError(err)
 
 	// ------------------------------

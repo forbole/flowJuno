@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	_ modules.Module      = &Module{}
+	_ modules.Module = &Module{}
 )
 
 // Module represents the x/auth module

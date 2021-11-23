@@ -68,7 +68,7 @@ func GetLockedAccount(addresses []string, height int64, client client.Proxy) ([]
 			if strings.Contains(err.Error(), catchError) {
 				continue
 			}
-			return nil, fmt.Errorf("fail to get locked account address :%s",err)
+			return nil, fmt.Errorf("fail to get locked account address :%s", err)
 		}
 
 		lockedAccount = append(lockedAccount, types.NewLockedAccount(address, lockedAddress))
@@ -177,16 +177,16 @@ func getLockedTokenAccountAddress(address string, height int64, client client.Pr
 		return "", err
 	}
 
-	val,ok:=value.(cadence.Address)
-	if !ok{
-		return "",fmt.Errorf("Not a cadence address")
+	val, ok := value.(cadence.Address)
+	if !ok {
+		return "", fmt.Errorf("Not a cadence address")
 	}
 
 	return val.String(), nil
 }
 
 // getDelegatorNodeInfo get delegator info associated to the address
-func getDelegatorNodeInfo (address string, height int64, client client.Proxy) ([]types.DelegatorNodeInfo, error) {
+func getDelegatorNodeInfo(address string, height int64, client client.Proxy) ([]types.DelegatorNodeInfo, error) {
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	import LockedTokens from %s
