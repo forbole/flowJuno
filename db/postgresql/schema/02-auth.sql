@@ -17,19 +17,6 @@ CREATE TABLE locked_account
     locked_address TEXT  NOT NULL UNIQUE
 );
 
-CREATE TABLE locked_account_delegator
-(  
-  locked_address TEXT  NOT NULL REFERENCES locked_account(locked_address),
-  node_id TEXT  NOT NULL  ,
-  delegator_id BIGINT  NOT NULL 
-);
-
-CREATE TABLE locked_account_staker
-(
-    locked_address TEXT  NOT NULL NOT NULL REFERENCES locked_account(locked_address),
-    node_id TEXT  NOT NULL 
-);
-
 CREATE TABLE locked_account_balance(
     locked_address TEXT NOT NULL REFERENCES locked_account(locked_address),
     balance BIGINT NOT NULL,

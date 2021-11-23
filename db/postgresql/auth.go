@@ -183,29 +183,6 @@ func (db *Db) GetAddresses() ([]string, error) {
 	return addresses, nil
 }
 
-func (db *Db) SaveLockedAccountDelegator(lockedAccount []types.LockedAccountDelegator) error {
-	stmt := `INSERT INTO locked_account(locked_address,node_id,delegator_id) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range lockedAccount {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		params = append(params, rows.LockedAddress, rows.NodeId, rows.DelegatorId)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (db *Db) SaveStakerNodeId(stakerNodeId []types.StakerNodeId) error {
 	stmt := `INSERT INTO staker_node_id(address,node_id) VALUES `
 
