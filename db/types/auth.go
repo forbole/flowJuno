@@ -97,28 +97,23 @@ type DelegatorAccountRow struct {
 	AccountAddress    string `db:"account_address"`
 	DelegatorId       int64  `db:"delegator_id"`
 	DelegatorNodeId   string `db:"delegator_node_id"`
-	DelegatorNodeInfo string `db:"delegator_node_info"`
 }
 
 // Equal tells whether v and w represent the same rows
 func (v DelegatorAccountRow) Equal(w DelegatorAccountRow) bool {
 	return v.AccountAddress == w.AccountAddress &&
 		v.DelegatorId == w.DelegatorId &&
-		v.DelegatorNodeId == w.DelegatorNodeId &&
-		v.DelegatorNodeInfo == w.DelegatorNodeInfo
-}
+		v.DelegatorNodeId == w.DelegatorNodeId }
 
 // DelegatorAccountRow allows to build a new DelegatorAccountRow
 func NewDelegatorAccountRow(
 	accountAddress string,
 	delegatorId int64,
-	delegatorNodeId string,
-	delegatorNodeInfo string) DelegatorAccountRow {
+	delegatorNodeId string,) DelegatorAccountRow {
 	return DelegatorAccountRow{
 		AccountAddress:    accountAddress,
 		DelegatorId:       delegatorId,
 		DelegatorNodeId:   delegatorNodeId,
-		DelegatorNodeInfo: delegatorNodeInfo,
 	}
 }
 

@@ -136,9 +136,8 @@ func (suite *DbTestSuite) TestBigDipperDb_LockedAccount(){
   }
 
 
+
 func (suite *DbTestSuite) TestSaveLockedAccountBalance() {
-	suite.AddAccount("0x1")
-	suite.AddAccount(("0x2"))
 	balance := uint64(10)
 	unlockLimit := uint64(20)
 
@@ -146,6 +145,11 @@ func (suite *DbTestSuite) TestSaveLockedAccountBalance() {
 		types.NewLockedAccountBalance("0x1", balance, unlockLimit, 10),
 	}
 
+	suite.AddLockedAccount("0x1","0x1")
+
+	account2 := []types.LockedAccountBalance{
+		types.NewLockedAccountBalance("0x1", balance, unlockLimit, 20),
+	}
 	// ------------------------------
 	// --- Save the data
 	// ------------------------------
@@ -156,17 +160,26 @@ func (suite *DbTestSuite) TestSaveLockedAccountBalance() {
 	err = suite.database.SaveLockedAccountBalance(accounts)
 	suite.Require().NoError(err, "double account insertion should not insert and returns no error")
 
+	err = suite.database.SaveLockedAccountBalance(account2)
+	suite.Require().NoError(err, "double account insertion should not insert and returns no error")
+
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedAccountRow := dbtypes.NewLockedAccountBalanceRow("0x1", int(balance), int(unlockLimit), 10)
+	expectedAccountRows := []dbtypes.LockedAccountBalanceRow{
+		dbtypes.NewLockedAccountBalanceRow("0x1", int(balance), int(unlockLimit), 10),
+		dbtypes.NewLockedAccountBalanceRow("0x1", int(balance), int(unlockLimit), 20),
+	} 
 
 	var accountRows []dbtypes.LockedAccountBalanceRow
-	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM locked_account`)
+	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM locked_account_balance`)
 	suite.Require().NoError(err)
-	suite.Require().Len(accountRows, 1, "account table should contain only one row")
+	suite.Require().Len(accountRows, 2, "account table should contain only two row")
 
-	suite.Require().True(expectedAccountRow.Equal(accountRows[0]))
+	for i,row:=range expectedAccountRows{
+		suite.Require().True(row.Equal(accountRows[i]))
+
+	}
 }
 
 func (suite *DbTestSuite) TestSaveDelegatorAccount() {
@@ -176,7 +189,6 @@ func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 	delegatorNodeId := "2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e"
 	//nodeInfo := types.NewDelegatorNodeInfo(uint32(delegatorId), delegatorNodeId, 0, 0, 0, 0, 0, 0)
 
-	expectedDelegatorNodeId := `{"Id":8411,"NodeID":"2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e","TokensCommitted":0,"TokensStaked":0,"TokensUnstaking":0,"TokensRewarded":0,"TokensUnstaked":0,"TokensRequestedToUnstake":0}`
 
 	accounts := []types.DelegatorAccount{
 		types.NewDelegatorAccount(address, delegatorId, delegatorNodeId),
@@ -195,8 +207,7 @@ func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 	// ------------------------------
 	// --- Verify the data
 	// ------------------------------
-	expectedDelegatorNodeId = `{"Id":8411,"NodeID":"2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e","TokensCommitted":0,"TokensStaked":0,"TokensUnstaking":0,"TokensRewarded":0,"TokensUnstaked":0,"TokensRequestedToUnstake":0}`
-	expectedAccountRow := dbtypes.NewDelegatorAccountRow("0x1", delegatorId, delegatorNodeId, expectedDelegatorNodeId)
+	expectedAccountRow := dbtypes.NewDelegatorAccountRow("0x1", delegatorId, delegatorNodeId)
 
 	var accountRows []dbtypes.DelegatorAccountRow
 	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM delegator_account`)

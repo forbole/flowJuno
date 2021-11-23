@@ -135,7 +135,7 @@ func (db *Db) SaveLockedAccountBalance(accounts []types.LockedAccountBalance) er
 	}
 
 	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT DO NOTHING "
+	stmt += " ON CONFLICT (locked_address,height) DO NOTHING "
 	_, err := db.Sqlx.Exec(stmt, params2...)
 	if err != nil {
 		return fmt.Errorf("psql error on locked_account_balance: %s",err)
@@ -159,7 +159,7 @@ func (db *Db) SaveDelegatorAccounts(accounts []types.DelegatorAccount) error {
 	}
 
 	stmt = stmt[:len(stmt)-1]
-	stmt += " ON CONFLICT DO NOTHING"
+	stmt += " ON CONFLICT (delegator_id,delegator_node_id ) DO NOTHING"
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
 		return fmt.Errorf("fail to save into psql table delegator_account: %s",err)
