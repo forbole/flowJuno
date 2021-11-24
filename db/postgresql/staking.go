@@ -119,7 +119,7 @@ func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
 }
 
 func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
-	stmt := `INSERT INTO current_table(height,current_table) VALUES `
+	stmt := `INSERT INTO current_table(height,node_id) VALUES `
 
 	var params []interface{}
 
