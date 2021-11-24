@@ -4,7 +4,7 @@ import (
 	"github.com/forbole/flowJuno/types"
 )
 
-func (suite *ProxyTestSuite) TestProxy_GetLockedAccountAddress() {
+func (suite *AuthProxyTestSuite) TestProxy_GetLockedAccountAddress() {
 	proxy := *suite.Proxy
 	height, err := proxy.LatestHeight()
 	suite.Require().NoError(err)
@@ -21,7 +21,7 @@ func (suite *ProxyTestSuite) TestProxy_GetLockedAccountAddress() {
 	suite.Require().Equal(lockedAccount[0], expected[0])
 }
 
-func (suite *ProxyTestSuite) TestProxy_GetLockedAccountBalance() {
+func (suite *AuthProxyTestSuite) TestProxy_GetLockedAccountBalance() {
 	proxy := *suite.Proxy
 	height, err := proxy.LatestHeight()
 	suite.Require().NoError(err)
@@ -32,7 +32,7 @@ func (suite *ProxyTestSuite) TestProxy_GetLockedAccountBalance() {
 	suite.Require().Equal(uint64(0), balance)
 }
 
-func (suite *ProxyTestSuite) TestProxy_getLockedTokenAccountUnlockLimit() {
+func (suite *AuthProxyTestSuite) TestProxy_getLockedTokenAccountUnlockLimit() {
 	proxy := *suite.Proxy
 	height, err := proxy.LatestHeight()
 	suite.Require().NoError(err)
@@ -43,7 +43,7 @@ func (suite *ProxyTestSuite) TestProxy_getLockedTokenAccountUnlockLimit() {
 	suite.Require().Equal(uint64(100000), balance)
 }
 
-func (suite *ProxyTestSuite) TestProxy_getDelegatorNodeInfo() {
+func (suite *AuthProxyTestSuite) TestProxy_getDelegatorNodeInfo() {
 	proxy := *suite.Proxy
 	height, err := proxy.LatestHeight()
 	suite.Require().NoError(err)
