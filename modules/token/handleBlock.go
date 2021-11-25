@@ -16,19 +16,30 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 	log.Debug().Str("module", "staking").Msg("setting up periodic tasks")
 
 	if _, err := scheduler.Every(1).Week().Tuesday().At("15:00").StartImmediately().Do(func() {
-		utils.WatchMethod(func() error { return getCurrentSupply(db, flowClient) })
+		utils.WatchMethod(func() error { return HandlePerodicOperation(db, flowClient) })
 	}); err != nil {
 		return err
 	}
 
-	return getCurrentSupply(db, flowClient)
+	return HandlePerodicOperation(db, flowClient)
 }
 
-func getCurrentSupply(db *database.Db, flowClient client.Proxy) error {
+func HandlePerodicOperation(db *database.Db, flowClient client.Proxy)error{
 	height, err := flowClient.LatestHeight()
 	if err != nil {
 		return fmt.Errorf("Cannot get latest height: %s", err)
 	}
+
+	supply,err:=getCurrentSupply(flowClient)
+	if err!=nil{
+		return fmt.Errorf("Fail to handle perodic operation for Token:%s",err)
+	}
+
+	return db.SaveSupply(supply, uint64(height))
+}
+
+func getCurrentSupply(flowClient client.Proxy) (uint64,error) {
+	
 	script := fmt.Sprintf(`
 	import FlowToken from %s
 	pub fun main(): UFix64 {
@@ -38,14 +49,16 @@ func getCurrentSupply(db *database.Db, flowClient client.Proxy) error {
 
 	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
 	if err != nil {
-		return fmt.Errorf("Error on getting token supply:%s", err)
+		return 0,fmt.Errorf("Error on getting token supply:%s", err)
 	}
 
 	supply, err := utils.CadenceConvertUint64(value)
 	if err != nil {
-		return fmt.Errorf("Error on getting token supply:%s", err)
+		return 0,fmt.Errorf("Error on getting token supply:%s", err)
 	}
 
-	return db.SaveSupply(supply, uint64(height))
+	return supply,err
+
+	
 
 }
