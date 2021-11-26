@@ -8,10 +8,6 @@ import (
 
 	"github.com/forbole/flowJuno/modules/staking/stakingutils"
 
-	"github.com/forbole/flowJuno/types"
-
-	"github.com/onflow/flow-go-sdk"
-
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/modules/utils"
 
@@ -33,22 +29,33 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 
 func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	block, err := flowClient.Client().GetLatestBlock(flowClient.Ctx(), false)
-	if err != nil {
-		return err
+	height:=int64(block.Height)
+	if err!=nil{
+		return fmt.Errorf("fail to handle staking:%s",err)
 	}
 
 	addresses, err := db.GetAddresses()
-	if err != nil {
-		return err
+	if err!=nil{
+		return fmt.Errorf("fail to handle staking:%s",err)
 	}
-	_, err = stakingutils.GetTable(block, db, flowClient)
-	if err != nil {
-		return err
+	table, err := stakingutils.GetTable(int64(height), flowClient)
+	if err!=nil{
+		return fmt.Errorf("fail to handle staking:%s",err)
 	}
 
-	nodeInfo, err := stakingutils.GetNodeInfosFromTable(block, db, flowClient)
-	if err != nil {
-		return err
+	err=db.SaveStakingTable(*table)
+	if err!=nil{
+		return fmt.Errorf("fail to handle staking:%s",err)
+	}
+
+	nodeInfo, err := stakingutils.GetNodeInfosFromTable(height, flowClient)
+	if err!=nil{
+		return fmt.Errorf("fail to handle staking:%s",err)
+	}
+
+	err=db.SaveNodeInfosFromTable(nodeInfo,block.Height)
+	if err!=nil{
+		return fmt.Errorf("fail to handle staking:%s",err)
 	}
 
 	if len(addresses) != 0 {
@@ -58,7 +65,7 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 		}
 	}
 
-	err = stakingutils.GetDataWithNoArgs(block, db, int64(block.Height), flowClient)
+	err = stakingutils.GetDataWithNoArgs( db, height, flowClient)
 	if err != nil {
 		return err
 	}
