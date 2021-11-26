@@ -52,7 +52,7 @@ func (suite *StakingProxyTestSuite) TestStakingProxy_getStakeRequirements() {
 	suite.Require().Len(table,5)
 	for i,t:=range table{
 		suite.Require().Equal(int64(1),t.Height)
-		suite.Require().Equal(int8(i+1),t.Role)
+		suite.Require().Equal(uint8(i+1),t.Role)
 	}
 }
 
