@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/forbole/flowJuno/client"
@@ -41,14 +40,14 @@ func GetDelegatorAccounts(addresses []string, height int64, client client.Proxy)
 			return nil, err
 		}
 
-		delegatorAccount = append(delegatorAccount, types.NewDelegatorAccount(address, delegatorId, delegatorNodeId))
+		delegatorAccount = append(delegatorAccount, types.NewDelegatorAccount(address, int64(delegatorId), delegatorNodeId))
 
 	}
 	return delegatorAccount, nil
 }
 
 // getDelegatorID return the delegator who staked in a locked account
-func getDelegatorID(address string, height int64, client client.Proxy) (int64, error) {
+func getDelegatorID(address string, height int64, client client.Proxy) (uint32, error) {
 	script := fmt.Sprintf(`
 	import LockedTokens from %s
 
@@ -75,8 +74,8 @@ func getDelegatorID(address string, height int64, client client.Proxy) (int64, e
 		return 0, err
 	}
 
-	fmt.Println("Locked Account" + value.String())
-	id, err := strconv.ParseInt(value.String(), 10, 32)
+	
+	id, err := utils.CadenceConvertUint32(value)
 	if err != nil {
 		return 0, err
 	}
