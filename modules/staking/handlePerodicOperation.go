@@ -41,12 +41,12 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	if err != nil {
 		return err
 	}
-	_, err = getTable(block, db, flowClient)
+	_, err = stakingutils.GetTable(block, db, flowClient)
 	if err != nil {
 		return err
 	}
 
-	nodeInfo, err := getNodeInfosFromTable(block, db, flowClient)
+	nodeInfo, err := stakingutils.GetNodeInfosFromTable(block, db, flowClient)
 	if err != nil {
 		return err
 	}
@@ -74,70 +74,4 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	}
 
 	return nil
-}
-
-func getTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]string, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
-		Msg("updating get Staked Node id per block")
-
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(): [String] {
-	  return FlowIDTableStaking.getNodeIDs()
-  }`, flowClient.Contract().StakingTable)
-
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	table, err := utils.CadenceConvertStringArray(value)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(table) == 0 {
-		return nil, nil
-	}
-
-	return table, db.SaveStakingTable(types.NewStakingTable(int64(block.Height), table))
-
-}
-
-func getNodeInfosFromTable(block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.StakerNodeInfo, error) {
-
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(): [FlowIDTableStaking.NodeInfo] {
-		var nodeIds=FlowIDTableStaking.getNodeIDs()
-		let nodeInfoArray: [FlowIDTableStaking.NodeInfo] = []
-		for node in nodeIds{
-			nodeInfoArray.append(FlowIDTableStaking.NodeInfo(nodeID: node))
-		}
-		return nodeInfoArray
-    }`, flowClient.Contract().StakingTable)
-
-	value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	stakingKeys, err := types.NewStakerNodeInfoArrayFromCadence(value)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(stakingKeys) == 0 {
-		return nil, nil
-	}
-
-	return stakingKeys, db.SaveNodeInfosFromTable(stakingKeys, block.Height)
-}
-
-func getAddressesFromAccounts(accounts []types.Account) []string {
-	addresses := make([]string, len(accounts))
-	for i, account := range accounts {
-		addresses[i] = account.Address
-	}
-	return addresses
 }
