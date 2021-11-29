@@ -63,7 +63,7 @@ func (suite *DbTestSuite) TestSaveConsensus_GetBlockHeightTimeDayAgo() {
 
 func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 	// Save the data
-	err := suite.database.SaveAverageBlockTimePerMin(5.05, 10)
+	err := suite.database.SaveAverageBlockTimePerMin(types.NewBlockTime( 10,5.05))
 	suite.Require().NoError(err)
 
 	original := dbtypes.NewAverageTimeRow(5.05, 10)
@@ -78,7 +78,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a lower height
-	err = suite.database.SaveAverageBlockTimePerMin(6, 9)
+	err = suite.database.SaveAverageBlockTimePerMin(types.NewBlockTime( 9,6))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -91,7 +91,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with the same height
-	err = suite.database.SaveAverageBlockTimePerMin(10, 10)
+	err = suite.database.SaveAverageBlockTimePerMin(types.NewBlockTime( 10,10))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -106,7 +106,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a higher height
-	err = suite.database.SaveAverageBlockTimePerMin(20, 15)
+	err = suite.database.SaveAverageBlockTimePerMin(types.NewBlockTime( 15,20))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -121,7 +121,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 
 func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 	// Save the data
-	err := suite.database.SaveAverageBlockTimePerHour(5.05, 10)
+	err := suite.database.SaveAverageBlockTimePerHour(types.NewBlockTime( 10,5.05))
 	suite.Require().NoError(err)
 
 	original := dbtypes.NewAverageTimeRow(5.05, 10)
@@ -136,7 +136,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a lower height
-	err = suite.database.SaveAverageBlockTimePerHour(6, 9)
+	err = suite.database.SaveAverageBlockTimePerHour(types.NewBlockTime( 9,6))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -149,7 +149,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with the same height
-	err = suite.database.SaveAverageBlockTimePerHour(10, 10)
+	err = suite.database.SaveAverageBlockTimePerHour(types.NewBlockTime( 10,10))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -164,7 +164,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a higher height
-	err = suite.database.SaveAverageBlockTimePerHour(20, 15)
+	err = suite.database.SaveAverageBlockTimePerHour(types.NewBlockTime( 15,20))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -179,7 +179,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 
 func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 	// Save the data
-	err := suite.database.SaveAverageBlockTimePerDay(5.05, 10)
+	err := suite.database.SaveAverageBlockTimePerDay(types.NewBlockTime( 10,5.05))
 	suite.Require().NoError(err)
 
 	original := dbtypes.NewAverageTimeRow(5.05, 10)
@@ -194,7 +194,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a lower height
-	err = suite.database.SaveAverageBlockTimePerDay(6, 9)
+	err = suite.database.SaveAverageBlockTimePerDay(types.NewBlockTime( 9,6))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -207,7 +207,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with the same height
-	err = suite.database.SaveAverageBlockTimePerDay(10, 10)
+	err = suite.database.SaveAverageBlockTimePerDay(types.NewBlockTime( 10,10))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -222,7 +222,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a higher height
-	err = suite.database.SaveAverageBlockTimePerDay(20, 15)
+	err = suite.database.SaveAverageBlockTimePerDay(types.NewBlockTime( 15,20))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -237,7 +237,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 
 func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimeGenesis() {
 	// Save the data
-	err := suite.database.SaveAverageBlockTimeGenesis(5.05, 10)
+	err := suite.database.SaveAverageBlockTimeGenesis(types.NewBlockTime( 10,5.05))
 	suite.Require().NoError(err)
 
 	original := dbtypes.NewAverageTimeRow(5.05, 10)
@@ -252,7 +252,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimeGenesis() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a lower height
-	err = suite.database.SaveAverageBlockTimeGenesis(6, 9)
+	err = suite.database.SaveAverageBlockTimeGenesis(types.NewBlockTime( 9,6))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -265,7 +265,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimeGenesis() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with the same height
-	err = suite.database.SaveAverageBlockTimeGenesis(10, 10)
+	err = suite.database.SaveAverageBlockTimeGenesis(types.NewBlockTime( 10,10))
 	suite.Require().NoError(err)
 
 	// Verify the data
@@ -280,7 +280,7 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimeGenesis() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a higher height
-	err = suite.database.SaveAverageBlockTimeGenesis(20, 15)
+	err = suite.database.SaveAverageBlockTimeGenesis(types.NewBlockTime( 15,20))
 	suite.Require().NoError(err)
 
 	// Verify the data

@@ -78,7 +78,7 @@ func (db *Db) GetBlockHeightTimeDayAgo(now time.Time) (dbtypes.BlockRow, error) 
 // -------------------------------------------------------------------------------------------------------------------
 
 // SaveAverageBlockTimePerMin save the average block time in average_block_time_per_minute table
-func (db *Db) SaveAverageBlockTimePerMin(averageTime float64, height int64) error {
+func (db *Db) SaveAverageBlockTimePerMin(blocktime types.BlockTime) error {
 	stmt := `
 INSERT INTO average_block_time_per_minute(average_time, height) 
 VALUES ($1, $2) 
@@ -87,12 +87,12 @@ ON CONFLICT (one_row_id) DO UPDATE
         height = excluded.height
 WHERE average_block_time_per_minute.height <= excluded.height`
 
-	_, err := db.Sqlx.Exec(stmt, averageTime, height)
+	_, err := db.Sqlx.Exec(stmt, blocktime.BlockTime, blocktime.Height)
 	return err
 }
 
 // SaveAverageBlockTimePerHour save the average block time in average_block_time_per_hour table
-func (db *Db) SaveAverageBlockTimePerHour(averageTime float64, height int64) error {
+func (db *Db) SaveAverageBlockTimePerHour(blocktime types.BlockTime) error {
 	stmt := `
 INSERT INTO average_block_time_per_hour(average_time, height) 
 VALUES ($1, $2) 
@@ -101,12 +101,12 @@ ON CONFLICT (one_row_id) DO UPDATE
         height = excluded.height
 WHERE average_block_time_per_hour.height <= excluded.height`
 
-	_, err := db.Sqlx.Exec(stmt, averageTime, height)
+	_, err := db.Sqlx.Exec(stmt, blocktime.BlockTime, blocktime.Height)
 	return err
 }
 
 // SaveAverageBlockTimePerDay save the average block time in average_block_time_per_day table
-func (db *Db) SaveAverageBlockTimePerDay(averageTime float64, height int64) error {
+func (db *Db) SaveAverageBlockTimePerDay(blocktime types.BlockTime) error {
 	stmt := `
 INSERT INTO average_block_time_per_day(average_time, height) 
 VALUES ($1, $2)
@@ -115,12 +115,12 @@ ON CONFLICT (one_row_id) DO UPDATE
         height = excluded.height
 WHERE average_block_time_per_day.height <= excluded.height`
 
-	_, err := db.Sqlx.Exec(stmt, averageTime, height)
+	_, err := db.Sqlx.Exec(stmt, blocktime.BlockTime, blocktime.Height)
 	return err
 }
 
 // SaveAverageBlockTimeGenesis save the average block time in average_block_time_from_genesis table
-func (db *Db) SaveAverageBlockTimeGenesis(averageTime float64, height int64) error {
+func (db *Db) SaveAverageBlockTimeGenesis(blocktime types.BlockTime) error {
 	stmt := `
 INSERT INTO average_block_time_from_genesis(average_time ,height) 
 VALUES ($1, $2) 
@@ -129,7 +129,7 @@ ON CONFLICT (one_row_id) DO UPDATE
         height = excluded.height
 WHERE average_block_time_from_genesis.height <= excluded.height`
 
-	_, err := db.Sqlx.Exec(stmt, averageTime, height)
+	_, err := db.Sqlx.Exec(stmt, blocktime.BlockTime, blocktime.Height)
 	return err
 }
 

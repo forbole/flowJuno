@@ -1,10 +1,13 @@
 package consensus
 
 import (
+	"fmt"
+
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 
 	database "github.com/forbole/flowJuno/db/postgresql"
+	consutils "github.com/forbole/flowJuno/modules/consensus/utils"
 	"github.com/forbole/flowJuno/modules/utils"
 )
 
@@ -38,28 +41,12 @@ func updateBlockTimeInMinute(db *database.Db) error {
 	log.Trace().Str("module", "consensus").Str("operation", "block time").
 		Msg("updating block time in minutes")
 
-	block, err := db.GetLastBlock()
-	if err != nil {
-		return err
-	}
+		newBlockTime,err:=consutils.GetBlockTimeInMinute(db)
+		if err!=nil{
+			return fmt.Errorf("Fail to update block time:%s",err)
+		}
 
-	genesis, err := db.GetGenesis()
-	if err != nil {
-		return err
-	}
-
-	// Check if the chain has been created at least a minute ago
-	if block.Timestamp.Sub(genesis.Time).Minutes() < 0 {
-		return nil
-	}
-
-	minute, err := db.GetBlockHeightTimeMinuteAgo(block.Timestamp)
-	if err != nil {
-		return err
-	}
-	newBlockTime := block.Timestamp.Sub(minute.Timestamp).Seconds() / float64(block.Height-minute.Height)
-
-	return db.SaveAverageBlockTimePerMin(newBlockTime, block.Height)
+	return db.SaveAverageBlockTimePerMin(*newBlockTime)
 }
 
 // updateBlockTimeInHour insert average block time in the latest hour
@@ -67,28 +54,12 @@ func updateBlockTimeInHour(db *database.Db) error {
 	log.Trace().Str("module", "consensus").Str("operation", "block time").
 		Msg("updating block time in hours")
 
-	block, err := db.GetLastBlock()
-	if err != nil {
+	blocktime,err:=consutils.GetBlockTimeInHour(db)
+	if err!=nil{
 		return err
 	}
 
-	genesis, err := db.GetGenesis()
-	if err != nil {
-		return err
-	}
-
-	// Check if the chain has been created at least an hour ago
-	if block.Timestamp.Sub(genesis.Time).Hours() < 0 {
-		return nil
-	}
-
-	hour, err := db.GetBlockHeightTimeHourAgo(block.Timestamp)
-	if err != nil {
-		return err
-	}
-	newBlockTime := block.Timestamp.Sub(hour.Timestamp).Seconds() / float64(block.Height-hour.Height)
-
-	return db.SaveAverageBlockTimePerHour(newBlockTime, block.Height)
+	return db.SaveAverageBlockTimePerHour(*blocktime)
 }
 
 // updateBlockTimeInDay insert average block time in the latest minute
@@ -96,26 +67,9 @@ func updateBlockTimeInDay(db *database.Db) error {
 	log.Trace().Str("module", "consensus").Str("operation", "block time").
 		Msg("updating block time in days")
 
-	block, err := db.GetLastBlock()
-	if err != nil {
+	blocktime,err:=consutils.GetBlockTimeInDays(db)
+	if err!=nil{
 		return err
 	}
-
-	genesis, err := db.GetGenesis()
-	if err != nil {
-		return err
-	}
-
-	// Check if the chain has been created at least a days ago
-	if block.Timestamp.Sub(genesis.Time).Hours() < 24 {
-		return nil
-	}
-
-	day, err := db.GetBlockHeightTimeDayAgo(block.Timestamp)
-	if err != nil {
-		return err
-	}
-	newBlockTime := block.Timestamp.Sub(day.Timestamp).Seconds() / float64(block.Height-day.Height)
-
-	return db.SaveAverageBlockTimePerDay(newBlockTime, block.Height)
+	return db.SaveAverageBlockTimePerDay(*blocktime)
 }

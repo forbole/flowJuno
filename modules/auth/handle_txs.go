@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/types"

@@ -9,6 +9,8 @@ import (
 	"github.com/forbole/flowJuno/client"
 	database "github.com/forbole/flowJuno/db/postgresql"
 	db "github.com/forbole/flowJuno/db/postgresql"
+	consutils "github.com/forbole/flowJuno/modules/consensus/utils"
+
 )
 
 func HandleBlock(block *flow.Block, _ messages.MessageAddressesParser, db *db.Db, height int64, flowClient client.Proxy) error {
@@ -26,11 +28,10 @@ func updateBlockTimeFromGenesis(block *flow.Block, db *database.Db) error {
 	log.Trace().Str("module", "consensus").Int64("height", int64(block.Height)).
 		Msg("updating block time from genesis")
 
-	genesis, err := db.GetGenesis()
-	if err != nil {
+	blocktime,err:=consutils.GetGenesisBlockTime(db,*block)
+	if err!=nil{
 		return err
 	}
 
-	newBlockTime := block.Timestamp.Sub(genesis.Time).Seconds() / float64(int64(block.Height)-genesis.InitialHeight)
-	return db.SaveAverageBlockTimeGenesis(newBlockTime, int64(block.Height))
+	return db.SaveAverageBlockTimeGenesis(*blocktime)
 }
