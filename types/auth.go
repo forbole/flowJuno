@@ -157,6 +157,17 @@ type DelegatorNodeInfo struct {
 	TokensRequestedToUnstake uint64
 }
 
+func (v DelegatorNodeInfo) Equal(w DelegatorNodeInfo) bool {
+	return (v.Id == w.Id &&
+		v.NodeID == w.NodeID &&
+		v.TokensCommitted == w.TokensCommitted &&
+		v.TokensStaked == w.TokensStaked &&
+		v.TokensUnstaking == w.TokensUnstaking &&
+		v.TokensRewarded == w.TokensRewarded &&
+		v.TokensUnstaked == w.TokensUnstaked &&
+		v.TokensRequestedToUnstake == w.TokensRequestedToUnstake)
+}
+
 func NewDelegatorNodeInfo(id uint32,
 	nodeID string,
 	tokensCommitted uint64,

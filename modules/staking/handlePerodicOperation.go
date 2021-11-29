@@ -29,33 +29,33 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 
 func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 	block, err := flowClient.Client().GetLatestBlock(flowClient.Ctx(), false)
-	height:=int64(block.Height)
-	if err!=nil{
-		return fmt.Errorf("fail to handle staking:%s",err)
+	height := int64(block.Height)
+	if err != nil {
+		return fmt.Errorf("fail to handle staking:%s", err)
 	}
 
 	addresses, err := db.GetAddresses()
-	if err!=nil{
-		return fmt.Errorf("fail to handle staking:%s",err)
+	if err != nil {
+		return fmt.Errorf("fail to handle staking:%s", err)
 	}
 	table, err := stakingutils.GetTable(int64(height), flowClient)
-	if err!=nil{
-		return fmt.Errorf("fail to handle staking:%s",err)
+	if err != nil {
+		return fmt.Errorf("fail to handle staking:%s", err)
 	}
 
-	err=db.SaveStakingTable(*table)
-	if err!=nil{
-		return fmt.Errorf("fail to handle staking:%s",err)
+	err = db.SaveStakingTable(*table)
+	if err != nil {
+		return fmt.Errorf("fail to handle staking:%s", err)
 	}
 
 	nodeInfo, err := stakingutils.GetNodeInfosFromTable(height, flowClient)
-	if err!=nil{
-		return fmt.Errorf("fail to handle staking:%s",err)
+	if err != nil {
+		return fmt.Errorf("fail to handle staking:%s", err)
 	}
 
-	err=db.SaveNodeInfosFromTable(nodeInfo,block.Height)
-	if err!=nil{
-		return fmt.Errorf("fail to handle staking:%s",err)
+	err = db.SaveNodeInfosFromTable(nodeInfo, block.Height)
+	if err != nil {
+		return fmt.Errorf("fail to handle staking:%s", err)
 	}
 
 	if len(addresses) != 0 {
@@ -65,17 +65,17 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 		}
 	}
 
-	err = stakingutils.GetDataWithNoArgs( db, height, flowClient)
+	err = stakingutils.GetDataWithNoArgs(db, height, flowClient)
 	if err != nil {
 		return err
 	}
 
-	err = stakingutils.GetDataFromNodeID(nodeInfo, block, db, flowClient)
+	err = stakingutils.GetDataFromNodeID(nodeInfo, height, db, flowClient)
 	if err != nil {
 		return err
 	}
 
-	err = stakingutils.GetDataFromNodeDelegatorID(nodeInfo, block, db, flowClient)
+	err = stakingutils.GetDataFromNodeDelegatorID(nodeInfo, height, db, flowClient)
 	if err != nil {
 		return err
 	}

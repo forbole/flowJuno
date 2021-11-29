@@ -8,20 +8,32 @@ import (
 	"github.com/forbole/flowJuno/modules/utils"
 	"github.com/forbole/flowJuno/types"
 	"github.com/onflow/cadence"
-	"github.com/onflow/flow-go-sdk"
 
 	"github.com/forbole/flowJuno/client"
 
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
+func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, height int64, db *database.Db, flowClient client.Proxy) error {
 
 	for _, node := range nodeInfo {
 
-		_, err := getDelegatorInfo(node, block, db, flowClient)
+		delegatorNodeInfoArray, err := getDelegatorInfo(node, height, flowClient)
 		if err != nil {
 			return err
+		}
+
+		splittedDelegatorInfos := utils.SplitDelegatorNodeInfo(delegatorNodeInfoArray, 9)
+
+		for _, arr := range splittedDelegatorInfos {
+			fmt.Println(len(arr))
+			if len(arr) == 0 {
+				continue
+			}
+			err := db.SaveDelegatorInfo(arr, uint64(height))
+			if err != nil {
+				return fmt.Errorf("failed to save delegator info to db:%s", err)
+			}
 		}
 
 	}
@@ -29,8 +41,8 @@ func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, block *flow.Blo
 	return nil
 }
 
-func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) ([]types.DelegatorNodeInfo, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+func getDelegatorInfo(nodeInfo types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.DelegatorNodeInfo, error) {
+	log.Trace().Str("module", "staking").Int64("height", int64(height)).
 		Msg("updating node unstaking tokens")
 
 	if nodeInfo.DelegatorIDCounter == 0 {
@@ -79,17 +91,5 @@ func getDelegatorInfo(nodeInfo types.StakerNodeInfo, block *flow.Block, db *data
 
 	}
 
-	splittedDelegatorInfos := utils.SplitDelegatorNodeInfo(delegatorInfoArray, 9)
-
-	for _, arr := range splittedDelegatorInfos {
-		fmt.Println(len(arr))
-		if len(arr) == 0 {
-			continue
-		}
-		err := db.SaveDelegatorInfo(arr, block.Height)
-		if err != nil {
-			return nil, err
-		}
-	}
 	return delegatorInfoArray, nil
 }

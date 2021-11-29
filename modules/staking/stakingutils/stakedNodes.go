@@ -16,18 +16,27 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
-func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, height int64, db *database.Db, flowClient client.Proxy) error {
+	log.Trace().Str("module", "staking").Int64("height", int64(height)).
 		Msg("getting staked node infos")
 
-	err := getNodeTotalCommitment(nodeInfofromNodeId, block, db, flowClient)
+	totalCommitment, err := getNodeTotalCommitment(nodeInfofromNodeId, height, flowClient)
 	if err != nil {
-		return err
+		return fmt.Errorf("fail to get data from nodeID:%s", err)
 	}
 
-	err = getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, block, db, flowClient)
+	err = db.SaveNodeTotalCommitment(totalCommitment)
 	if err != nil {
-		return err
+		return fmt.Errorf("fail to get data from nodeID:%s", err)
+	}
+
+	totalCommitmentNoDelegators, err := getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, height, db, flowClient)
+	if err != nil {
+		return fmt.Errorf("fail to get data from nodeID:%s", err)
+	}
+	err = db.SaveNodeTotalCommitmentWithoutDelegators(totalCommitmentNoDelegators)
+	if err != nil {
+		return fmt.Errorf("fail to get data from nodeID:%s", err)
 	}
 
 	return nil
@@ -49,8 +58,8 @@ func getNodeUnstakingTokens(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 	return db.SaveNodeUnstakingTokens(totalStakeArr)
 }
 
-func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitment, error) {
+	log.Trace().Str("module", "staking").Int64("height", int64(height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
@@ -67,33 +76,33 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 			// When validator exist 10000, cadence exceed computation limit. It need to calculate in raw
 			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
 				fmt.Println(id.Id)
-				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, block, db, flowClient)
+				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, flowClient, height)
 				if err != nil {
-					return err
+					return nil, err
 				}
 				totalStakeArr[i] = *nodeTotalCommitment
 				continue
 			}
-			return err
+			return nil, err
 		}
 
 		totalCommit, err := utils.CadenceConvertUint64(value)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		totalStakeArr[i] = types.NewNodeTotalCommitment(id.Id, totalCommit, int64(block.Height))
+		totalStakeArr[i] = types.NewNodeTotalCommitment(id.Id, totalCommit, height)
 	}
 
 	if len(totalStakeArr) == 0 {
-		return nil
+		return nil, nil
 	}
 
-	return db.SaveNodeTotalCommitment(totalStakeArr)
+	return totalStakeArr, nil
 }
 
 // getNodeTotalCommitmentRaw add up all delegator's delegatorFullCommittedBalance in a node
-func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) (*types.NodeTotalCommitment, error) {
+func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, flowClient client.Proxy, height int64) (*types.NodeTotalCommitment, error) {
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(node:String,begin:UInt32,end:UInt32): UFix64{
@@ -146,13 +155,13 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, block *flow.Block,
 		totalCommit += val
 
 	}
-	nodeTotalCommitment := types.NewNodeTotalCommitment(nodeInfo.Id, totalCommit, int64(block.Height))
+	nodeTotalCommitment := types.NewNodeTotalCommitment(nodeInfo.Id, totalCommit, height)
 
 	return &nodeTotalCommitment, nil
 }
 
-func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
+func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, height int64, db *database.Db, flowClient client.Proxy) ([]types.NodeTotalCommitmentWithoutDelegators, error) {
+	log.Trace().Str("module", "staking").Int64("height", int64(height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
@@ -166,20 +175,20 @@ func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, b
 		nodeId := []cadence.Value{cadence.NewString(id.Id)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		tokensUnstaking, err := utils.CadenceConvertUint64(value)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		totalStakeArr[i] = types.NewNodeTotalCommitmentWithoutDelegators(id.Id, tokensUnstaking, int64(block.Height))
+		totalStakeArr[i] = types.NewNodeTotalCommitmentWithoutDelegators(id.Id, tokensUnstaking, height)
 	}
 
 	if len(totalStakeArr) == 0 {
-		return nil
+		return nil, nil
 	}
 
-	return db.SaveNodeTotalCommitmentWithoutDelegators(totalStakeArr)
+	return totalStakeArr, nil
 }

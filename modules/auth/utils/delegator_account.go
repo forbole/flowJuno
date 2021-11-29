@@ -74,7 +74,6 @@ func getDelegatorID(address string, height int64, client client.Proxy) (uint32, 
 		return 0, err
 	}
 
-	
 	id, err := utils.CadenceConvertUint32(value)
 	if err != nil {
 		return 0, err
