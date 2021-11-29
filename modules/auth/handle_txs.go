@@ -13,12 +13,16 @@ import (
 )
 
 // HandleEvent handles any message updating the involved accounts
-func HandleTxs(getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, height int64, flowClient client.Proxy, tx *types.Tx) error {
+func HandleTxs(getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, flowClient client.Proxy, tx *types.Tx) error {
+	height,err:=flowClient.LatestHeight()
+	if err!=nil{
+		return err
+	}
+
 	addresses, err := getAddresses(cdc, *tx)
 	if err != nil {
 		return err
 	}
-	fmt.Println("HandleEvent")
 
 	return authutils.UpdateAccounts(addresses, db, height, flowClient)
 

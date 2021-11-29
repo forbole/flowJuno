@@ -45,7 +45,7 @@ func (m *Module) Name() string {
 
 // HandleEvent implements modules.MessageModule
 func (m *Module) HandleTx(index int, tx *types.Tx) error {
-	return HandleTxs(m.messagesParser, m.encodingConfig.Marshaler, m.db, int64(tx.Height), m.flowClient, tx)
+	return HandleTxs(m.messagesParser, m.encodingConfig.Marshaler, m.db, m.flowClient, tx)
 }
 
 // RegisterPeriodicOperations implements modules.Module
