@@ -30,7 +30,7 @@ func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, height int64, 
 		return fmt.Errorf("fail to get data from nodeID:%s", err)
 	}
 
-	totalCommitmentNoDelegators, err := getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, height, db, flowClient)
+	totalCommitmentNoDelegators, err := getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, height, flowClient)
 	if err != nil {
 		return fmt.Errorf("fail to get data from nodeID:%s", err)
 	}
@@ -76,7 +76,7 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 			// When validator exist 10000, cadence exceed computation limit. It need to calculate in raw
 			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
 				fmt.Println(id.Id)
-				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, flowClient, height)
+				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, height,flowClient)
 				if err != nil {
 					return nil, err
 				}
@@ -102,7 +102,7 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 }
 
 // getNodeTotalCommitmentRaw add up all delegator's delegatorFullCommittedBalance in a node
-func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, flowClient client.Proxy, height int64) (*types.NodeTotalCommitment, error) {
+func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64,flowClient client.Proxy) (*types.NodeTotalCommitment, error) {
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(node:String,begin:UInt32,end:UInt32): UFix64{
@@ -160,7 +160,7 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, flowClient client.
 	return &nodeTotalCommitment, nil
 }
 
-func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, height int64, db *database.Db, flowClient client.Proxy) ([]types.NodeTotalCommitmentWithoutDelegators, error) {
+func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitmentWithoutDelegators, error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(height)).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
