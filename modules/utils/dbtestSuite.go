@@ -1,8 +1,6 @@
 package utils
 
 import (
-	database "github.com/forbole/flowJuno/db/postgresql"
-
 	"io/ioutil"
 	"path"
 	"path/filepath"
@@ -11,11 +9,10 @@ import (
 	"testing"
 	"time"
 
-	_ "github.com/proullon/ramsql/driver"
-
 	"github.com/forbole/flowJuno/types/config"
 	"github.com/onflow/flow-go-sdk"
 
+	database "github.com/forbole/flowJuno/db/postgresql"
 	"github.com/forbole/flowJuno/types"
 
 	juno "github.com/desmos-labs/juno/types"
@@ -65,31 +62,31 @@ func (suite *DbProxyTestSuite) SetupTest() {
 	bigDipperDb, ok := (db).(*database.Db)
 	suite.Require().True(ok)
 
-	// Delete the public schema
-	_, err = bigDipperDb.Sql.Exec(`DROP SCHEMA public CASCADE;`)
+ //Delete the public schema
+_, err = bigDipperDb.Sql.Exec(`DROP SCHEMA public CASCADE;`)
+suite.Require().NoError(err)
+// Re-create the schema
+_, err = bigDipperDb.Sql.Exec(`CREATE SCHEMA public;`)
+suite.Require().NoError(err)
+dirPath := path.Join(".","..","..","..","db","postgresql","schema")
+dir, err := ioutil.ReadDir(dirPath)
+suite.Require().NoError(err)
+
+for _, fileInfo := range dir {
+	file, err := ioutil.ReadFile(filepath.Join(dirPath, fileInfo.Name()))
 	suite.Require().NoError(err)
 
-	// Re-create the schema
-	_, err = bigDipperDb.Sql.Exec(`CREATE SCHEMA public;`)
-	suite.Require().NoError(err)
-
-	dirPath := path.Join(".", "schema")
-	dir, err := ioutil.ReadDir(dirPath)
-	suite.Require().NoError(err)
-
-	for _, fileInfo := range dir {
-		file, err := ioutil.ReadFile(filepath.Join(dirPath, fileInfo.Name()))
+	commentsRegExp := regexp.MustCompile(`/\*.*\*/`)
+	requests := strings.Split(string(file), ";")
+	for _, request := range requests {
+		
+		_, err := bigDipperDb.Sql.Exec(commentsRegExp.ReplaceAllString(request, ""))
 		suite.Require().NoError(err)
-
-		commentsRegExp := regexp.MustCompile(`/\*.*\*/`)
-		requests := strings.Split(string(file), ";")
-		for _, request := range requests {
-			_, err := bigDipperDb.Sql.Exec(commentsRegExp.ReplaceAllString(request, ""))
-			suite.Require().NoError(err)
-		}
 	}
+} 
+	
 
-	suite.database = bigDipperDb
+	suite.Database = bigDipperDb
 }
 
 // getBlock builds, stores and returns a block for the provided height
@@ -116,7 +113,7 @@ func (suite *DbProxyTestSuite) getBlock(height int64) *flow.Block {
 			},
 		},
 	}
-	err := suite.database.SaveBlock(&block)
+	err := suite.Database.SaveBlock(&block)
 	suite.Require().NoError(err)
 	return &block
 }
