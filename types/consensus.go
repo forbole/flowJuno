@@ -25,22 +25,23 @@ func (g *Genesis) Equal(other *Genesis) bool {
 		g.ChainId == other.ChainId
 }
 
-type BlockTime struct { 
-	Height int64
+type BlockTime struct {
+	Height    int64
 	BlockTime float64
-  }
-  
-  // Equal tells whether v and w represent the same rows
-  func (v BlockTime) Equal(w BlockTime)bool{
-	return v.Height==w.Height && 
-  v.BlockTime==w.BlockTime }
-  
-   // BlockTime allows to build a new BlockTime
-  func NewBlockTime( 
+}
+
+// Equal tells whether v and w represent the same rows
+func (v BlockTime) Equal(w BlockTime) bool {
+	return v.Height == w.Height &&
+		v.BlockTime == w.BlockTime
+}
+
+// BlockTime allows to build a new BlockTime
+func NewBlockTime(
 	height int64,
-	blockTime float64) BlockTime{
-   return BlockTime{
-   Height:height,
-   BlockTime:blockTime,
-  }
-  }
+	blockTime float64) BlockTime {
+	return BlockTime{
+		Height:    height,
+		BlockTime: blockTime,
+	}
+}

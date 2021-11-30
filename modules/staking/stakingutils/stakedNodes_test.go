@@ -51,8 +51,8 @@ func (suite *StakingProxyTestSuite) TestStakingProxy_getNodeTotalCommitmentWitho
 		"ada64f100d7f02d56a4f195ff7c844456178130c841ee79022d3d29705a76916ed323ed6b1a758d77ef68c32a816c65316084a6859bc645166c12e78cdf321ac52010afdf24573a3988ae6f050557bb2a16d3d9573ec8ea4175862b205ec3db9",
 		333448072243, 0, 0, 0, 46886804123689, delegator, 2, 0, 100)
 	nodeInfoArray := []types.StakerNodeInfo{
-			nodeInfo,
-		}
+		nodeInfo,
+	}
 	commitment, err := getNodeTotalCommitmentWithoutDelegators(nodeInfoArray, 1, proxy)
 	suite.Require().NoError(err)
 

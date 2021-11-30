@@ -12,8 +12,8 @@ import (
 
 // HandleEvent handles any message updating the involved accounts
 func HandleTxs(getAddresses messages.MessageAddressesParser, cdc codec.Marshaler, db *db.Db, flowClient client.Proxy, tx *types.Tx) error {
-	height,err:=flowClient.LatestHeight()
-	if err!=nil{
+	height, err := flowClient.LatestHeight()
+	if err != nil {
 		return err
 	}
 

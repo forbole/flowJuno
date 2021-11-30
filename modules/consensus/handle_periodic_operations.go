@@ -41,10 +41,10 @@ func updateBlockTimeInMinute(db *database.Db) error {
 	log.Trace().Str("module", "consensus").Str("operation", "block time").
 		Msg("updating block time in minutes")
 
-		newBlockTime,err:=consutils.GetBlockTimeInMinute(db)
-		if err!=nil{
-			return fmt.Errorf("Fail to update block time:%s",err)
-		}
+	newBlockTime, err := consutils.GetBlockTimeInMinute(db)
+	if err != nil {
+		return fmt.Errorf("Fail to update block time:%s", err)
+	}
 
 	return db.SaveAverageBlockTimePerMin(*newBlockTime)
 }
@@ -54,8 +54,8 @@ func updateBlockTimeInHour(db *database.Db) error {
 	log.Trace().Str("module", "consensus").Str("operation", "block time").
 		Msg("updating block time in hours")
 
-	blocktime,err:=consutils.GetBlockTimeInHour(db)
-	if err!=nil{
+	blocktime, err := consutils.GetBlockTimeInHour(db)
+	if err != nil {
 		return err
 	}
 
@@ -67,8 +67,8 @@ func updateBlockTimeInDay(db *database.Db) error {
 	log.Trace().Str("module", "consensus").Str("operation", "block time").
 		Msg("updating block time in days")
 
-	blocktime,err:=consutils.GetBlockTimeInDays(db)
-	if err!=nil{
+	blocktime, err := consutils.GetBlockTimeInDays(db)
+	if err != nil {
 		return err
 	}
 	return db.SaveAverageBlockTimePerDay(*blocktime)

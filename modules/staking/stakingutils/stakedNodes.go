@@ -76,7 +76,7 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 			// When validator exist 10000, cadence exceed computation limit. It need to calculate in raw
 			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
 				fmt.Println(id.Id)
-				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, height,flowClient)
+				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, height, flowClient)
 				if err != nil {
 					return nil, err
 				}
@@ -102,7 +102,7 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 }
 
 // getNodeTotalCommitmentRaw add up all delegator's delegatorFullCommittedBalance in a node
-func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64,flowClient client.Proxy) (*types.NodeTotalCommitment, error) {
+func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64, flowClient client.Proxy) (*types.NodeTotalCommitment, error) {
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(node:String,begin:UInt32,end:UInt32): UFix64{
