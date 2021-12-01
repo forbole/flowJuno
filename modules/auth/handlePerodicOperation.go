@@ -14,14 +14,14 @@ import (
 
 func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClient client.Proxy) error {
 	log.Debug().Str("module", "staking").Msg("setting up periodic tasks")
-/* 
+
 	if _, err := scheduler.Every(1).Week().Tuesday().At("15:00").StartImmediately().Do(func() {
 		utils.WatchMethod(func() error { return HandleAccounts(db, flowClient) })
 	}); err != nil {
 		return err
 	}
 
-	return HandleAccounts(db, flowClient) */
+	return HandleAccounts(db, flowClient) 
 }
 
 func HandleAccounts(db *db.Db, flowClient client.Proxy) error {
