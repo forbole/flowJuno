@@ -8,6 +8,7 @@ type Contracts struct {
 	LockedTokens     string
 	NonFungibleToken string
 	StakingProxy     string
+	ChainID string
 }
 
 func MainnetContracts() Contracts {
@@ -19,6 +20,7 @@ func MainnetContracts() Contracts {
 		LockedTokens:     "0x8d0e87b65159ae63",
 		NonFungibleToken: "0x1d7e57aa55817448",
 		StakingProxy:     "0x62430cf28c26d095",
+		ChainID: "Mainnet",
 	}
 }
 func TestnetContracts() Contracts {
@@ -30,5 +32,6 @@ func TestnetContracts() Contracts {
 		LockedTokens:     "0x95e019a17d0e23d7",
 		NonFungibleToken: "0x631e88ae7f1d7c20",
 		StakingProxy:     "0x7aad92e5a0715d21",
+		ChainID: "Testnet",
 	}
 }

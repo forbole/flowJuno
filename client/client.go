@@ -144,7 +144,7 @@ func (cp *Proxy) Contract() Contracts {
 
 func (cp *Proxy) GetChainID() string {
 	// There is GetNetworkParameters rpc method that not implenment yet in flow-go-sdk.
-	return "Mainnet"
+	return cp.contract.ChainID
 }
 
 /*
