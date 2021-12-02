@@ -14,6 +14,8 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
+// GetDataFromAddresses getting delegator info and node info from address. However, it should be 
+// replaced by auth that save the node id with addres
 func GetDataFromAddresses(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	err := getNodeInfoFromAddress(addresses, block, db, flowClient)
 	if err != nil {
@@ -28,6 +30,7 @@ func GetDataFromAddresses(addresses []string, block *flow.Block, db *database.Db
 	return nil
 }
 
+// getNodeInfoFromAddress get validator nodes that the addresses control 
 func getNodeInfoFromAddress(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get node networking address")
@@ -62,6 +65,7 @@ func getNodeInfoFromAddress(addresses []string, block *flow.Block, db *database.
 	return db.SaveNodeInfoFromAddresses(totalStakeArr)
 }
 
+// getDelegatorInfoFromAddress get the delegators info that the addresses control
 func getDelegatorInfoFromAddress(addresses []string, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating get node networking address")
