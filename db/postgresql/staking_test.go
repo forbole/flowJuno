@@ -302,44 +302,6 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitmentWithoutDelegators()
 
 }
 
-func (suite *DbTestSuite) TestBigDipperDb_NodeInfoFromAddresses() {
-
-	// ------------------------------
-	// --- Prepare the data
-	// ------------------------------
-
-	/*  TODO: Prepare parameter    */
-
-	id := "e7df1454826425251716a703e907981672a43208ef3eabfc95d593673da778f6"
-
-	stakerNodeInfo := types.NewStakerNodeInfo(id, 5, "34.211.45.12:3569",
-		"3fa19db960a86a1722a2d8ffa9563bd1e7d905c91536860c64f9e808ef88862639112a1e872d7eef93dd91207d07dd7c043e2a1e80077b109290682250429f1f",
-		"87d827de3e1b3541c394dcbbb6d76d98e3a7710d6740d28122c468b83f41002625e7a5788cabfcd6ce76b188f7f60de614364d4ab2932dfe0ed6f2d602bd551606ea31045ca2ccde9658a175ccd73da859ab17e56ad81ca4f6ef982c5968a7cb",
-		0, 20000000, 0, 0, 0, []uint32{}, 0, 0, 0)
-
-	input := []types.NodeInfoFromAddress{
-		types.NewNodeInfoFromAddress("0x1", stakerNodeInfo, 1),
-	}
-
-	// ------------------------------
-	// --- Save the data
-	// ------------------------------
-
-	err := suite.database.SaveNodeInfoFromAddresses(input)
-	suite.Require().NoError(err)
-
-	// ------------------------------
-	// --- Verify the data
-	// ------------------------------
-	expectedStakerNodeInfo := `{"Id":"e7df1454826425251716a703e907981672a43208ef3eabfc95d593673da778f6","Role":5,"NetworkingAddress":"34.211.45.12:3569","NetworkingKey":"3fa19db960a86a1722a2d8ffa9563bd1e7d905c91536860c64f9e808ef88862639112a1e872d7eef93dd91207d07dd7c043e2a1e80077b109290682250429f1f","StakingKey":"87d827de3e1b3541c394dcbbb6d76d98e3a7710d6740d28122c468b83f41002625e7a5788cabfcd6ce76b188f7f60de614364d4ab2932dfe0ed6f2d602bd551606ea31045ca2ccde9658a175ccd73da859ab17e56ad81ca4f6ef982c5968a7cb","TokensStaked":0,"TokensCommitted":20000000,"TokensUnstaking":0,"TokensUnstaked":0,"TokensRewarded":0,"Delegators":[],"DelegatorIDCounter":0,"TokensRequestedToUnstake":0,"InitialWeight":0}`
-
-	expectedRow := dbtypes.NewNodeInfoFromAddressRow("0x1", expectedStakerNodeInfo, 1)
-	var outputs []dbtypes.NodeInfoFromAddressRow
-	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM node_info_from_address`)
-	suite.Require().NoError(err)
-	suite.Require().Len(outputs, 1, "should contain only one row")
-	suite.Require().True(expectedRow.Equal(outputs[0]))
-}
 
 func (suite *DbTestSuite) TestBigDipperDb_SaveNodeInfosFromTable() {
 
@@ -455,38 +417,4 @@ func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfo() {
 	suite.Require().NoError(err)
 	suite.Require().Len(outputs, 1, "should contain only one row")
 	suite.Require().True(expectedRow.Equal(outputs[0]))
-}
-
-func (suite *DbTestSuite) TestBigDipperDb_DelegatorInfoFromAddress() {
-
-	// ------------------------------
-	// --- Prepare the data
-	// ------------------------------
-
-	/*  TODO: Prepare parameter    */
-
-	delegatorId := int64(8411)
-	delegatorNodeId := "2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e"
-	nodeInfo := types.NewDelegatorNodeInfo(uint32(delegatorId), delegatorNodeId, 0, 0, 0, 0, 0, 0)
-
-	input := []types.DelegatorInfoFromAddress{types.NewDelegatorInfoFromAddress(nodeInfo, 2, "0x1")}
-
-	// ------------------------------
-	// --- Save the data
-	// ------------------------------
-
-	err := suite.database.SaveDelegatorInfoFromAddress(input)
-	suite.Require().NoError(err)
-
-	// ------------------------------
-	// --- Verify the data
-	// ------------------------------
-	expectedDelegatorNodeId := `{"Id":8411,"NodeID":"2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e","TokensCommitted":0,"TokensStaked":0,"TokensUnstaking":0,"TokensRewarded":0,"TokensUnstaked":0,"TokensRequestedToUnstake":0}`
-	expectedRow := dbtypes.NewDelegatorInfoFromAddressRow(expectedDelegatorNodeId, 2, "0x1")
-	var outputs []dbtypes.DelegatorInfoFromAddressRow
-	err = suite.database.Sqlx.Select(&outputs, `SELECT * FROM delegator_info_from_address`)
-	suite.Require().NoError(err)
-	suite.Require().Len(outputs, 1, "should contain only one row")
-	suite.Require().True(expectedRow.Equal(outputs[0]))
-
 }

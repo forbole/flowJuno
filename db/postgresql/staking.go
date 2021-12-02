@@ -1,7 +1,6 @@
 package postgresql
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/lib/pq"
@@ -187,32 +186,6 @@ func (db *Db) SaveNodeTotalCommitmentWithoutDelegators(nodeTotalCommitmentWithou
 	return nil
 }
 
-func (db *Db) SaveNodeInfoFromAddresses(NodeInfoFromAddress []types.NodeInfoFromAddress) error {
-	stmt := `INSERT INTO node_info_from_address(address,node_info,height) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range NodeInfoFromAddress {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		nodeInfo, err := json.Marshal(rows.NodeInfo)
-		if err != nil {
-			return err
-		}
-		params = append(params, rows.Address, nodeInfo, rows.Height)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func (db *Db) SaveNodeInfosFromTable(nodeInfosFromTable []types.StakerNodeInfo, height uint64) error {
 	stmt := `INSERT INTO node_infos_from_table(id,role,networking_address,networking_key,staking_key,tokens_staked,tokens_committed,tokens_unstaking,tokens_unstaked,tokens_rewarded,delegators,delegator_i_d_counter,tokens_requested_to_unstake,initial_weight,height) VALUES `
@@ -267,33 +240,6 @@ func (db *Db) SaveDelegatorInfo(delegatorInfo []types.DelegatorNodeInfo, height 
 	return nil
 }
 
-func (db *Db) SaveDelegatorInfoFromAddress(delegatorInfoFromAddress []types.DelegatorInfoFromAddress) error {
-	stmt := `INSERT INTO delegator_info_from_address(delegator_info,height,address) VALUES `
-
-	var params []interface{}
-
-	for i, rows := range delegatorInfoFromAddress {
-		ai := i * 3
-		stmt += fmt.Sprintf("($%d,$%d,$%d),", ai+1, ai+2, ai+3)
-
-		info, err := json.Marshal(rows.DelegatorInfo)
-		if err != nil {
-			return err
-		}
-
-		params = append(params, info, rows.Height, rows.Address)
-
-	}
-	stmt = stmt[:len(stmt)-1]
-	stmt += ` ON CONFLICT DO NOTHING`
-
-	_, err := db.Sqlx.Exec(stmt, params...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func (db *Db) SaveNodeUnstakingTokens(nodeUnstakingTokens []types.NodeUnstakingTokens) error {
 	stmt := `INSERT INTO node_unstaking_tokens(node_id,token_unstaking,height) VALUES `

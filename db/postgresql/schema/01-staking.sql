@@ -115,21 +115,3 @@ CREATE TABLE delegator_info
 
 CREATE INDEX delegator_info_index ON delegator_info (height);
 
-
-CREATE TABLE delegator_info_from_address
-(  delegator_info TEXT NOT NULL ,
-  height BIGINT  NOT NULL ,
-  address TEXT NOT NULL
-);
-
-CREATE INDEX delegator_info_from_address_index ON delegator_info_from_address (height);
-
-
-CREATE TABLE node_info_from_address
-(
-  address TEXT NOT NULL,
-  node_info TEXT NOT NULL,
-  height BIGINT  NOT NULL 
-);
-
-CREATE INDEX node_info_from_address_index ON node_info_from_address (height);
