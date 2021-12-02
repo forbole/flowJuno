@@ -11,10 +11,10 @@ import (
 	"github.com/forbole/flowJuno/types"
 )
 
-func (suite *DbTestSuite) AddAccount(address string) {
+func (suite *DbTestSuite) AddAccount(address string) error{
 	_, err := suite.database.Sqlx.Exec(
 		`INSERT INTO account(address) VALUES ($1)`, address)
-	suite.Require().NoError(err)
+	return err
 }
 
 func (suite *DbTestSuite) AddLockedAccount(address, lockedAddress string) {
@@ -25,6 +25,8 @@ func (suite *DbTestSuite) AddLockedAccount(address, lockedAddress string) {
 		`INSERT INTO locked_account(address,locked_address) VALUES ($1,$2)`, address, lockedAddress)
 	suite.Require().NoError(err)
 }
+
+
 
 func (suite *DbTestSuite) TestSaveAccount() {
 	pubkeyString := "d0d45a9f40dc5e7440c71fcbc1a7836e7b38cc7874ac2875c5475fe550f582e005a5ed864c779d413fe49f58d3451c24ccf2cc12b9495c2baeeb0752538a0bcb"
@@ -188,7 +190,6 @@ func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 	accounts := []types.DelegatorAccount{
 		types.NewDelegatorAccount(address, delegatorId, delegatorNodeId),
 	}
-
 	// ------------------------------
 	// --- Save the data
 	// ------------------------------
@@ -206,6 +207,48 @@ func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 
 	var accountRows []dbtypes.DelegatorAccountRow
 	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM delegator_account`)
+
+	suite.Require().NoError(err)
+	suite.Require().Len(accountRows, 1, "account table should contain only one row")
+
+	suite.Require().True(expectedAccountRow.Equal(accountRows[0]))
+
+}
+
+
+func (suite *DbTestSuite) TestSaveStakerNodeId() {
+	address := "0x1"
+	delegatorNodeId := "2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e"
+	//nodeInfo := types.NewDelegatorNodeInfo(uint32(delegatorId), delegatorNodeId, 0, 0, 0, 0, 0, 0)
+	err:=suite.AddAccount(address)
+	suite.Require().NoError(err)
+
+	err=suite.InsertIntoStakingTable(1,delegatorNodeId)
+	suite.Require().NoError(err)
+
+
+
+	accounts := []types.StakerNodeId{
+		types.NewStakerNodeId(address, delegatorNodeId),
+	}
+
+	// ------------------------------
+	// --- Save the data
+	// ------------------------------
+
+	err = suite.database.SaveStakerNodeId(accounts)
+	suite.Require().NoError(err)
+
+	err = suite.database.SaveStakerNodeId(accounts)
+	suite.Require().NoError(err, "double account insertion should not insert and returns no error")
+
+	// ------------------------------
+	// --- Verify the data
+	// ------------------------------
+	expectedAccountRow := dbtypes.NewStakerNodeIdRow("0x1", delegatorNodeId)
+
+	var accountRows []dbtypes.StakerNodeIdRow
+	err = suite.database.Sqlx.Select(&accountRows, `SELECT * FROM staker_node_id`)
 
 	suite.Require().NoError(err)
 	suite.Require().Len(accountRows, 1, "account table should contain only one row")

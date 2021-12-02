@@ -183,6 +183,7 @@ func (db *Db) GetAddresses() ([]string, error) {
 	return addresses, nil
 }
 
+
 func (db *Db) SaveStakerNodeId(stakerNodeId []types.StakerNodeId) error {
 	stmt := `INSERT INTO staker_node_id(address,node_id) VALUES `
 

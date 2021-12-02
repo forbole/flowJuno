@@ -50,5 +50,5 @@ CREATE TABLE account_key_list(
 
 CREATE TABLE staker_node_id(
     address TEXT  NOT NULL REFERENCES account(address),
-    node_id TEXT NOT NULL UNIQUE 
+    node_id TEXT NOT NULL UNIQUE REFERENCES staking_table (node_id)
 );

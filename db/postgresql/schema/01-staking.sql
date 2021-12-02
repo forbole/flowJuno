@@ -102,7 +102,7 @@ CREATE INDEX cut_percentage_index ON cut_percentage (height);
 
 
 CREATE TABLE delegator_info
-(  id TEXT NOT NULL ,
+(  id BIGINT NOT NULL ,
   node_id TEXT NOT NULL REFERENCES staking_table (node_id),
   tokens_committed TEXT NOT NULL ,
   tokens_staked TEXT NOT NULL ,
