@@ -297,6 +297,7 @@ func NewStakerNodeInfoArrayFromCadence(value cadence.Value) ([]StakerNodeInfo, e
 	return stakers, nil
 }
 
+//nolint:gocyclo
 // NewNodeOperatorInfoFromInterface create a NodeOperatorInfo from []interface{}
 func NewStakerNodeInfoFromCadence(value cadence.Value) (StakerNodeInfo, error) {
 	fields := value.(cadence.Struct).Fields

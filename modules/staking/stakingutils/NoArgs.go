@@ -14,6 +14,7 @@ import (
 	"github.com/onflow/cadence"
 )
 
+//nolint:gocyclo
 // GetDataWithNoArgs get all data that don't need any argument and 
 // save it into database
 func GetDataWithNoArgs(db *db.Db, height int64, flowClient client.Proxy) error {
