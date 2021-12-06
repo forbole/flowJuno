@@ -18,7 +18,7 @@ import (
 
 // GetDataFromNodeID get all data that need staker node info as parameter and save it into database
 func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, height int64, db *database.Db, flowClient client.Proxy) error {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("getting staked node infos")
 
 	totalCommitment, err := getNodeTotalCommitment(nodeInfofromNodeId, height, flowClient)
@@ -62,7 +62,7 @@ func getNodeUnstakingTokens(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 
 // getNodeTotalCommitment get all node's total commitment
 func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitment, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
@@ -165,7 +165,7 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64, flow
 
 // getNodeTotalCommitmentWithoutDelegators get all node's total commitment without delegator 
 func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitmentWithoutDelegators, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating node unstaking tokens")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s

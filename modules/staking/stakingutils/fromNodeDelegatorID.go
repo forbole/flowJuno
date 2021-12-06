@@ -46,7 +46,7 @@ func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, height int64, d
 
 // getDelegatorInfo Get all delegator that delegated to the specific staker
 func getDelegatorInfo(nodeInfo types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.DelegatorNodeInfo, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating node unstaking tokens")
 
 	if nodeInfo.DelegatorIDCounter == 0 {

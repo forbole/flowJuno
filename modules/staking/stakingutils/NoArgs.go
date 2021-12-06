@@ -97,7 +97,7 @@ func GetDataWithNoArgs(db *db.Db, height int64, flowClient client.Proxy) error {
 
 // getCurrentTable get FlowIDTableStaking.getStakedNodeIDs() at the latest height
 func getCurrentTable(height int64, flowClient client.Proxy) (*types.CurrentTable, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("Getting staked node ids")
 
 	script := fmt.Sprintf(`
@@ -116,14 +116,14 @@ func getCurrentTable(height int64, flowClient client.Proxy) (*types.CurrentTable
 		return nil, err
 	}
 
-	table := types.NewCurrentTable(int64(height), ids)
+	table := types.NewCurrentTable(height, ids)
 
 	return &table, nil
 }
 
 // getWeeklyPayout get weekly payout for each epoch
 func getWeeklyPayout(height int64, flowClient client.Proxy) (*types.WeeklyPayout, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating get weekly epoch payout")
 
 	script := fmt.Sprintf(`
@@ -142,14 +142,14 @@ func getWeeklyPayout(height int64, flowClient client.Proxy) (*types.WeeklyPayout
 		return nil, err
 	}
 
-	p := types.NewWeeklyPayout(int64(height), payout)
+	p := types.NewWeeklyPayout(height, payout)
 
 	return &p, err
 }
 
 // getTotalStake get the total stake for the system
 func getTotalStake(height int64, flowClient client.Proxy) (*types.TotalStake, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating get total stake by type")
 
 	script := fmt.Sprintf(`
@@ -179,14 +179,14 @@ func getTotalStake(height int64, flowClient client.Proxy) (*types.TotalStake, er
 		return nil, err
 	}
 
-	t := types.NewTotalStake(int64(height), totalStake)
+	t := types.NewTotalStake(height, totalStake)
 
 	return &t, nil
 }
 
 // getTotalStakeByType return the total token staked for all stakers in each 5 types of staker node in the current epoach
 func getTotalStakeByType(height int64, flowClient client.Proxy) ([]types.TotalStakeByType, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating getTotalStakeByType")
 
 		// https://github.com/onflow/flow-core-contracts/blob/301206b27090fa9116c1aba35cd8bade8a26857c/contracts/FlowIDTableStaking.cdc#L101
@@ -217,7 +217,7 @@ func getTotalStakeByType(height int64, flowClient client.Proxy) ([]types.TotalSt
 			return nil, err
 		}
 
-		totalStakeArr[role-1] = types.NewTotalStakeByType(int64(height), int8(role), totalStake)
+		totalStakeArr[role-1] = types.NewTotalStakeByType(height, int8(role), totalStake)
 	}
 
 	return totalStakeArr, nil
@@ -225,7 +225,7 @@ func getTotalStakeByType(height int64, flowClient client.Proxy) ([]types.TotalSt
 
 // getStakeRequirements get minium stake requirement for each role
 func getStakeRequirements(height int64, flowClient client.Proxy) ([]types.StakeRequirements, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating get stake requirement")
 
 		// https://github.com/onflow/flow-core-contracts/blob/301206b27090fa9116c1aba35cd8bade8a26857c/contracts/FlowIDTableStaking.cdc#L101
@@ -255,7 +255,7 @@ func getStakeRequirements(height int64, flowClient client.Proxy) ([]types.StakeR
 		if err != nil {
 			return nil, err
 		}
-		stakeRequirements[role-1] = types.NewStakeRequirements(int64(height), uint8(role), totalStake)
+		stakeRequirements[role-1] = types.NewStakeRequirements(height, uint8(role), totalStake)
 	}
 
 	return stakeRequirements, nil
@@ -263,7 +263,7 @@ func getStakeRequirements(height int64, flowClient client.Proxy) ([]types.StakeR
 
 // getProposedTable get proposed node in current height
 func getProposedTable(height int64, flowClient client.Proxy) (*types.ProposedTable, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating get ProposedTable")
 
 	script := fmt.Sprintf(`
@@ -282,14 +282,14 @@ func getProposedTable(height int64, flowClient client.Proxy) (*types.ProposedTab
 		return nil, err
 	}
 
-	t := types.NewProposedTable(int64(height), table)
+	t := types.NewProposedTable(height, table)
 
 	return &t, nil
 }
 
 // getCutPercentage get cut percentage in current height
 func getCutPercentage(height int64, flowClient client.Proxy) (*types.CutPercentage, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating cut percentage")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
@@ -306,14 +306,14 @@ func getCutPercentage(height int64, flowClient client.Proxy) (*types.CutPercenta
 	if err != nil {
 		return nil, err
 	}
-	t := types.NewCutPercentage(table, int64(height))
+	t := types.NewCutPercentage(table,height)
 
 	return &t, nil
 }
 
 // GetTable get all staker node id in the system
 func GetTable(height int64, flowClient client.Proxy) (*types.StakingTable, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating get Staked Node id per block")
 
 	script := fmt.Sprintf(`

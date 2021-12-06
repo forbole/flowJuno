@@ -34,7 +34,7 @@ func HandleStaking(db *db.Db, flowClient client.Proxy) error {
 		return fmt.Errorf("fail to handle staking:%s", err)
 	}
 
-	table, err := stakingutils.GetTable(int64(height), flowClient)
+	table, err := stakingutils.GetTable(height, flowClient)
 	if err != nil {
 		return fmt.Errorf("fail to handle staking:%s", err)
 	}
