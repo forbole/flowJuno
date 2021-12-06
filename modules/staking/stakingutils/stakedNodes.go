@@ -16,6 +16,7 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
+// GetDataFromNodeID get all data that need staker node info as parameter and save it into database
 func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, height int64, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(height)).
 		Msg("getting staked node infos")
@@ -42,6 +43,7 @@ func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, height int64, 
 	return nil
 }
 
+// getNodeUnstakingTokens get unstaking token for all nodes and save that into database
 func getNodeUnstakingTokens(nodeInfos []types.StakerNodeInfo, block *flow.Block, db *database.Db, flowClient client.Proxy) error {
 	log.Trace().Str("module", "staking").Int64("height", int64(block.Height)).
 		Msg("updating node unstaking tokens")
@@ -58,6 +60,7 @@ func getNodeUnstakingTokens(nodeInfos []types.StakerNodeInfo, block *flow.Block,
 	return db.SaveNodeUnstakingTokens(totalStakeArr)
 }
 
+// getNodeTotalCommitment get all node's total commitment
 func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitment, error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(height)).
 		Msg("updating node unstaking tokens")
@@ -160,6 +163,7 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64, flow
 	return &nodeTotalCommitment, nil
 }
 
+// getNodeTotalCommitmentWithoutDelegators get all node's total commitment without delegator 
 func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitmentWithoutDelegators, error) {
 	log.Trace().Str("module", "staking").Int64("height", int64(height)).
 		Msg("updating node unstaking tokens")

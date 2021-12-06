@@ -13,6 +13,7 @@ func TestAuthProxyTestSuite(t *testing.T) {
 	suite.Run(t, new(AuthProxyTestSuite))
 }
 
+// AuthProxyTestSuite the base test case class for Auth module
 type AuthProxyTestSuite struct {
 	testutils.ProxyTestSuite
 }
