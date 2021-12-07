@@ -67,7 +67,7 @@ func updateBlockTimeInDay(db *database.Db) error {
 	log.Trace().Str("module", "consensus").Str("operation", "block time").
 		Msg("updating block time in days")
 
-	blocktime, err := consutils.GetBlockTimeInDays(db)
+	blocktime, err := consutils.GetBlockTimeInDay(db)
 	if err != nil {
 		return err
 	}

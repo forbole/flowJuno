@@ -8,6 +8,7 @@ import (
 	"github.com/onflow/flow-go-sdk"
 )
 
+// GetBlockTimeInMinute get last block in db and get the block time in minute
 func GetBlockTimeInMinute(db *database.Db) (*types.BlockTime, error) {
 
 	block, err := db.GetLastBlock()
@@ -35,6 +36,8 @@ func GetBlockTimeInMinute(db *database.Db) (*types.BlockTime, error) {
 	return &blocktime, nil
 
 }
+
+// GetBlockTimeInHour get last block in db and get the block time in hour
 
 func GetBlockTimeInHour(db *database.Db) (*types.BlockTime, error) {
 
@@ -65,7 +68,9 @@ func GetBlockTimeInHour(db *database.Db) (*types.BlockTime, error) {
 
 }
 
-func GetBlockTimeInDays(db *database.Db) (*types.BlockTime, error) {
+// GetBlockTimeInDay get last block in db and get the block time in day
+
+func GetBlockTimeInDay(db *database.Db) (*types.BlockTime, error) {
 
 	block, err := db.GetLastBlock()
 	if err != nil {
@@ -93,6 +98,7 @@ func GetBlockTimeInDays(db *database.Db) (*types.BlockTime, error) {
 
 }
 
+// GetGenesisBlockTime get the genesis block from db and calculate block time using latest block
 func GetGenesisBlockTime(db *database.Db, block flow.Block) (*types.BlockTime, error) {
 	genesis, err := db.GetGenesis()
 	if err != nil {

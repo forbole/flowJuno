@@ -150,6 +150,7 @@ func getLockedTokenAccountUnlockLimit(address string, height int64, client clien
 
 }
 
+// getLockedTokenAccountAddress get the locked account address associated with the input address
 func getLockedTokenAccountAddress(address string, height int64, client client.Proxy) (string, error) {
 	script := fmt.Sprintf(`
 	import LockedTokens from %s

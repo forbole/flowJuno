@@ -40,8 +40,7 @@ func GetStakerAccounts(addresses []string, height int64, client client.Proxy) ([
 	return stakerAccounts, nil
 }
 
-// Danger zone
-
+// getStakerNodeId get node ids that the address have control on it
 func getStakerNodeId(address string, height int64, client client.Proxy) ([]string, error) {
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s

@@ -12,34 +12,6 @@ import (
 	db "github.com/forbole/flowJuno/db/postgresql"
 )
 
-/*
-//TODO: to replace getGenesisAccounts when genesis function is here
-// GetGenesisAccounts parses the given appState and returns the genesis accounts
-func GetGenesisAccounts(appState map[string]json.RawMessage, cdc codec.Marshaler) ([]types.Account, error) {
-	log.Debug().Str("module", "auth").Msg("parsing genesis")
-
-	var authState authtypes.GenesisState
-	if err := cdc.UnmarshalJSON(appState[authtypes.ModuleName], &authState); err != nil {
-		return nil, err
-	}
-
-	// Store the accounts
-	accounts := make([]types.Account, len(authState.Accounts))
-	for index, account := range authState.Accounts {
-		var accountI authtypes.AccountI
-		err := cdc.UnpackAny(account, &accountI)
-		if err != nil {
-			return nil, err
-		}
-
-		accounts[index] = types.NewAccount(accountI.GetAddress().String(), accountI)
-	}
-
-	return accounts, nil
-} */
-
-// --------------------------------------------------------------------------------------------------------------------
-
 // GetAccounts returns the account data for the given addresses
 func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types.Account, error) {
 	log.Debug().Str("module", "auth").Str("operation", "accounts").Int("height", int(height)).Msg("getting accounts data")
@@ -105,6 +77,7 @@ func UpdateAccounts(addresses []string, db *db.Db, height int64, client client.P
 	return err
 }
 
+// UpdateLockedAccount get all the details that need for locked account
 func UpdateLockedAccount(addresses []string, height int64, client client.Proxy, db *db.Db) error {
 	lockedAccount, err := GetLockedAccount(addresses, height, client)
 	if err != nil {

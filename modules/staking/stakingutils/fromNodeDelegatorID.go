@@ -14,6 +14,8 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
+// GetDataFromNodeDelegatorID get all data that need staker node info as input and 
+// save it into database
 func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, height int64, db *database.Db, flowClient client.Proxy) error {
 
 	for _, node := range nodeInfo {
@@ -41,8 +43,10 @@ func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, height int64, d
 	return nil
 }
 
+
+// getDelegatorInfo Get all delegator that delegated to the specific staker
 func getDelegatorInfo(nodeInfo types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.DelegatorNodeInfo, error) {
-	log.Trace().Str("module", "staking").Int64("height", int64(height)).
+	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating node unstaking tokens")
 
 	if nodeInfo.DelegatorIDCounter == 0 {
