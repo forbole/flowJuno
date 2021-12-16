@@ -18,8 +18,17 @@ import (
 func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClient client.Proxy) error {
 	log.Debug().Str("module", "staking").Msg("setting up periodic tasks")
 
-	if _, err := scheduler.Every(1).Week().Tuesday().At("15:00").StartImmediately().Do(func() {
-		utils.WatchMethod(func() error { return HandleStaking(db, flowClient) })
+	if _, err := scheduler.Every(1).Minute().StartImmediately().Do(func() {
+		utils.WatchMethod(func() error {
+			startEpoch, err := utils.CheckStartEpochEvent(flowClient)
+			if err != nil {
+				return err
+			}
+			if !startEpoch {
+				return nil
+			}
+			return HandleStaking(db, flowClient)
+		})
 	}); err != nil {
 		return err
 	}

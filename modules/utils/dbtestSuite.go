@@ -62,29 +62,28 @@ func (suite *DbProxyTestSuite) SetupTest() {
 	bigDipperDb, ok := (db).(*database.Db)
 	suite.Require().True(ok)
 
- //Delete the public schema
-_, err = bigDipperDb.Sql.Exec(`DROP SCHEMA public CASCADE;`)
-suite.Require().NoError(err)
-// Re-create the schema
-_, err = bigDipperDb.Sql.Exec(`CREATE SCHEMA public;`)
-suite.Require().NoError(err)
-dirPath := path.Join(".","..","..","..","db","postgresql","schema")
-dir, err := ioutil.ReadDir(dirPath)
-suite.Require().NoError(err)
-
-for _, fileInfo := range dir {
-	file, err := ioutil.ReadFile(filepath.Join(dirPath, fileInfo.Name()))
+	//Delete the public schema
+	_, err = bigDipperDb.Sql.Exec(`DROP SCHEMA public CASCADE;`)
+	suite.Require().NoError(err)
+	// Re-create the schema
+	_, err = bigDipperDb.Sql.Exec(`CREATE SCHEMA public;`)
+	suite.Require().NoError(err)
+	dirPath := path.Join(".", "..", "..", "..", "db", "postgresql", "schema")
+	dir, err := ioutil.ReadDir(dirPath)
 	suite.Require().NoError(err)
 
-	commentsRegExp := regexp.MustCompile(`/\*.*\*/`)
-	requests := strings.Split(string(file), ";")
-	for _, request := range requests {
-		
-		_, err := bigDipperDb.Sql.Exec(commentsRegExp.ReplaceAllString(request, ""))
+	for _, fileInfo := range dir {
+		file, err := ioutil.ReadFile(filepath.Join(dirPath, fileInfo.Name()))
 		suite.Require().NoError(err)
+
+		commentsRegExp := regexp.MustCompile(`/\*.*\*/`)
+		requests := strings.Split(string(file), ";")
+		for _, request := range requests {
+
+			_, err := bigDipperDb.Sql.Exec(commentsRegExp.ReplaceAllString(request, ""))
+			suite.Require().NoError(err)
+		}
 	}
-} 
-	
 
 	suite.Database = bigDipperDb
 }

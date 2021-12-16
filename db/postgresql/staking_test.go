@@ -302,7 +302,6 @@ func (suite *DbTestSuite) TestBigDipperDb_NodeTotalCommitmentWithoutDelegators()
 
 }
 
-
 func (suite *DbTestSuite) TestBigDipperDb_SaveNodeInfosFromTable() {
 
 	// ------------------------------

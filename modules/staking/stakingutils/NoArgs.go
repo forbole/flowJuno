@@ -15,7 +15,7 @@ import (
 )
 
 //nolint:gocyclo
-// GetDataWithNoArgs get all data that don't need any argument and 
+// GetDataWithNoArgs get all data that don't need any argument and
 // save it into database
 func GetDataWithNoArgs(db *db.Db, height int64, flowClient client.Proxy) error {
 	payout, err := getWeeklyPayout(height, flowClient)
@@ -307,7 +307,7 @@ func getCutPercentage(height int64, flowClient client.Proxy) (*types.CutPercenta
 	if err != nil {
 		return nil, err
 	}
-	t := types.NewCutPercentage(table,height)
+	t := types.NewCutPercentage(table, height)
 
 	return &t, nil
 }
