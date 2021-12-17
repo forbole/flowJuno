@@ -24,8 +24,10 @@ func CheckStartEpochEvent(flowClient client.Proxy) (bool, error) {
 		return false, err
 	}
 
-	if len(events) != 0 {
-		return true, nil
+	for _, block := range events {
+		if len(block.Events) > 0 {
+			return true, nil
+		}
 	}
 
 	return false, nil
