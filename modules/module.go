@@ -94,5 +94,5 @@ type MessageModule interface {
 	// are passed as well.
 	// NOTE. The returned error will be logged using the logging.LogMsgError method. All other modules' handlers
 	// will still be called.
-	HandleEvent(index int, msg types.Event, tx *types.Tx) error
+	HandleEvent(index int, msg types.Event) error
 }

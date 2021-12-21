@@ -245,24 +245,30 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 	return txResponses, nil
 }
 
-func (cp *Proxy) TransactionResult(transactionIds []flow.Identifier) ([]types.TransactionResult, error) {
+// TransactionResult return the transaction result and from
+func (cp *Proxy) TransactionResult(transactionIds []flow.Identifier, height uint64) ([]types.TransactionResult, []types.Event, error) {
 	if len(transactionIds) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	txResults := make([]types.TransactionResult, len(transactionIds))
+	var events []types.Event
 	for i, txid := range transactionIds {
 		result, err := cp.flowClient.GetTransactionResult(cp.ctx, txid)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		errStr := ""
 		if result.Error != nil {
 			errStr = result.Error.Error()
 		}
+
 		txResults[i] = types.NewTransactionResult(txid.String(), result.Status.String(), errStr)
+		for _, event := range result.Events {
+			events = append(events, types.NewEvent(int(height), event.Type, txid.String(), event.TransactionIndex, event.EventIndex, event.Value))
+		}
 	}
-	return txResults, nil
+	return txResults, events, nil
 }
 
 func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {

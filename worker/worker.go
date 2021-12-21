@@ -135,15 +135,22 @@ func (w Worker) process(height int64) error {
 	return nil
 }
 
+// ExportTransactionResult process the transaction result and also events
 func (w Worker) ExportTransactionResult(txids []flow.Identifier, height int64) error {
-	txResults, err := w.cp.TransactionResult(txids)
-	if len(txResults) == 0 {
-		return nil
-	}
+	txResults, events, err := w.cp.TransactionResult(txids, uint64(height))
 	if err != nil {
 		return err
 	}
-	return w.db.SaveTransactionResult(txResults, uint64(height))
+	if len(txResults) == 0 {
+		return nil
+	}
+
+	err = w.db.SaveTransactionResult(txResults, uint64(height))
+	if err != nil {
+		return err
+	}
+
+	return w.exportEvent(events)
 }
 
 func (w Worker) ExportCollection(block *flow.Block) ([]types.Collection, error) {
@@ -220,34 +227,6 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 		return err
 	}
 
-	//Handle all event
-	var allEventInTx []types.Event
-	for _, tx := range *txs {
-		events, err := w.cp.EventsInTransaction(tx)
-		if err != nil {
-			log.Error().Err(err).Int64("height", int64(tx.Height)).Msg("failed to get events for block")
-			return err
-		}
-		allEventInTx = append(allEventInTx, events...)
-
-		//Handle event with associated tx
-		for _, event := range events {
-			for _, module := range w.modules {
-				if messageModule, ok := module.(modules.MessageModule); ok {
-					err = messageModule.HandleEvent(event.Height, event, &tx)
-					if err != nil {
-						return err
-					}
-				}
-			}
-		}
-	}
-
-	err = w.db.SaveEvents(allEventInTx)
-	if err != nil {
-		return err
-	}
-
 	for _, tx := range *txs {
 		for _, module := range w.modules {
 			if transactionModule, ok := module.(modules.TransactionModule); ok {
@@ -261,6 +240,28 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 	}
 
 	return nil
+}
+
+func (w Worker) exportEvent(events []types.Event) error {
+	//Handle all event
+
+	for _, event := range events {
+		for _, module := range w.modules {
+			if messageModule, ok := module.(modules.MessageModule); ok {
+				err := messageModule.HandleEvent(event.Height, event)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	err := w.db.SaveEvents(events)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 // HandleGenesis accepts a GenesisDoc and calls all the registered genesis handlers

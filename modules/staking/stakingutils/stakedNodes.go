@@ -163,7 +163,7 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64, flow
 	return &nodeTotalCommitment, nil
 }
 
-// getNodeTotalCommitmentWithoutDelegators get all node's total commitment without delegator 
+// getNodeTotalCommitmentWithoutDelegators get all node's total commitment without delegator
 func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitmentWithoutDelegators, error) {
 	log.Trace().Str("module", "staking").Int64("height", height).
 		Msg("updating node unstaking tokens")

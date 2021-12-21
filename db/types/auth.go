@@ -190,22 +190,23 @@ func NewAccountKeyListRow(
 }
 
 // StakerNodeIdRow represents a single row of the staker_node_id table
-type StakerNodeIdRow struct { 
+type StakerNodeIdRow struct {
 	Address string `db:"address"`
-	NodeId string `db:"node_id"`
-  }
-  
-	 // Equal tells whether v and w represent the same rows
-  func (v StakerNodeIdRow) Equal(w StakerNodeIdRow)bool{
-	return v.Address==w.Address && 
-  v.NodeId==w.NodeId }
-  
-	  // StakerNodeIdRow allows to build a new StakerNodeIdRow
-  func NewStakerNodeIdRow( 
+	NodeId  string `db:"node_id"`
+}
+
+// Equal tells whether v and w represent the same rows
+func (v StakerNodeIdRow) Equal(w StakerNodeIdRow) bool {
+	return v.Address == w.Address &&
+		v.NodeId == w.NodeId
+}
+
+// StakerNodeIdRow allows to build a new StakerNodeIdRow
+func NewStakerNodeIdRow(
 	address string,
-	nodeId string) StakerNodeIdRow{
-   return StakerNodeIdRow{
-   Address:address,
-   NodeId:nodeId,
-  }
-  }
+	nodeId string) StakerNodeIdRow {
+	return StakerNodeIdRow{
+		Address: address,
+		NodeId:  nodeId,
+	}
+}

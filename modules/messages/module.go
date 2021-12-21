@@ -6,7 +6,6 @@ import (
 
 	"github.com/forbole/flowJuno/db"
 	"github.com/forbole/flowJuno/modules/modules"
-	"github.com/forbole/flowJuno/types"
 )
 
 var _ modules.Module = &Module{}
@@ -32,7 +31,7 @@ func (m *Module) Name() string {
 }
 
 // HandleEvent implements modules.MessageModule
-func (m *Module) HandleEvent(index int, msg sdk.Msg, tx *types.Txs) error {
+func (m *Module) HandleEvent(index int, msg sdk.Msg) error {
 	//return HandleEvent(index, msg, tx, m.parser, m.cdc, m.db)
 	return nil
 }
