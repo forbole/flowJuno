@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/cosmos/cosmos-sdk/simapp/params"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/db"
 	"github.com/forbole/flowJuno/db/postgresql"
@@ -13,14 +12,13 @@ import (
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/modules/registrar"
-	juno "github.com/forbole/flowJuno/types"
+	"github.com/forbole/flowJuno/types"
 
 	"github.com/forbole/flowJuno/modules/auth"
 	"github.com/forbole/flowJuno/modules/consensus"
 	"github.com/forbole/flowJuno/modules/staking"
-	"github.com/forbole/flowJuno/modules/token"
 	"github.com/forbole/flowJuno/modules/telemetry"
-
+	"github.com/forbole/flowJuno/modules/token"
 )
 
 var (
@@ -41,7 +39,7 @@ func NewRegistrar(parser messages.MessageAddressesParser) *Registrar {
 
 // BuildModules implements modules.Registrar
 func (r *Registrar) BuildModules(
-	cfg juno.Config, encodingConfig *params.EncodingConfig, database db.Database, cp *client.Proxy, cfg types.Config
+	cfg types.Config, encodingConfig *params.EncodingConfig, database db.Database, cp *client.Proxy,
 ) modules.Modules {
 
 	bigDipperBd := postgresql.Cast(database)
@@ -54,7 +52,6 @@ func (r *Registrar) BuildModules(
 		consensus.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		staking.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		token.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
-		telemetry.NewModule(r.parser, *cp, encodingConfig, cfg),
-
+		telemetry.NewModule(cfg,r.parser, *cp, encodingConfig, bigDipperBd),
 	}
 }

@@ -3,8 +3,6 @@ package parse
 import (
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/modules/modules"
 	modsregistrar "github.com/forbole/flowJuno/modules/registrar"

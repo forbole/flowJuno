@@ -54,6 +54,7 @@ func (suite *DbProxyTestSuite) SetupTest() {
 			true,
 		),
 		nil, nil, nil,
+		nil,
 	)
 
 	db, err := database.Builder(cfg, &codec)
