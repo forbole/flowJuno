@@ -16,6 +16,9 @@ func RunAdditionalOperations(cfg types.Config) error {
 	if err != nil {
 		return err
 	}
+	if !cfg.GetTelemetryConfig().GetEnable(){
+		return nil
+	}
 
 	go startPrometheus(cfg)
 
