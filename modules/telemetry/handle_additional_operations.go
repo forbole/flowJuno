@@ -6,10 +6,12 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/forbole/flowJuno/types"
+
 )
 
 // RunAdditionalOperations runs the module additional operations
-func RunAdditionalOperations(cfg *Config) error {
+func RunAdditionalOperations(cfg types.Config) error {
 	err := checkConfig(cfg)
 	if err != nil {
 		return err
@@ -21,8 +23,8 @@ func RunAdditionalOperations(cfg *Config) error {
 }
 
 // checkConfig checks if the given config is valid
-func checkConfig(cfg *Config) error {
-	if cfg == nil {
+func checkConfig(cfg types.Config) error {
+	if cfg.GetTelemetryConfig() == nil {
 		return fmt.Errorf("no telemetry config found")
 	}
 
@@ -30,11 +32,11 @@ func checkConfig(cfg *Config) error {
 }
 
 // startPrometheus starts a Prometheus server using the given configuration
-func startPrometheus(cfg *Config) {
+func startPrometheus(cfg types.Config) {
 	router := mux.NewRouter()
 	router.Handle("/metrics", promhttp.Handler())
 
-	err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), router)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.GetTelemetryConfig().GetPort()), router)
 	if err != nil {
 		panic(err)
 	}

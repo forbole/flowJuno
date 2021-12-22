@@ -19,12 +19,7 @@ func SetupParsing(parseConfig *Config) (*ParserData, error) {
 
 	// Build the codec
 	encodingConfig := parseConfig.GetEncodingConfigBuilder()()
-
-	// Setup the SDK configuration
-	sdkConfig := sdk.GetConfig()
-	parseConfig.GetSetupConfig()(cfg, sdkConfig)
-	sdkConfig.Seal()
-
+	
 	// Get the database
 	database, err := parseConfig.GetDBBuilder()(cfg, &encodingConfig)
 	if err != nil {
@@ -49,7 +44,7 @@ func SetupParsing(parseConfig *Config) (*ParserData, error) {
 	}
 
 	// Get the modules
-	mods := parseConfig.GetRegistrar().BuildModules(cfg, &encodingConfig, sdkConfig, database, cp)
+	mods := parseConfig.GetRegistrar().BuildModules(cfg, &encodingConfig, database, cp)
 	registeredModules := modsregistrar.GetModules(mods, cfg.GetCosmosConfig().GetModules())
 	logger := parseConfig.GetLogger()
 

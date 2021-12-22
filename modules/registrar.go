@@ -19,6 +19,8 @@ import (
 	"github.com/forbole/flowJuno/modules/consensus"
 	"github.com/forbole/flowJuno/modules/staking"
 	"github.com/forbole/flowJuno/modules/token"
+	"github.com/forbole/flowJuno/modules/telemetry"
+
 )
 
 var (
@@ -39,7 +41,7 @@ func NewRegistrar(parser messages.MessageAddressesParser) *Registrar {
 
 // BuildModules implements modules.Registrar
 func (r *Registrar) BuildModules(
-	cfg juno.Config, encodingConfig *params.EncodingConfig, _ *sdk.Config, database db.Database, cp *client.Proxy,
+	cfg juno.Config, encodingConfig *params.EncodingConfig, database db.Database, cp *client.Proxy, cfg types.Config
 ) modules.Modules {
 
 	bigDipperBd := postgresql.Cast(database)
@@ -52,5 +54,7 @@ func (r *Registrar) BuildModules(
 		consensus.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		staking.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		token.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
+		telemetry.NewModule(r.parser, *cp, encodingConfig, cfg),
+
 	}
 }
