@@ -6,11 +6,13 @@ require (
 	github.com/cosmos/cosmos-sdk v0.42.9
 	github.com/desmos-labs/juno v0.0.0-20210820090829-4142e0029177
 	github.com/go-co-op/gocron v0.3.3
+	github.com/gogo/protobuf v1.3.3
 	github.com/jmoiron/sqlx v1.2.1-0.20200324155115-ee514944af4b
 	github.com/lib/pq v1.9.0
 	github.com/onflow/cadence v0.18.0
 	github.com/onflow/flow-go-sdk v0.21.0
 	github.com/pelletier/go-toml v1.8.1
+	github.com/prometheus/client_golang v1.11.0
 	github.com/proullon/ramsql v0.0.0-20181213202341-817cee58a244
 	github.com/rs/zerolog v1.21.0
 	github.com/spf13/cobra v1.1.3

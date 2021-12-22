@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/forbole/flowJuno/types/logging"
+	"github.com/forbole/flowJuno/logging"
 
 	"github.com/onflow/flow-go-sdk"
 	"github.com/rs/zerolog/log"

@@ -3,7 +3,7 @@ package parse
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/forbole/flowJuno/types/logging"
+	"github.com/forbole/flowJuno/logging"
 
 	"github.com/forbole/flowJuno/types"
 )
