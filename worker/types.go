@@ -5,6 +5,8 @@ import (
 
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/db"
+	"github.com/forbole/flowJuno/logging"
+
 	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
 )
@@ -15,6 +17,7 @@ type Config struct {
 	ClientProxy    *client.Proxy
 	Database       db.Database
 	Modules        []modules.Module
+	Logger         logging.Logger
 }
 
 func NewConfig(
@@ -23,6 +26,7 @@ func NewConfig(
 	clientProxy *client.Proxy,
 	db db.Database,
 	modules []modules.Module,
+	logger logging.Logger,
 ) *Config {
 	return &Config{
 		EncodingConfig: encodingConfig,
@@ -30,5 +34,6 @@ func NewConfig(
 		ClientProxy:    clientProxy,
 		Database:       db,
 		Modules:        modules,
+		Logger:         logger,
 	}
 }

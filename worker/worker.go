@@ -3,6 +3,7 @@ package worker
 import (
 	"fmt"
 
+	"github.com/forbole/flowJuno/logging"
 	"github.com/onflow/flow-go-sdk"
 
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -28,6 +29,7 @@ type Worker struct {
 	cp             *client.Proxy
 	db             db.Database
 	modules        []modules.Module
+	logger         logging.Logger
 }
 
 // NewWorker allows to create a new Worker implementation.
@@ -38,6 +40,7 @@ func NewWorker(config *Config) Worker {
 		queue:          config.Queue,
 		db:             config.Database,
 		modules:        config.Modules,
+		logger:         config.Logger,
 	}
 }
 

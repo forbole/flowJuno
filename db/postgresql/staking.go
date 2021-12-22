@@ -186,7 +186,6 @@ func (db *Db) SaveNodeTotalCommitmentWithoutDelegators(nodeTotalCommitmentWithou
 	return nil
 }
 
-
 func (db *Db) SaveNodeInfosFromTable(nodeInfosFromTable []types.StakerNodeInfo, height uint64) error {
 	stmt := `INSERT INTO node_infos_from_table(id,role,networking_address,networking_key,staking_key,tokens_staked,tokens_committed,tokens_unstaking,tokens_unstaked,tokens_rewarded,delegators,delegator_i_d_counter,tokens_requested_to_unstake,initial_weight,height) VALUES `
 
@@ -239,7 +238,6 @@ func (db *Db) SaveDelegatorInfo(delegatorInfo []types.DelegatorNodeInfo, height 
 
 	return nil
 }
-
 
 func (db *Db) SaveNodeUnstakingTokens(nodeUnstakingTokens []types.NodeUnstakingTokens) error {
 	stmt := `INSERT INTO node_unstaking_tokens(node_id,token_unstaking,height) VALUES `

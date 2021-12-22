@@ -51,9 +51,7 @@ func (suite *AuthProxyTestSuite) TestProxy_getDelegatorNodeInfo() {
 	nodeInfo, err := getDelegatorNodeInfo("808b03495a0408bb", height, proxy)
 	suite.Require().NoError(err)
 
-
 	suite.Require().Equal("2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e", nodeInfo[0].NodeID)
 	suite.Require().Equal(uint32(3905), nodeInfo[0].Id)
-
 
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/logging"
 	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
 	"github.com/forbole/flowJuno/worker"
@@ -30,11 +31,21 @@ func ParseCmd(cmdCfg *Config) *cobra.Command {
 	return &cobra.Command{
 		Use:     "parse",
 		Short:   "Start parsing the blockchain data",
-		PreRunE: types.ConcatCobraCmdFuncs(ReadConfig(cmdCfg), setupLogging),
+		PreRunE: types.ConcatCobraCmdFuncs(ReadConfig(cmdCfg)),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			parserData, err := SetupParsing(cmdCfg)
 			if err != nil {
 				return err
+			}
+
+			// Run all the additional operations
+			for _, module := range parserData.Modules {
+				if module, ok := module.(modules.AdditionalOperationsModule); ok {
+					err = module.RunAdditionalOperations()
+					if err != nil {
+						return err
+					}
+				}
 			}
 
 			return StartParsing(parserData)
@@ -46,6 +57,7 @@ func ParseCmd(cmdCfg *Config) *cobra.Command {
 func StartParsing(data *ParserData) error {
 	// Get the config
 	cfg := types.Cfg.GetParsingConfig()
+	logging.StartHeight.Add(float64(cfg.GetStartHeight()))
 
 	// Start periodic operations
 	scheduler := gocron.NewScheduler(time.UTC)
@@ -63,7 +75,7 @@ func StartParsing(data *ParserData) error {
 	exportQueue := types.NewQueue(25)
 
 	// Create workers
-	config := worker.NewConfig(exportQueue, data.EncodingConfig, data.Proxy, data.Database, data.Modules)
+	config := worker.NewConfig(exportQueue, data.EncodingConfig, data.Proxy, data.Database, data.Modules, data.Logger)
 	workers := make([]worker.Worker, cfg.GetWorkers(), cfg.GetWorkers())
 	for i := range workers {
 		workers[i] = worker.NewWorker(config)

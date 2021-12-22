@@ -11,7 +11,7 @@ import (
 	"github.com/forbole/flowJuno/types"
 )
 
-func (suite *DbTestSuite) AddAccount(address string) error{
+func (suite *DbTestSuite) AddAccount(address string) error {
 	_, err := suite.database.Sqlx.Exec(
 		`INSERT INTO account(address) VALUES ($1)`, address)
 	return err
@@ -25,8 +25,6 @@ func (suite *DbTestSuite) AddLockedAccount(address, lockedAddress string) {
 		`INSERT INTO locked_account(address,locked_address) VALUES ($1,$2)`, address, lockedAddress)
 	suite.Require().NoError(err)
 }
-
-
 
 func (suite *DbTestSuite) TestSaveAccount() {
 	pubkeyString := "d0d45a9f40dc5e7440c71fcbc1a7836e7b38cc7874ac2875c5475fe550f582e005a5ed864c779d413fe49f58d3451c24ccf2cc12b9495c2baeeb0752538a0bcb"
@@ -215,18 +213,15 @@ func (suite *DbTestSuite) TestSaveDelegatorAccount() {
 
 }
 
-
 func (suite *DbTestSuite) TestSaveStakerNodeId() {
 	address := "0x1"
 	delegatorNodeId := "2cfab7e9163475282f67186b06ce6eea7fa0687d25dd9c7a84532f2016bc2e5e"
 	//nodeInfo := types.NewDelegatorNodeInfo(uint32(delegatorId), delegatorNodeId, 0, 0, 0, 0, 0, 0)
-	err:=suite.AddAccount(address)
+	err := suite.AddAccount(address)
 	suite.Require().NoError(err)
 
-	err=suite.InsertIntoStakingTable(1,delegatorNodeId)
+	err = suite.InsertIntoStakingTable(1, delegatorNodeId)
 	suite.Require().NoError(err)
-
-
 
 	accounts := []types.StakerNodeId{
 		types.NewStakerNodeId(address, delegatorNodeId),
