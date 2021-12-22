@@ -100,7 +100,7 @@ func (w Worker) process(height int64) error {
 		if blockModule, ok := module.(modules.BlockModule); ok {
 			err = blockModule.HandleBlock(block, &txs)
 			if err != nil {
-				log.Error().Err(err).Int64("height", height).Msg("failed to handle block")
+				w.logger.BlockError(module,block,err)
 				return err
 			}
 		}
@@ -239,6 +239,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 				if messageModule, ok := module.(modules.MessageModule); ok {
 					err = messageModule.HandleEvent(event.Height, event, &tx)
 					if err != nil {
+						w.logger.EventsError(module,&event,err)
 						return err
 					}
 				}
@@ -256,7 +257,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 			if transactionModule, ok := module.(modules.TransactionModule); ok {
 				err = transactionModule.HandleTx(int(tx.Height), &tx)
 				if err != nil {
-					//w.logger.TxError(module, tx, err)
+					w.logger.TxError(module, &tx, err)
 					return err
 				}
 			}
@@ -274,7 +275,7 @@ func (w Worker) HandleGenesis(block *flow.Block) error {
 	for _, module := range w.modules {
 		if genesisModule, ok := module.(modules.GenesisModule); ok {
 			if err := genesisModule.HandleGenesis(block, w.cp.GetChainID()); err != nil {
-				//w.logger.GenesisError(module, err)
+				w.logger.GenesisError(module, err)
 			}
 		}
 	}

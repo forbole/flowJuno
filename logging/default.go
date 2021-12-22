@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/onflow/flow-go-sdk"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 
-	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
 )
 
@@ -85,20 +83,20 @@ func (d *defaultLogger) GenesisError(module modules.Module, err error) {
 }
 
 // BlockError implements Logger
-func (d *defaultLogger) BlockError(module modules.Module, block *tmctypes.ResultBlock, err error) {
+func (d *defaultLogger) BlockError(module modules.Module, block *flow.Block, err error) {
 	d.Error("error while handling block",
 		"err", err,
 		LogKeyModule, module.Name(),
-		LogKeyHeight, block.Block.Height,
+		LogKeyHeight, block.Height,
 	)
 }
 
 // EventsError implements Logger
-func (d *defaultLogger) EventsError(module modules.Module, block *tmctypes.ResultBlock, err error) {
+func (d *defaultLogger) EventsError(module modules.Module, event *types.Event, err error) {
 	d.Error("error while handling block events",
 		"err", err,
 		LogKeyModule, module.Name(),
-		LogKeyHeight, block.Block.Height,
+		LogKeyHeight, event.Height,
 	)
 }
 
@@ -108,18 +106,7 @@ func (d *defaultLogger) TxError(module modules.Module, tx *types.Tx, err error) 
 		"err", err,
 		LogKeyModule, module.Name(),
 		LogKeyHeight, tx.Height,
-		LogKeyTxHash, tx.TxHash,
-	)
-}
-
-// MsgError implements Logger
-func (d *defaultLogger) MsgError(module modules.Module, tx *types.Tx, msg sdk.Msg, err error) {
-	d.Error("error while handling message",
-		"err", err,
-		LogKeyModule, module.Name(),
-		LogKeyHeight, tx.Height,
-		LogKeyTxHash, tx.TxHash,
-		LogKeyMsgType, proto.MessageName(msg),
+		LogKeyTxHash, tx.TransactionID,
 	)
 }
 

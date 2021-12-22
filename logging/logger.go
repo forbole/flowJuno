@@ -1,10 +1,9 @@
 package logging
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
+	"github.com/onflow/flow-go-sdk"
 
-	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/types"
 )
 
@@ -25,8 +24,7 @@ type Logger interface {
 	Error(msg string, keyvals ...interface{})
 
 	GenesisError(module modules.Module, err error)
-	BlockError(module modules.Module, block *tmctypes.ResultBlock, err error)
-	EventsError(module modules.Module, results *tmctypes.ResultBlock, err error)
+	BlockError(module modules.Module, block *flow.Block, err error)
+	EventsError(module modules.Module, results *types.Event, err error)
 	TxError(module modules.Module, tx *types.Tx, err error)
-	MsgError(module modules.Module, tx *types.Tx, msg sdk.Msg, err error)
 }
