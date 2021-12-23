@@ -97,7 +97,6 @@ func (suite *DbTestSuite) TestSaveAccount() {
 	err = suite.database.Sqlx.Select(&accountKeyList, `SELECT * FROM account_key_list`)
 	suite.Require().NoError(err)
 	suite.Require().Len(accountKeyList, 1, "account table should contain only one row")
-	fmt.Println(accountKeyList)
 	suite.Require().True(expectedAccountKeyList.Equal(accountKeyList[0]))
 
 }

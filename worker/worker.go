@@ -271,7 +271,6 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 // in the order in which they have been registered.
 func (w Worker) HandleGenesis(block *flow.Block) error {
 	// Call the genesis handlers
-	fmt.Println("Parsing Handle Geneis")
 	for _, module := range w.modules {
 		if genesisModule, ok := module.(modules.GenesisModule); ok {
 			if err := genesisModule.HandleGenesis(block, w.cp.GetChainID()); err != nil {

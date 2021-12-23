@@ -43,9 +43,7 @@ func (r *Registrar) BuildModules(
 ) modules.Modules {
 
 	bigDipperBd := postgresql.Cast(database)
-	fmt.Println("BuildModules")
 
-	fmt.Println(reflect.TypeOf(r.parser))
 	return []modules.Module{
 		messages.NewModule(r.parser, encodingConfig.Marshaler, database),
 		auth.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),

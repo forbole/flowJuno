@@ -78,7 +78,6 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 		if err != nil {
 			// When validator exist 10000, cadence exceed computation limit. It need to calculate in raw
 			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
-				fmt.Println(id.Id)
 				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, height, flowClient)
 				if err != nil {
 					return nil, err

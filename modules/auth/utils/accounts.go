@@ -18,7 +18,6 @@ func GetAccounts(addresses []string, height int64, client client.Proxy) ([]types
 	var accounts []types.Account
 
 	for _, address := range addresses {
-		fmt.Println("GetAccounts:" + address)
 		if address == "" {
 			continue
 		}

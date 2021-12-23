@@ -102,7 +102,6 @@ func (db *Db) SaveProposedTable(proposedTable types.ProposedTable) error {
 	for i, rows := range proposedTable.ProposedTable {
 		ai := i * 2
 		stmt += fmt.Sprintf("($%d,$%d),", ai+1, ai+2)
-		fmt.Println(rows)
 
 		params = append(params, proposedTable.Height, rows)
 	}
@@ -125,7 +124,6 @@ func (db *Db) SaveCurrentTable(currentTable types.CurrentTable) error {
 	for i, rows := range currentTable.Table {
 		ai := i * 2
 		stmt += fmt.Sprintf("($%d,$%d),", ai+1, ai+2)
-		fmt.Println(rows)
 
 		params = append(params, currentTable.Height, rows)
 	}
@@ -230,7 +228,6 @@ func (db *Db) SaveDelegatorInfo(delegatorInfo []types.DelegatorNodeInfo, height 
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
-	fmt.Println(stmt)
 	_, err := db.Sqlx.Exec(stmt, params...)
 	if err != nil {
 		return err

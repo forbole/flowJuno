@@ -28,7 +28,6 @@ func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, height int64, d
 		splittedDelegatorInfos := utils.SplitDelegatorNodeInfo(delegatorNodeInfoArray, 9)
 
 		for _, arr := range splittedDelegatorInfos {
-			fmt.Println(len(arr))
 			if len(arr) == 0 {
 				continue
 			}
