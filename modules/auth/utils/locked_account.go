@@ -145,7 +145,6 @@ func getLockedTokenAccountUnlockLimit(address string, height int64, client clien
 	if !ok {
 		return 0, fmt.Errorf("cadence script does not return a uint64 value")
 	}
-	fmt.Printf("Locked Account Unlock Limit! %d", limit)
 	return limit, nil
 
 }
