@@ -11,13 +11,13 @@ var (
 type ConfigParser = func(fileContents []byte) (Config, error)
 
 type configToml struct {
-	RPC      *rpcConfig      `toml:"rpc"`
-	Grpc     *grpcConfig     `toml:"grpc"`
-	Cosmos   *cosmosConfig   `toml:"cosmos"`
-	Database *databaseConfig `toml:"database"`
-	Logging  *loggingConfig  `toml:"logging"`
-	Parsing  *parsingConfig  `toml:"parsing"`
-	Pruning  *pruningConfig  `toml:"pruning"`
+	RPC       *rpcConfig       `toml:"rpc"`
+	Grpc      *grpcConfig      `toml:"grpc"`
+	Cosmos    *cosmosConfig    `toml:"cosmos"`
+	Database  *databaseConfig  `toml:"database"`
+	Logging   *loggingConfig   `toml:"logging"`
+	Parsing   *parsingConfig   `toml:"parsing"`
+	Pruning   *pruningConfig   `toml:"pruning"`
 	Telemetry *telemetryConfig `toml:"telemetry"`
 }
 
@@ -56,13 +56,13 @@ var _ Config = &config{}
 
 // Config defines all necessary flowjuno configuration parameters.
 type config struct {
-	RPC      RPCConfig      `toml:"rpc"`
-	Grpc     GrpcConfig     `toml:"grpc"`
-	Cosmos   CosmosConfig   `toml:"cosmos"`
-	Database DatabaseConfig `toml:"database"`
-	Logging  LoggingConfig  `toml:"logging"`
-	Parsing  ParsingConfig  `toml:"parsing"`
-	Pruning  PruningConfig  `toml:"pruning"`
+	RPC       RPCConfig       `toml:"rpc"`
+	Grpc      GrpcConfig      `toml:"grpc"`
+	Cosmos    CosmosConfig    `toml:"cosmos"`
+	Database  DatabaseConfig  `toml:"database"`
+	Logging   LoggingConfig   `toml:"logging"`
+	Parsing   ParsingConfig   `toml:"parsing"`
+	Pruning   PruningConfig   `toml:"pruning"`
 	Telemetry TelemetryConfig `toml:"telemetry"`
 }
 
@@ -74,13 +74,13 @@ func NewConfig(
 	pruningConfig PruningConfig, telemetryConfig TelemetryConfig,
 ) Config {
 	return &config{
-		RPC:      rpcConfig,
-		Grpc:     grpConfig,
-		Cosmos:   cosmosConfig,
-		Database: dbConfig,
-		Logging:  loggingConfig,
-		Parsing:  parsingConfig,
-		Pruning:  pruningConfig,
+		RPC:       rpcConfig,
+		Grpc:      grpConfig,
+		Cosmos:    cosmosConfig,
+		Database:  dbConfig,
+		Logging:   loggingConfig,
+		Parsing:   parsingConfig,
+		Pruning:   pruningConfig,
 		Telemetry: telemetryConfig,
 	}
 }
@@ -124,6 +124,7 @@ func (c *config) GetPruningConfig() PruningConfig {
 func (c *config) GetTelemetryConfig() TelemetryConfig {
 	return c.Telemetry
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 // GrpcConfig contains the configuration of the gRPC endpoint
@@ -490,21 +491,21 @@ type TelemetryConfig interface {
 var _ TelemetryConfig = &telemetryConfig{}
 
 type telemetryConfig struct {
-	Enable bool `toml:"enable"`
-	Port  int64 `toml:"port"`
+	Enable bool  `toml:"enable"`
+	Port   int64 `toml:"port"`
 }
 
-func NewTelemetryConfig(enable bool, port int64) TelemetryConfig{
- 	return &telemetryConfig{
+func NewTelemetryConfig(enable bool, port int64) TelemetryConfig {
+	return &telemetryConfig{
 		Enable: enable,
-		Port: port,
+		Port:   port,
 	}
 }
 
-func (t *telemetryConfig) GetEnable()bool{
+func (t *telemetryConfig) GetEnable() bool {
 	return t.Enable
 }
 
-func (t *telemetryConfig) GetPort()int64{
+func (t *telemetryConfig) GetPort() int64 {
 	return t.Port
 }

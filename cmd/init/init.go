@@ -52,7 +52,7 @@ const (
 	flagPruningInterval   = "pruning-interval"
 
 	flagTelemetryEnabled = "telemetry-enabled"
-	flagTelemetryPort = "telemetry-port"
+	flagTelemetryPort    = "telemetry-port"
 )
 
 // InitCmd returns the command that should be run in order to properly initialize BDJuno

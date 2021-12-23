@@ -100,7 +100,7 @@ func (w Worker) process(height int64) error {
 		if blockModule, ok := module.(modules.BlockModule); ok {
 			err = blockModule.HandleBlock(block, &txs)
 			if err != nil {
-				w.logger.BlockError(module,block,err)
+				w.logger.BlockError(module, block, err)
 				return err
 			}
 		}
@@ -239,7 +239,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 				if messageModule, ok := module.(modules.MessageModule); ok {
 					err = messageModule.HandleEvent(event.Height, event, &tx)
 					if err != nil {
-						w.logger.EventsError(module,&event,err)
+						w.logger.EventsError(module, &event, err)
 						return err
 					}
 				}

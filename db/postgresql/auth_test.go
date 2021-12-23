@@ -2,7 +2,6 @@ package postgresql_test
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/crypto"

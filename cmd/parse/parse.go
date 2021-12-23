@@ -96,7 +96,7 @@ func StartParsing(data *ParserData) error {
 	}
 
 	// Listen for and trap any OS signal to gracefully shutdown and exit
-	trapSignal(data.Proxy, data.Database,data.Logger)
+	trapSignal(data.Proxy, data.Database, data.Logger)
 
 	if cfg.ShouldParseGenesis() {
 		// Add the genesis to the queue if requested
@@ -176,7 +176,7 @@ func startNewBlockListener(exportQueue types.HeightQueue, data *ParserData) {
 
 // trapSignal will listen for any OS signal and invoke Done on the main
 // WaitGroup allowing the main process to gracefully exit.
-func trapSignal(cp *client.Proxy, db db.Database,logger logging.Logger) {
+func trapSignal(cp *client.Proxy, db db.Database, logger logging.Logger) {
 	var sigCh = make(chan os.Signal)
 
 	signal.Notify(sigCh, syscall.SIGTERM)
@@ -184,7 +184,7 @@ func trapSignal(cp *client.Proxy, db db.Database,logger logging.Logger) {
 
 	go func() {
 		sig := <-sigCh
-		logger.Info("caught signal; shutting down...", "signal", sig.String())		
+		logger.Info("caught signal; shutting down...", "signal", sig.String())
 		defer cp.Stop()
 		defer db.Close()
 		defer waitGroup.Done()

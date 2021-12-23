@@ -22,7 +22,7 @@ var (
 
 // Module represents the telemetry module
 type Module struct {
-	cfg types.Config
+	cfg            types.Config
 	messagesParser messages.MessageAddressesParser
 	encodingConfig *params.EncodingConfig
 	flowClient     client.Proxy
@@ -37,13 +37,14 @@ func NewModule(
 	encodingConfig *params.EncodingConfig, db *db.Db,
 ) *Module {
 	return &Module{
-cfg:cfg,
+		cfg:            cfg,
 		messagesParser: messagesParser,
 		encodingConfig: encodingConfig,
 		flowClient:     flowClient,
 		db:             db,
 	}
 }
+
 // Name implements modules.Module
 func (m *Module) Name() string {
 	return ModuleName

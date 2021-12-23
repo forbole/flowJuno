@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/forbole/flowJuno/types"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/forbole/flowJuno/types"
-
 )
 
 // RunAdditionalOperations runs the module additional operations
@@ -16,7 +15,7 @@ func RunAdditionalOperations(cfg types.Config) error {
 	if err != nil {
 		return err
 	}
-	if !cfg.GetTelemetryConfig().GetEnable(){
+	if !cfg.GetTelemetryConfig().GetEnable() {
 		return nil
 	}
 

@@ -40,13 +40,13 @@ func (r *Registrar) BuildModules(
 ) modules.Modules {
 
 	bigDipperBd := postgresql.Cast(database)
-	
+
 	return []modules.Module{
 		messages.NewModule(r.parser, encodingConfig.Marshaler, database),
 		auth.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		consensus.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		staking.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		token.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
-		telemetry.NewModule(cfg,r.parser, *cp, encodingConfig, bigDipperBd),
+		telemetry.NewModule(cfg, r.parser, *cp, encodingConfig, bigDipperBd),
 	}
 }
