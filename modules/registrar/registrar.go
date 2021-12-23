@@ -2,7 +2,6 @@ package registrar
 
 import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
-	"github.com/rs/zerolog/log"
 
 	"github.com/forbole/flowJuno/logging"
 	"github.com/forbole/flowJuno/types"
