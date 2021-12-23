@@ -57,7 +57,6 @@ func VersionCmd() *cobra.Command {
 				return err
 			}
 
-			_, err = fmt.Println(string(bz))
 			return err
 		},
 	}

@@ -42,9 +42,9 @@ func SetupParsing(parseConfig *Config) (*ParserData, error) {
 	}
 
 	// Get the modules
-	mods := parseConfig.GetRegistrar().BuildModules(cfg, &encodingConfig, database, cp)
-	registeredModules := modsregistrar.GetModules(mods, cfg.GetCosmosConfig().GetModules())
 	logger := parseConfig.GetLogger()
+	mods := parseConfig.GetRegistrar().BuildModules(cfg, &encodingConfig, database, cp)
+	registeredModules := modsregistrar.GetModules(mods, cfg.GetCosmosConfig().GetModules(),logger)
 
 	// Run all the additional operations
 	for _, module := range registeredModules {

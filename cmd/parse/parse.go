@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
-	"github.com/rs/zerolog/log"
 
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/logging"
@@ -92,13 +91,12 @@ func StartParsing(data *ParserData) error {
 	// Start each blocking worker in a go-routine where the worker consumes jobs
 	// off of the export queue.
 	for i, w := range workers {
-		log.Debug().Int("number", i+1).Msg("starting worker...")
-
+		data.Logger.Debug("starting worker...", "number", i+1)
 		go w.Start()
 	}
 
 	// Listen for and trap any OS signal to gracefully shutdown and exit
-	trapSignal(data.Proxy, data.Database)
+	trapSignal(data.Proxy, data.Database,data.Logger)
 
 	if cfg.ShouldParseGenesis() {
 		// Add the genesis to the queue if requested
@@ -127,28 +125,27 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, data *ParserData) {
 	// Get the latest height
 	latestBlockHeight, err := data.Proxy.LatestHeight()
 	if err != nil {
-		log.Fatal().Err(fmt.Errorf("failed to get last block from RPC client: %s", err))
+		panic(fmt.Errorf("failed to get last block from RPC client: %s", err))
 	}
 
 	if cfg.UseFastSync() {
-		log.Info().Int64("latest_block_height", latestBlockHeight).
-			Msg("fast sync is enabled, ignoring all previous blocks")
+		data.Logger.Info("fast sync is enabled, ignoring all previous blocks", "latest_block_height", latestBlockHeight)
 		for _, module := range data.Modules {
 			if mod, ok := module.(modules.FastSyncModule); ok {
 				err := mod.DownloadState(latestBlockHeight)
 				if err != nil {
-					log.Error().Err(err).
-						Int64("last_block_height", latestBlockHeight).
-						Str("module", module.Name()).
-						Msg("error while performing fast sync")
+					data.Logger.Error("error while performing fast sync",
+						"err", err,
+						"last_block_height", latestBlockHeight,
+						"module", module.Name(),
+					)
 				}
 			}
 		}
 	} else {
-		log.Info().Int64("latest_block_height", latestBlockHeight).
-			Msg("syncing missing blocks...")
+		data.Logger.Info("syncing missing blocks...", "latest_block_height", latestBlockHeight)
 		for i := cfg.GetStartHeight(); i <= latestBlockHeight; i++ {
-			log.Debug().Int64("height", i).Msg("enqueueing missing block")
+			data.Logger.Debug("enqueueing missing block", "height", i)
 			exportQueue <- i
 		}
 	}
@@ -179,7 +176,7 @@ func startNewBlockListener(exportQueue types.HeightQueue, data *ParserData) {
 
 // trapSignal will listen for any OS signal and invoke Done on the main
 // WaitGroup allowing the main process to gracefully exit.
-func trapSignal(cp *client.Proxy, db db.Database) {
+func trapSignal(cp *client.Proxy, db db.Database,logger logging.Logger) {
 	var sigCh = make(chan os.Signal)
 
 	signal.Notify(sigCh, syscall.SIGTERM)
@@ -187,7 +184,7 @@ func trapSignal(cp *client.Proxy, db db.Database) {
 
 	go func() {
 		sig := <-sigCh
-		log.Info().Str("signal", sig.String()).Msg("caught signal; shutting down...")
+		logger.Info("caught signal; shutting down...", "signal", sig.String())		
 		defer cp.Stop()
 		defer db.Close()
 		defer waitGroup.Done()

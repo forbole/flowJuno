@@ -284,7 +284,6 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 	var event []types.Event
 
-	fmt.Println(tx.TransactionID)
 	ev, err := cp.Events(tx.TransactionID, int(tx.Height))
 	if err != nil {
 		return []types.Event{}, err

@@ -1,9 +1,6 @@
 package modules
 
 import (
-	"fmt"
-	"reflect"
-
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/db"
@@ -43,7 +40,7 @@ func (r *Registrar) BuildModules(
 ) modules.Modules {
 
 	bigDipperBd := postgresql.Cast(database)
-
+	
 	return []modules.Module{
 		messages.NewModule(r.parser, encodingConfig.Marshaler, database),
 		auth.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
