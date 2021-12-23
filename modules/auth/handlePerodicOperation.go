@@ -21,7 +21,7 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 		return err
 	}
 
-	return HandleAccounts(db, flowClient) 
+	return HandleAccounts(db, flowClient)
 }
 
 func HandleAccounts(db *db.Db, flowClient client.Proxy) error {

@@ -7,6 +7,7 @@ import (
 	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/db"
 	"github.com/forbole/flowJuno/db/builder"
+	"github.com/forbole/flowJuno/logging"
 	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/flowJuno/modules/registrar"
 	"github.com/forbole/flowJuno/types"
@@ -19,6 +20,7 @@ type Config struct {
 	encodingConfigBuilder types.EncodingConfigBuilder
 	setupCfg              types.SdkConfigSetup
 	buildDb               db.Builder
+	logger                logging.Logger
 }
 
 // NewConfig allows to build a new Config instance
@@ -96,6 +98,20 @@ func (config *Config) GetDBBuilder() db.Builder {
 	return config.buildDb
 }
 
+// WithLogger sets the logger to be used while parsing the data
+func (cfg *Config) WithLogger(logger logging.Logger) *Config {
+	cfg.logger = logger
+	return cfg
+}
+
+// GetLogger returns the logger to be used when parsing the data
+func (cfg *Config) GetLogger() logging.Logger {
+	if cfg.logger == nil {
+		return logging.DefaultLogger()
+	}
+	return cfg.logger
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 
 // ParserData contains the data that should be used to start parsing the chain
@@ -104,17 +120,19 @@ type ParserData struct {
 	Proxy          *client.Proxy
 	Database       db.Database
 	Modules        []modules.Module
+	Logger         logging.Logger
 }
 
 // NewParserData builds a new ParserData instance
 func NewParserData(
 	encodingConfig *params.EncodingConfig,
-	proxy *client.Proxy, db db.Database, modules []modules.Module,
+	proxy *client.Proxy, db db.Database, modules []modules.Module, logger logging.Logger,
 ) *ParserData {
 	return &ParserData{
 		EncodingConfig: encodingConfig,
 		Proxy:          proxy,
 		Database:       db,
 		Modules:        modules,
+		Logger:         logger,
 	}
 }

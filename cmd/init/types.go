@@ -59,6 +59,9 @@ func DefaultConfigCreator(cmd *cobra.Command) types.Config {
 	pruningKeepRecent, _ := cmd.Flags().GetInt64(flagPruningKeepRecent)
 	pruningInterval, _ := cmd.Flags().GetInt64(flagPruningInterval)
 
+	telemetryEnabled, _ := cmd.Flags().GetBool(flagTelemetryEnabled)
+	telemetryPort, _ := cmd.Flags().GetInt64(flagTelemetryPort)
+
 	return types.NewConfig(
 		types.NewRPCConfig(rpcClientName, rpcAddr, rpcContract),
 		types.NewGrpcConfig(grpcAddr, grpcInsecure),
@@ -88,6 +91,10 @@ func DefaultConfigCreator(cmd *cobra.Command) types.Config {
 			pruningKeepRecent,
 			pruningKeepEvery,
 			pruningInterval,
+		),
+		types.NewTelemetryConfig(
+			telemetryEnabled,
+			telemetryPort,
 		),
 	)
 }

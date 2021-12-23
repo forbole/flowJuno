@@ -1,36 +1,43 @@
-package auth
+package telemetry
 
 import (
 	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/forbole/flowJuno/modules/messages"
 	"github.com/forbole/flowJuno/modules/modules"
-	"github.com/forbole/flowJuno/types"
 
 	"github.com/forbole/flowJuno/client"
+	"github.com/forbole/flowJuno/types"
+
 	db "github.com/forbole/flowJuno/db/postgresql"
-	"github.com/go-co-op/gocron"
+)
+
+const (
+	ModuleName = "telemetry"
 )
 
 var (
-	_ modules.Module            = &Module{}
-	_ modules.TransactionModule = &Module{}
+	_ modules.Module                     = &Module{}
+	_ modules.AdditionalOperationsModule = &Module{}
 )
 
-// Module represents the x/auth module
+// Module represents the telemetry module
 type Module struct {
+	cfg            types.Config
 	messagesParser messages.MessageAddressesParser
 	encodingConfig *params.EncodingConfig
 	flowClient     client.Proxy
 	db             *db.Db
 }
 
-// NewModule builds a new Module instance
+// NewModule returns a new Module implementation
 func NewModule(
+	cfg types.Config,
 	messagesParser messages.MessageAddressesParser,
 	flowClient client.Proxy,
 	encodingConfig *params.EncodingConfig, db *db.Db,
 ) *Module {
 	return &Module{
+		cfg:            cfg,
 		messagesParser: messagesParser,
 		encodingConfig: encodingConfig,
 		flowClient:     flowClient,
@@ -40,15 +47,10 @@ func NewModule(
 
 // Name implements modules.Module
 func (m *Module) Name() string {
-	return "auth"
+	return ModuleName
 }
 
-// HandleEvent implements modules.MessageModule
-func (m *Module) HandleTx(index int, tx *types.Tx) error {
-	return HandleTxs(m.messagesParser, m.encodingConfig.Marshaler, m.db, m.flowClient, tx)
-}
-
-// RegisterPeriodicOperations implements modules.Module
-func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
-	return nil //RegisterPeriodicOps(scheduler, m.db, m.flowClient)
+// RunAdditionalOperations implements modules.AdditionalOperationsModule
+func (m *Module) RunAdditionalOperations() error {
+	return RunAdditionalOperations(m.cfg)
 }

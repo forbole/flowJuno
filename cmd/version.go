@@ -56,8 +56,8 @@ func VersionCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
 			_, err = fmt.Println(string(bz))
+
 			return err
 		},
 	}
