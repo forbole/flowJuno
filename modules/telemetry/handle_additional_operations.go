@@ -15,7 +15,8 @@ func RunAdditionalOperations(cfg types.Config) error {
 	if err != nil {
 		return err
 	}
-	if !cfg.GetTelemetryConfig().GetEnable() {
+	fmt.Printf("telemetry: %t,port: %d", cfg.GetTelemetryConfig().GetEnabled(), cfg.GetTelemetryConfig().GetPort())
+	if !cfg.GetTelemetryConfig().GetEnabled() {
 		return nil
 	}
 
@@ -37,6 +38,7 @@ func checkConfig(cfg types.Config) error {
 func startPrometheus(cfg types.Config) {
 	router := mux.NewRouter()
 	router.Handle("/metrics", promhttp.Handler())
+	fmt.Println("Start Promethus")
 
 	err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.GetTelemetryConfig().GetPort()), router)
 	if err != nil {

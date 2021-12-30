@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/forbole/flowJuno/client"
-	"github.com/forbole/flowJuno/modules/modules"
 	modsregistrar "github.com/forbole/flowJuno/modules/registrar"
 	"github.com/forbole/flowJuno/types"
 )
@@ -45,16 +44,6 @@ func SetupParsing(parseConfig *Config) (*ParserData, error) {
 	logger := parseConfig.GetLogger()
 	mods := parseConfig.GetRegistrar().BuildModules(cfg, &encodingConfig, database, cp)
 	registeredModules := modsregistrar.GetModules(mods, cfg.GetCosmosConfig().GetModules(), logger)
-
-	// Run all the additional operations
-	for _, module := range registeredModules {
-		if module, ok := module.(modules.AdditionalOperationsModule); ok {
-			err := module.RunAdditionalOperations()
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
 
 	return NewParserData(&encodingConfig, cp, database, registeredModules, logger), nil
 }
