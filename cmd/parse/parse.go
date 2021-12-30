@@ -77,7 +77,7 @@ func StartParsing(data *ParserData) error {
 	config := worker.NewConfig(exportQueue, data.EncodingConfig, data.Proxy, data.Database, data.Modules, data.Logger)
 	workers := make([]worker.Worker, cfg.GetWorkers(), cfg.GetWorkers())
 	for i := range workers {
-		workers[i] = worker.NewWorker(config)
+		workers[i] = worker.NewWorker(i, config)
 	}
 
 	waitGroup.Add(1)
