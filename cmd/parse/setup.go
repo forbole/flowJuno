@@ -45,6 +45,5 @@ func SetupParsing(parseConfig *Config) (*ParserData, error) {
 	mods := parseConfig.GetRegistrar().BuildModules(cfg, &encodingConfig, database, cp)
 	registeredModules := modsregistrar.GetModules(mods, cfg.GetCosmosConfig().GetModules(), logger)
 
-
 	return NewParserData(&encodingConfig, cp, database, registeredModules, logger), nil
 }

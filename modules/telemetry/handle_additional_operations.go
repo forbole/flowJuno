@@ -15,7 +15,7 @@ func RunAdditionalOperations(cfg types.Config) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("telemetry: %t,port: %d",cfg.GetTelemetryConfig().GetEnabled(),cfg.GetTelemetryConfig().GetPort())
+	fmt.Printf("telemetry: %t,port: %d", cfg.GetTelemetryConfig().GetEnabled(), cfg.GetTelemetryConfig().GetPort())
 	if !cfg.GetTelemetryConfig().GetEnabled() {
 		return nil
 	}

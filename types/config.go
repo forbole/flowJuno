@@ -492,13 +492,13 @@ var _ TelemetryConfig = &telemetryConfig{}
 
 type telemetryConfig struct {
 	Enabled bool  `toml:"enabled"`
-	Port   int64 `toml:"port"`
+	Port    int64 `toml:"port"`
 }
 
 func NewTelemetryConfig(enabled bool, port int64) TelemetryConfig {
 	return &telemetryConfig{
 		Enabled: enabled,
-		Port:   port,
+		Port:    port,
 	}
 }
 
