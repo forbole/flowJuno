@@ -35,9 +35,9 @@ type Worker struct {
 }
 
 // NewWorker allows to create a new Worker implementation.
-func NewWorker(index int,config *Config) Worker {
+func NewWorker(index int, config *Config) Worker {
 	return Worker{
-		index:   index,
+		index:          index,
 		encodingConfig: config.EncodingConfig,
 		cp:             config.ClientProxy,
 		queue:          config.Queue,
