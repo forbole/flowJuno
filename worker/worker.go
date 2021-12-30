@@ -24,6 +24,8 @@ import (
 // Worker defines a job consumer that is responsible for getting and
 // aggregating block and associated data and exporting it to a database.
 type Worker struct {
+	index int
+
 	queue          types.HeightQueue
 	encodingConfig *params.EncodingConfig
 	cp             *client.Proxy
@@ -33,8 +35,9 @@ type Worker struct {
 }
 
 // NewWorker allows to create a new Worker implementation.
-func NewWorker(config *Config) Worker {
+func NewWorker(index int,config *Config) Worker {
 	return Worker{
+		index:   index,
 		encodingConfig: config.EncodingConfig,
 		cp:             config.ClientProxy,
 		queue:          config.Queue,
@@ -47,6 +50,7 @@ func NewWorker(config *Config) Worker {
 // Start starts a worker by listening for new jobs (block heights) from the
 // given worker queue. Any failed job is logged and re-enqueued.
 func (w Worker) Start() {
+	logging.WorkerCount.Inc()
 
 	for i := range w.queue {
 		if err := w.process(i); err != nil {
@@ -57,6 +61,7 @@ func (w Worker) Start() {
 				w.queue <- i
 			}()
 		}
+		logging.WorkerHeight.WithLabelValues(fmt.Sprintf("%d", w.index)).Set(float64(i))
 	}
 }
 
