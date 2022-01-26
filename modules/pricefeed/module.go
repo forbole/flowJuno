@@ -1,42 +1,42 @@
 package pricefeed
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/forbole/juno/v2/types/config"
+	"github.com/cosmos/cosmos-sdk/simapp/params"
+	"github.com/forbole/flowJuno/modules/messages"
+	"github.com/forbole/flowJuno/modules/modules"
+	"github.com/go-co-op/gocron"
 
-	"github.com/forbole/flowJuno/database"
-
-	"github.com/forbole/juno/v2/modules"
+	"github.com/forbole/flowJuno/client"
+	db "github.com/forbole/flowJuno/db/postgresql"
 )
+
 
 var (
-	_ modules.Module                     = &Module{}
-	_ modules.AdditionalOperationsModule = &Module{}
-	_ modules.PeriodicOperationsModule   = &Module{}
+	_ modules.Module = &Module{}
 )
 
-// Module represents the module that allows to get the token prices
+// Module represents the x/auth module
 type Module struct {
-	cfg           *Config
-	cdc           codec.Marshaler
-	db            *database.Db
-	historyModule HistoryModule
+	messagesParser messages.MessageAddressesParser
+	encodingConfig *params.EncodingConfig
+	flowClient     client.Proxy
+	db             *db.Db
 }
 
-// NewModule returns a new Module instance
-func NewModule(cfg config.Config, historyModule HistoryModule, cdc codec.Marshaler, db *database.Db) *Module {
-	pricefeedCfg, err := ParseConfig(cfg.GetBytes())
-	if err != nil {
-		panic(err)
-	}
-
+// NewModule builds a new Module instance
+func NewModule(
+	messagesParser messages.MessageAddressesParser,
+	flowClient client.Proxy,
+	encodingConfig *params.EncodingConfig, db *db.Db,
+) *Module {
 	return &Module{
-		cfg:           pricefeedCfg,
-		cdc:           cdc,
-		db:            db,
-		historyModule: historyModule,
+		messagesParser: messagesParser,
+		encodingConfig: encodingConfig,
+		flowClient:     flowClient,
+		db:             db,
 	}
 }
+
 
 // Name implements modules.Module
 func (m *Module) Name() string {
