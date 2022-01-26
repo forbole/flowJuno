@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/forbole/bdjuno/v2/types"
+	"github.com/forbole/flowJuno/types"
 )
 
 // UpdateAccountBalanceHistory updates the historic balance for the user having the given address

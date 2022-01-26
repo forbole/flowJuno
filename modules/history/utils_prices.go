@@ -1,7 +1,7 @@
 package history
 
 import (
-	"github.com/forbole/bdjuno/v2/types"
+	"github.com/forbole/flowJuno/types"
 )
 
 // UpdatePricesHistory stores the given prices inside the price history table

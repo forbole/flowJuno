@@ -1,12 +1,13 @@
 package history
 
-import (
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/forbole/juno/v2/modules"
-	"github.com/forbole/juno/v2/modules/messages"
-	"github.com/forbole/juno/v2/types/config"
 
-	"github.com/forbole/bdjuno/v2/database"
+import (
+	"github.com/cosmos/cosmos-sdk/simapp/params"
+	"github.com/forbole/flowJuno/modules/messages"
+	"github.com/forbole/flowJuno/modules/modules"
+
+	"github.com/forbole/flowJuno/client"
+	db "github.com/forbole/flowJuno/db/postgresql"
 )
 
 const (
@@ -14,31 +15,30 @@ const (
 )
 
 var (
-	_ modules.Module                   = &Module{}
-	_ modules.PeriodicOperationsModule = &Module{}
-	_ modules.GenesisModule            = &Module{}
-	_ modules.MessageModule            = &Module{}
+	_ modules.Module = &Module{}
 )
 
-// Module represents the module that allows to store historic information
+// Module represents the x/auth module
 type Module struct {
-	cfg config.ChainConfig
-	cdc codec.Marshaler
-	db  *database.Db
-
-	getAddresses messages.MessageAddressesParser
+	messagesParser messages.MessageAddressesParser
+	encodingConfig *params.EncodingConfig
+	flowClient     client.Proxy
+	db             *db.Db
 }
 
-// NewModule allows to build a new Module instance
-func NewModule(cfg config.ChainConfig, messagesParser messages.MessageAddressesParser, cdc codec.Marshaler, db *database.Db) *Module {
+// NewModule builds a new Module instance
+func NewModule(
+	messagesParser messages.MessageAddressesParser,
+	flowClient client.Proxy,
+	encodingConfig *params.EncodingConfig, db *db.Db,
+) *Module {
 	return &Module{
-		cfg:          cfg,
-		cdc:          cdc,
-		db:           db,
-		getAddresses: messagesParser,
+		messagesParser: messagesParser,
+		encodingConfig: encodingConfig,
+		flowClient:     flowClient,
+		db:             db,
 	}
 }
-
 // Name implements modules.Module
 func (m *Module) Name() string {
 	return moduleName

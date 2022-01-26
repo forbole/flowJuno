@@ -1,51 +1,50 @@
 package types
 
-import "time"
+import (
+	"database/sql"
+	"time"
 
-// Token represents a valid token inside the chain
-type Token struct {
-	Name  string      `yaml:"name"`
-	Units []TokenUnit `yaml:"units"`
+	"github.com/lib/pq"
+)
+
+type TokenUnitRow struct {
+	TokenName string         `db:"token_name"`
+	Denom     string         `db:"denom"`
+	Exponent  int            `db:"exponent"`
+	Aliases   pq.StringArray `db:"aliases"`
+	PriceID   sql.NullString `db:"price_id"`
 }
 
-func NewToken(name string, units []TokenUnit) Token {
-	return Token{
-		Name:  name,
-		Units: units,
-	}
+type TokenRow struct {
+	Name       string `db:"name"`
+	TradedUnit string `db:"traded_unit"`
 }
 
-// TokenUnit represents a unit of a token
-type TokenUnit struct {
-	Denom    string   `yaml:"denom"`
-	Exponent int      `yaml:"exponent"`
-	Aliases  []string `yaml:"aliases,omitempty"`
-	PriceID  string   `yaml:"price_id,omitempty"`
+// --------------------------------------------------------------------------------------------------------------------
+
+// TokenPriceRow represent a row of the table token_price in the database
+type TokenPriceRow struct {
+	ID        string    `db:"id"`
+	Name      string    `db:"unit_name"`
+	Price     float64   `db:"price"`
+	MarketCap int64     `db:"market_cap"`
+	Timestamp time.Time `db:"timestamp"`
 }
 
-func NewTokenUnit(denom string, exponent int, aliases []string, priceID string) TokenUnit {
-	return TokenUnit{
-		Denom:    denom,
-		Exponent: exponent,
-		Aliases:  aliases,
-		PriceID:  priceID,
-	}
-}
-
-// TokenPrice represents the price at a given moment in time of a token unit
-type TokenPrice struct {
-	UnitName  string
-	Price     float64
-	MarketCap int64
-	Timestamp time.Time
-}
-
-// NewTokenPrice returns a new TokenPrice instance containing the given data
-func NewTokenPrice(unitName string, price float64, marketCap int64, timestamp time.Time) TokenPrice {
-	return TokenPrice{
-		UnitName:  unitName,
-		Price:     price,
+// NewTokenPriceRow allows to easily create a new NewTokenPriceRow
+func NewTokenPriceRow(name string, currentPrice float64, marketCap int64, timestamp time.Time) TokenPriceRow {
+	return TokenPriceRow{
+		Name:      name,
+		Price:     currentPrice,
 		MarketCap: marketCap,
 		Timestamp: timestamp,
 	}
+}
+
+// Equals return true if u and v represent the same row
+func (u TokenPriceRow) Equals(v TokenPriceRow) bool {
+	return u.Name == v.Name &&
+		u.Price == v.Price &&
+		u.MarketCap == v.MarketCap &&
+		u.Timestamp.Equal(v.Timestamp)
 }
