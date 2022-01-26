@@ -4,20 +4,27 @@ import (
 	"fmt"
 	"strings"
 
+
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 
-	"github.com/forbole/flowJuno/modules/pricefeed/coingecko"
+	"github.com/forbole/flowJuno/client"
 	"github.com/forbole/flowJuno/modules/utils"
+	"github.com/forbole/flowJuno/types"
+
+	"github.com/forbole/flowJuno/modules/pricefeed/coingecko"
+
+
+	database "github.com/forbole/flowJuno/db/postgresql"
 )
 
 // RegisterPeriodicOperations implements modules.PeriodicOperationsModule
-func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
+func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClient client.Proxy) error {
 	log.Debug().Str("module", "pricefeed").Msg("setting up periodic tasks")
 
 	// Fetch total supply of token in 30 seconds each
 	if _, err := scheduler.Every(30).Second().StartImmediately().Do(func() {
-		utils.WatchMethod(m.updatePrice)
+		utils.WatchMethod(func ()error{return updatePrice(db)})
 	}); err != nil {
 		return fmt.Errorf("error while setting up pricefeed period operations: %s", err)
 	}
@@ -26,7 +33,7 @@ func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
 }
 
 // updatePrice fetch total amount of coins in the system from RPC and store it into database
-func (m *Module) updatePrice() error {
+func updatePrice(db *database.Db ) error {
 	log.Debug().
 		Str("module", "pricefeed").
 		Str("operation", "pricefeed").
@@ -39,7 +46,7 @@ func (m *Module) updatePrice() error {
 	}
 
 	// Get the list of token units
-	units, err := m.db.GetTokenUnits()
+	units, err := db.GetTokenUnits()
 	if err != nil {
 		return fmt.Errorf("error while getting token units: %s", err)
 	}
@@ -72,10 +79,15 @@ func (m *Module) updatePrice() error {
 	}
 
 	// Save the token prices
-	err = m.db.SaveTokensPrices(prices)
+	err = db.SaveTokensPrices(prices)
 	if err != nil {
 		return fmt.Errorf("error while saving token prices: %s", err)
 	}
 
-	return m.historyModule.UpdatePricesHistory(prices)
+	return updatePricesHistory(prices,db)
+}
+
+func updatePricesHistory(prices []types.TokenPrice,db *database.Db) error {
+
+	return db.SaveTokenPricesHistory(prices)
 }
