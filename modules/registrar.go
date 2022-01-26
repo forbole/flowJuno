@@ -16,6 +16,9 @@ import (
 	"github.com/forbole/flowJuno/modules/staking"
 	"github.com/forbole/flowJuno/modules/telemetry"
 	"github.com/forbole/flowJuno/modules/token"
+	"github.com/forbole/flowJuno/modules/history"
+	"github.com/forbole/flowJuno/modules/pricefeed"
+
 )
 
 var (
@@ -48,5 +51,8 @@ func (r *Registrar) BuildModules(
 		staking.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		token.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
 		telemetry.NewModule(cfg, r.parser, *cp, encodingConfig, bigDipperBd),
+		history.NewModule(r.parser, bigDipperBd),
+		pricefeed.NewModule(r.parser, *cp, encodingConfig, bigDipperBd),
+
 	}
 }

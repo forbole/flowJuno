@@ -1,12 +1,10 @@
 package history
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/forbole/flowJuno/modules"
-	"github.com/forbole/flowJuno/modules/messages"
-	"github.com/forbole/flowJuno/types/config"
+	"github.com/forbole/juno/v2/types/config"
 
-	"github.com/forbole/flowJuno/db/db"
+	db "github.com/forbole/flowJuno/db/postgresql"
 )
 
 const (
@@ -15,27 +13,18 @@ const (
 
 var (
 	_ modules.Module                   = &Module{}
-	_ modules.PeriodicOperationsModule = &Module{}
-	_ modules.GenesisModule            = &Module{}
-	_ modules.MessageModule            = &Module{}
 )
 
 // Module represents the module that allows to store historic information
 type Module struct {
 	cfg config.ChainConfig
-	cdc codec.Marshaler
-	db  *database.Db
-
-	getAddresses messages.MessageAddressesParser
+	db  *db.Db
 }
 
 // NewModule allows to build a new Module instance
-func NewModule(cfg config.ChainConfig, messagesParser messages.MessageAddressesParser, cdc codec.Marshaler, db *database.Db) *Module {
+func NewModule(cfg config.ChainConfig,  db *db.Db) *Module {
 	return &Module{
 		cfg:          cfg,
-		cdc:          cdc,
-		db:           db,
-		getAddresses: messagesParser,
 	}
 }
 
