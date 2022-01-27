@@ -39,12 +39,10 @@ func updatePrice(db *database.Db ) error {
 		Str("operation", "pricefeed").
 		Msg("getting token price and market cap")
 
-	// Get the list of coins
-	coins, err := coingecko.GetCoinsList()
-	if err != nil {
-		return fmt.Errorf("error while getting coins list: %s", err)
+	// Since this is specialise for Flow, it does not need to have any variable at
+	coins :=[]coingecko.Token{
+		coingecko.NewToken("FLOW","FLOW","Flow"),
 	}
-
 	// Get the list of token units
 	units, err := db.GetTokenUnits()
 	if err != nil {

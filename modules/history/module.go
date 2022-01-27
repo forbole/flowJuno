@@ -1,7 +1,7 @@
 package history
 
 import (
-	"github.com/forbole/flowJuno/modules"
+	"github.com/forbole/flowJuno/modules/modules"
 	"github.com/forbole/juno/v2/types/config"
 
 	db "github.com/forbole/flowJuno/db/postgresql"
@@ -25,6 +25,7 @@ type Module struct {
 func NewModule(cfg config.ChainConfig,  db *db.Db) *Module {
 	return &Module{
 		cfg:          cfg,
+		db:db,
 	}
 }
 

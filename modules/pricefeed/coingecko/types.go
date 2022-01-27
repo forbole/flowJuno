@@ -12,6 +12,14 @@ type Token struct {
 // Tokens represents a list of Token objects
 type Tokens []Token
 
+func NewToken(id string,symbol string,name string)Token{
+	return Token{
+		ID:id,
+		Symbol: symbol,
+		Name:name,
+	}
+}
+
 // MarketTicker contains the current market data for a single token
 type MarketTicker struct {
 	Symbol       string    `json:"symbol"`
@@ -22,3 +30,12 @@ type MarketTicker struct {
 
 // MarketTickers is an array of MarketTicker
 type MarketTickers []MarketTicker
+
+func NewMarketTicker(symbol string,currentPrice float64,marketCap float64,lastUpdated time.Time)MarketTicker{
+	return MarketTicker{
+		Symbol: symbol,
+		CurrentPrice: currentPrice,
+		MarketCap: marketCap,
+		LastUpdated: lastUpdated,
+	}
+}

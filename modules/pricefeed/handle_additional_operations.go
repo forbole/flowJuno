@@ -24,26 +24,20 @@ func checkConfig(cfg *Config) error {
 func storeTokens(cfg *Config,db *db.Db) error {
 	log.Debug().Str("module", "pricefeed").Msg("storing tokens")
 
-	var prices []types.TokenPrice
-	for _, coin := range cfg.Tokens {
 		// Save the coin as a token with its units
+		coin:=types.NewToken("Flow",[]types.TokenUnit{
+			types.NewTokenUnit("Flow",0,nil,"FLOW"),
+		})
 		err := db.SaveToken(coin)
 		if err != nil {
 			return fmt.Errorf("error while saving token: %s", err)
 		}
 
-		// Create the price entry
-		for _, unit := range coin.Units {
-			// Skip units with empty price ids
-			if unit.PriceID == "" {
-				continue
-			}
-
-			prices = append(prices, types.NewTokenPrice(unit.Denom, 0, 0, time.Time{}))
+		prices := []types.TokenPrice{
+			types.NewTokenPrice("Flow", 0, 0, time.Time{}),
 		}
-	}
 
-	err := db.SaveTokensPrices(prices)
+	err = db.SaveTokensPrices(prices)
 	if err != nil {
 		return fmt.Errorf("error while storing token prices: %s", err)
 	}
