@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/forbole/lowJuno/types"
+	"github.com/forbole/flowJuno/types"
 
-	dbtypes "github.com/forbole/lowJuno/database/types"
+	dbtypes "github.com/forbole/flowJuno/database/types"
 )
 
 func (suite *DbTestSuite) insertToken(name string) {
