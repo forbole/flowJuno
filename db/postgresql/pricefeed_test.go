@@ -6,7 +6,7 @@ import (
 
 	"github.com/forbole/flowJuno/types"
 
-	dbtypes "github.com/forbole/flowJuno/database/types"
+	dbtypes "github.com/forbole/flowJuno/db/types"
 )
 
 func (suite *DbTestSuite) insertToken(name string) {
