@@ -32,7 +32,6 @@ func NewTokenUnit(denom string, exponent int, aliases []string, priceID string) 
 	}
 }
 
-
 // TokenPrice represents the price at a given moment in time of a token unit
 type TokenPrice struct {
 	UnitName  string

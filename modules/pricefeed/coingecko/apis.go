@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"math"
 	"net/http"
-	"strings"
 
 	"github.com/forbole/flowJuno/types"
 )
@@ -20,7 +19,7 @@ func GetCoinsList() (coins Tokens, err error) {
 // GetTokensPrices queries the remote APIs to get the token prices of all the tokens having the given ids
 func GetTokensPrices(ids []string) ([]types.TokenPrice, error) {
 	var prices []MarketTicker
-	query := fmt.Sprintf("/coins/markets?vs_currency=usd&ids=%s", strings.Join(ids, ","))
+	query := "/coins/markets?vs_currency=usd&ids=flow"
 	err := queryCoinGecko(query, &prices)
 	if err != nil {
 		return nil, err

@@ -11,11 +11,9 @@ import (
 	db "github.com/forbole/flowJuno/db/postgresql"
 )
 
-
 var (
-	_ modules.Module = &Module{}
+	_ modules.Module                     = &Module{}
 	_ modules.AdditionalOperationsModule = &Module{}
-
 )
 
 // Module represents the x/auth module
@@ -41,7 +39,6 @@ func NewModule(
 	}
 }
 
-
 // Name implements modules.Module
 func (m *Module) Name() string {
 	return "pricefeed"
@@ -54,10 +51,6 @@ func (m *Module) RegisterPeriodicOperations(scheduler *gocron.Scheduler) error {
 
 // RunAdditionalOperations implements modules.AdditionalOperationsModule
 func (m *Module) RunAdditionalOperations() error {
-	err := checkConfig(m.cfg)
-	if err != nil {
-		return err
-	}
 
-	return storeTokens(m.cfg,m.db)
+	return storeTokens(m.cfg, m.db)
 }

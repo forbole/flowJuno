@@ -12,11 +12,11 @@ type Token struct {
 // Tokens represents a list of Token objects
 type Tokens []Token
 
-func NewToken(id string,symbol string,name string)Token{
+func NewToken(id string, symbol string, name string) Token {
 	return Token{
-		ID:id,
+		ID:     id,
 		Symbol: symbol,
-		Name:name,
+		Name:   name,
 	}
 }
 
@@ -31,11 +31,11 @@ type MarketTicker struct {
 // MarketTickers is an array of MarketTicker
 type MarketTickers []MarketTicker
 
-func NewMarketTicker(symbol string,currentPrice float64,marketCap float64,lastUpdated time.Time)MarketTicker{
+func NewMarketTicker(symbol string, currentPrice float64, marketCap float64, lastUpdated time.Time) MarketTicker {
 	return MarketTicker{
-		Symbol: symbol,
+		Symbol:       symbol,
 		CurrentPrice: currentPrice,
-		MarketCap: marketCap,
-		LastUpdated: lastUpdated,
+		MarketCap:    marketCap,
+		LastUpdated:  lastUpdated,
 	}
 }

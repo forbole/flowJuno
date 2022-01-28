@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/forbole/flowJuno/types"
 
 	"github.com/forbole/flowJuno/modules/pricefeed/coingecko"
-
 
 	database "github.com/forbole/flowJuno/db/postgresql"
 )
@@ -24,7 +22,7 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 
 	// Fetch total supply of token in 30 seconds each
 	if _, err := scheduler.Every(30).Second().StartImmediately().Do(func() {
-		utils.WatchMethod(func ()error{return updatePrice(db)})
+		utils.WatchMethod(func() error { return updatePrice(db) })
 	}); err != nil {
 		return fmt.Errorf("error while setting up pricefeed period operations: %s", err)
 	}
@@ -33,15 +31,15 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 }
 
 // updatePrice fetch total amount of coins in the system from RPC and store it into database
-func updatePrice(db *database.Db ) error {
+func updatePrice(db *database.Db) error {
 	log.Debug().
 		Str("module", "pricefeed").
 		Str("operation", "pricefeed").
 		Msg("getting token price and market cap")
 
 	// Since this is specialise for Flow, it does not need to have any variable at
-	coins :=[]coingecko.Token{
-		coingecko.NewToken("FLOW","FLOW","Flow"),
+	coins := []coingecko.Token{
+		coingecko.NewToken("flow", "flow", "flow"),
 	}
 	// Get the list of token units
 	units, err := db.GetTokenUnits()
@@ -76,16 +74,18 @@ func updatePrice(db *database.Db ) error {
 		return fmt.Errorf("error while getting tokens prices: %s", err)
 	}
 
+	fmt.Println(fmt.Sprintf("Price:%f", prices[0].Price))
+
 	// Save the token prices
 	err = db.SaveTokensPrices(prices)
 	if err != nil {
 		return fmt.Errorf("error while saving token prices: %s", err)
 	}
 
-	return updatePricesHistory(prices,db)
+	return updatePricesHistory(prices, db)
 }
 
-func updatePricesHistory(prices []types.TokenPrice,db *database.Db) error {
+func updatePricesHistory(prices []types.TokenPrice, db *database.Db) error {
 
 	return db.SaveTokenPricesHistory(prices)
 }
