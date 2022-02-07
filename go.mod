@@ -6,7 +6,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.42.9
 	github.com/desmos-labs/juno v0.0.0-20210820090829-4142e0029177
 	github.com/go-co-op/gocron v0.3.3
-	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/gorilla/mux v1.8.0
 	github.com/jmoiron/sqlx v1.2.1-0.20200324155115-ee514944af4b
 	github.com/lib/pq v1.9.0
 	github.com/onflow/cadence v0.18.0
@@ -22,7 +22,7 @@ require (
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	google.golang.org/grpc v1.37.0
 	gopkg.in/yaml.v2 v2.4.0
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
