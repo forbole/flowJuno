@@ -350,7 +350,7 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 }
 
 // createPartition allows to create a partition with the id for the given table name
-func (db *Database) createPartition(table string, id int) error {
+func (db *Database) CreatePartition(table string, id int) error {
 	stmt := fmt.Sprintf(
 		"CREATE TABLE IF NOT EXISTS %v_%d PARTITION OF %v FOR VALUES IN (%d)",
 		table,
@@ -358,16 +358,16 @@ func (db *Database) createPartition(table string, id int) error {
 		table,
 		id,
 	)
-	_, err := db.Exec(stmt)
+	_, err := db.Sql.Exec(stmt)
 	return err
 }
 
 // dropPartition allows to drop a partition with the given partition name
-func (db *Database) dropPartition(name string) error {
+func (db *Database) DropPartition(name string) error {
 	stmt := fmt.Sprintf(
 		"DROP TABLE IF EXISTS %v",
 		name,
 	)
-	_, err := db.Exec(stmt)
+	_, err := db.Sql.Exec(stmt)
 	return err
 }

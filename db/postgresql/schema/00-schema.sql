@@ -93,9 +93,3 @@ CREATE TABLE event
 
 CREATE INDEX event_index ON event (height);
 
-
-CREATE TABLE pruning
-(
-    last_pruned_height BIGINT NOT NULL
-);
-
