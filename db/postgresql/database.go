@@ -60,3 +60,4 @@ func Cast(db db.Database) *Db {
 	}
 	return bdDatabase
 }
+

@@ -50,6 +50,25 @@ CREATE TABLE transaction
 );
 CREATE INDEX transaction_index ON transaction (height);
 
+CREATE TABLE transaction_partioned
+(
+		height BIGINT NOT NULL REFERENCES block (height),
+        transaction_id TEXT NOT NULL REFERENCES collection (transaction_id),
+
+		script TEXT ,
+		arguments TEXT[],
+		reference_block_id TEXT,
+		gas_limit BIGINT,
+		proposal_key TEXT,
+		payer TEXT,
+		authorizers TEXT[],
+		payload_signature JSONB,
+		envelope_signatures JSONB
+) PARTITION BY LIST  (height);
+
+create table clients_1 
+   partition of clients_partioned
+   for values in (1,2,3);
 
 CREATE TABLE transaction_result
 (  height BIGINT  NOT NULL REFERENCES block (height),
