@@ -57,8 +57,7 @@ CREATE TABLE transaction_result
   status TEXT  NOT NULL ,
   error TEXT,
   partition_id    INT     NOT NULL
- 
-)PARTITION BY LIST(partition_id);
+) PARTITION BY LIST(partition_id);
 
 CREATE INDEX transaction_result_index ON transaction_result (height);
 
@@ -69,8 +68,10 @@ CREATE TABLE event
     transaction_id TEXT REFERENCES collection (transaction_id),
     transaction_index TEXT,
     event_index BIGINT,
-    value TEXT
-);
+    value TEXT,
+    partition_id    INT     NOT NULL
+
+)  PARTITION BY LIST(partition_id);
 
 CREATE INDEX event_index ON event (height);
 
