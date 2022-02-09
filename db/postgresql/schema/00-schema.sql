@@ -46,40 +46,21 @@ CREATE TABLE transaction
 		payer TEXT,
 		authorizers TEXT[],
 		payload_signature JSONB,
-		envelope_signatures JSONB
-);
+		envelope_signatures JSONB,
+        partition_id    INT     NOT NULL
+) PARTITION BY LIST(partition_id);
 CREATE INDEX transaction_index ON transaction (height);
-
-CREATE TABLE transaction_partioned
-(
-		height BIGINT NOT NULL REFERENCES block (height),
-        transaction_id TEXT NOT NULL REFERENCES collection (transaction_id),
-
-		script TEXT ,
-		arguments TEXT[],
-		reference_block_id TEXT,
-		gas_limit BIGINT,
-		proposal_key TEXT,
-		payer TEXT,
-		authorizers TEXT[],
-		payload_signature JSONB,
-		envelope_signatures JSONB
-) PARTITION BY LIST  (height);
-
-create table clients_1 
-   partition of clients_partioned
-   for values in (1,2,3);
 
 CREATE TABLE transaction_result
 (  height BIGINT  NOT NULL REFERENCES block (height),
   transaction_id TEXT  NOT NULL REFERENCES collection (transaction_id),
   status TEXT  NOT NULL ,
-  error TEXT 
-);
+  error TEXT,
+  partition_id    INT     NOT NULL
+ 
+)PARTITION BY LIST(partition_id);
 
 CREATE INDEX transaction_result_index ON transaction_result (height);
-
-
 
 CREATE TABLE event
 (

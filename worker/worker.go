@@ -2,7 +2,6 @@ package worker
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/forbole/flowJuno/logging"
 	"github.com/onflow/flow-go-sdk"
@@ -99,8 +98,10 @@ func (w Worker) process(height int64) error {
 	// the table should have a computed field which is int(height/100) round to 10^3
 	if height % 100 ==0{
 		patch:=int(height/100)
+		log.Debug().Int64("height", height).Msg(fmt.Sprintf("Making partition #%d",patch))
 
-		err=w.db.CreatePartition("block",patch)
+
+		/* err=w.db.CreatePartition("block",patch)
 		if err!=nil{
 			return fmt.Errorf("Error creating partition on %d at block table: %s",height,err)
 		}
@@ -114,12 +115,12 @@ func (w Worker) process(height int64) error {
 		if err!=nil{
 			return fmt.Errorf("Error creating partition on %d at collection table: %s",height,err)
 		}
-
+ */
 		err=w.db.CreatePartition("transaction",patch)
 		if err!=nil{
 			return fmt.Errorf("Error creating partition on %d at transaction table:%s",height,err)
 		}
-
+/* 
 		err=w.db.CreatePartition("transaction_result",patch)
 		if err!=nil{
 			return fmt.Errorf("Error creating partition on %d at transaction_result table:%s",height,err)
@@ -128,10 +129,9 @@ func (w Worker) process(height int64) error {
 		err=w.db.CreatePartition("event",patch)
 		if err!=nil{
 			return fmt.Errorf("Error creating partition on %d at event table:%s",height,err)
-		}
+		} */
 	}
 
-	partition:=math.Floor(float64(height/100))
 
 	txs, err := w.cp.Txs(block)
 	if err != nil {

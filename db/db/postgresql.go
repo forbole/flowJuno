@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
 
 	"github.com/forbole/flowJuno/logging"
 
@@ -124,16 +125,16 @@ func (db *Database) SaveTxs(txs types.Txs) error {
 	}
 	sqlStatement := `
 INSERT INTO transaction 
-    (height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures ) 
+    (height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures,partition_id ) 
 VALUES `
 
 	var vparams []interface{}
 	for i, tx := range txs {
-		vi := i * 11
-		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),`,
-			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11)
+		vi := i * 12
+		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d,$%d),`,
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11,vi+12)
 		vparams = append(vparams, tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, pq.StringArray(tx.Authorizers),
-			tx.PayloadSignatures, tx.EnvelopeSignatures)
+			tx.PayloadSignatures, tx.EnvelopeSignatures, getPartitionId(int64(tx.Height)))
 
 	}
 	sqlStatement = sqlStatement[:len(sqlStatement)-1] // Remove trailing ,
@@ -333,10 +334,9 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 
 	for i, rows := range transactionResult {
 		ai := i * 4
-		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4,ai+5)
 
-		params = append(params, height, rows.TransactionId, rows.Status, rows.Error)
-
+		params = append(params, height, rows.TransactionId, rows.Status, rows.Error, getPartitionId(int64(height)))
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
@@ -370,4 +370,8 @@ func (db *Database) DropPartition(name string) error {
 	)
 	_, err := db.Sql.Exec(stmt)
 	return err
+}
+
+func getPartitionId(height int64) float64{
+	return math.Floor(float64(height/100))
 }
