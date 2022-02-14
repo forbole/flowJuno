@@ -132,7 +132,7 @@ VALUES `
 	for i, tx := range txs {
 		vi := i * 12
 		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d,$%d),`,
-			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11,vi+12)
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11, vi+12)
 		vparams = append(vparams, tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, pq.StringArray(tx.Authorizers),
 			tx.PayloadSignatures, tx.EnvelopeSignatures, getPartitionId(int64(tx.Height)))
 
@@ -294,7 +294,7 @@ func (db *Database) SaveEvents(events []types.Event) error {
 
 		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d),",
 			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7)
-		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value.String(),getPartitionId(int64(event.Height)))
+		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value.String(), getPartitionId(int64(event.Height)))
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
@@ -334,7 +334,7 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 
 	for i, rows := range transactionResult {
 		ai := i * 5
-		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4,ai+5)
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
 
 		params = append(params, height, rows.TransactionId, rows.Status, rows.Error, getPartitionId(int64(height)))
 	}
@@ -372,6 +372,6 @@ func (db *Database) DropPartition(name string) error {
 	return err
 }
 
-func getPartitionId(height int64) float64{
-	return math.Floor(float64(height/100))
+func getPartitionId(height int64) float64 {
+	return math.Floor(float64(height / 100))
 }
