@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
 
 	"github.com/forbole/flowJuno/logging"
 
@@ -124,16 +125,16 @@ func (db *Database) SaveTxs(txs types.Txs) error {
 	}
 	sqlStatement := `
 INSERT INTO transaction 
-    (height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures ) 
+    (height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures,partition_id ) 
 VALUES `
 
 	var vparams []interface{}
 	for i, tx := range txs {
-		vi := i * 11
-		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),`,
-			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11)
+		vi := i * 12
+		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d,$%d),`,
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11, vi+12)
 		vparams = append(vparams, tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, pq.StringArray(tx.Authorizers),
-			tx.PayloadSignatures, tx.EnvelopeSignatures)
+			tx.PayloadSignatures, tx.EnvelopeSignatures, getPartitionId(int64(tx.Height)))
 
 	}
 	sqlStatement = sqlStatement[:len(sqlStatement)-1] // Remove trailing ,
@@ -284,16 +285,16 @@ func (db *Database) SaveEvents(events []types.Event) error {
 	}
 
 	stmt := `INSERT INTO event (
-		height,type,transaction_id,transaction_index,event_index,value
+		height,type,transaction_id,transaction_index,event_index,value, partition_id
 	) VALUES `
 
 	var vparams []interface{}
 	for i, event := range events {
-		vi := i * 6
+		vi := i * 7
 
-		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d),",
-			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6)
-		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value.String())
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d),",
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7)
+		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value.String(), getPartitionId(int64(event.Height)))
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
@@ -327,16 +328,15 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 	return nil
 }
 func (db *Database) SaveTransactionResult(transactionResult []types.TransactionResult, height uint64) error {
-	stmt := `INSERT INTO transaction_result(height,transaction_id,status,error) VALUES `
+	stmt := `INSERT INTO transaction_result(height,transaction_id,status,error,partition_id) VALUES `
 
 	var params []interface{}
 
 	for i, rows := range transactionResult {
-		ai := i * 4
-		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
+		ai := i * 5
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
 
-		params = append(params, height, rows.TransactionId, rows.Status, rows.Error)
-
+		params = append(params, height, rows.TransactionId, rows.Status, rows.Error, getPartitionId(int64(height)))
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
@@ -347,4 +347,31 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 	}
 
 	return nil
+}
+
+// createPartition allows to create a partition with the id for the given table name
+func (db *Database) CreatePartition(table string, id int) error {
+	stmt := fmt.Sprintf(
+		"CREATE TABLE IF NOT EXISTS %v_%d PARTITION OF %v FOR VALUES IN (%d)",
+		table,
+		id,
+		table,
+		id,
+	)
+	_, err := db.Sql.Exec(stmt)
+	return err
+}
+
+// dropPartition allows to drop a partition with the given partition name
+func (db *Database) DropPartition(name string) error {
+	stmt := fmt.Sprintf(
+		"DROP TABLE IF EXISTS %v",
+		name,
+	)
+	_, err := db.Sql.Exec(stmt)
+	return err
+}
+
+func getPartitionId(height int64) float64 {
+	return math.Floor(float64(height / 100))
 }

@@ -65,6 +65,7 @@ func (w Worker) Start() {
 	}
 }
 
+//nolint:gocyclo
 // process defines the job consumer workflow. It will fetch a block for a given
 // height and associated metadata and export it to a database. It returns an
 // error if any export process fails.
@@ -92,6 +93,18 @@ func (w Worker) process(height int64) error {
 
 	if height == int64(w.cp.GetGenesisHeight()) {
 		return w.HandleGenesis(block)
+	}
+
+	// create partition for all table indexed by height
+	// the table should have a computed field which is int(height/100) round to 10^3
+	if height%100 == 0 {
+		patch := int(height / 100)
+		log.Debug().Int64("height", height).Msg(fmt.Sprintf("Making partition #%d", patch))
+
+		err=w.CreateDbPartition(patch)
+		if err!=nil{
+			return err
+		}
 	}
 
 	txs, err := w.cp.Txs(block)
@@ -135,11 +148,26 @@ func (w Worker) process(height int64) error {
 		transactionIDs = append(transactionIDs, (collection.TransactionIds)...)
 	}
 
-	err = w.ExportTransactionResult(transactionIDs, height)
+	return w.ExportTransactionResult(transactionIDs, height)
+	
+}
+
+func (w Worker) CreateDbPartition(patch int)error{
+
+	err := w.db.CreatePartition("transaction", patch)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error creating partition on patch %d at transaction table:%s", patch, err)
 	}
 
+	err = w.db.CreatePartition("transaction_result", patch)
+	if err != nil {
+		return fmt.Errorf("Error creating partition on patch %d at transaction_result table:%s", patch, err)
+	}
+
+	err = w.db.CreatePartition("event", patch)
+	if err != nil {
+		return fmt.Errorf("Error creating partition on patch %d at event table:%s", patch, err)
+	}
 	return nil
 }
 

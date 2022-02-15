@@ -46,21 +46,20 @@ CREATE TABLE transaction
 		payer TEXT,
 		authorizers TEXT[],
 		payload_signature JSONB,
-		envelope_signatures JSONB
-);
+		envelope_signatures JSONB,
+        partition_id    INT     NOT NULL
+) PARTITION BY LIST(partition_id);
 CREATE INDEX transaction_index ON transaction (height);
-
 
 CREATE TABLE transaction_result
 (  height BIGINT  NOT NULL REFERENCES block (height),
   transaction_id TEXT  NOT NULL REFERENCES collection (transaction_id),
   status TEXT  NOT NULL ,
-  error TEXT 
-);
+  error TEXT,
+  partition_id    INT     NOT NULL
+) PARTITION BY LIST(partition_id);
 
 CREATE INDEX transaction_result_index ON transaction_result (height);
-
-
 
 CREATE TABLE event
 (
@@ -69,14 +68,10 @@ CREATE TABLE event
     transaction_id TEXT REFERENCES collection (transaction_id),
     transaction_index TEXT,
     event_index BIGINT,
-    value TEXT
-);
+    value TEXT,
+    partition_id    INT     NOT NULL
+
+)  PARTITION BY LIST(partition_id);
 
 CREATE INDEX event_index ON event (height);
-
-
-CREATE TABLE pruning
-(
-    last_pruned_height BIGINT NOT NULL
-);
 
