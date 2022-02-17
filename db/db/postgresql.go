@@ -104,11 +104,11 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 	}
 
 	var params []interface{}
-	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures) VALUES `
+	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures,result_approval_signatures) VALUES `
 	for i, seal := range block.Seals {
-		vi := i * 3
-		stmt += fmt.Sprintf("($%d, $%d, $%d),", vi+1, vi+2, vi+3)
-		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures))
+		vi := i * 4
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d),", vi+1, vi+2, vi+3, vi+4)
+		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures),pq.ByteaArray(seal.ResultApprovalSignatures))
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
