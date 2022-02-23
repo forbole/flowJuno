@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/rs/zerolog/log"
 
@@ -190,14 +191,16 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 	collectionsID := block.CollectionGuarantees
 	collections := make([]types.Collection, len(block.CollectionGuarantees))
 	for i, c := range collectionsID {
-		processed := true
 		collection, err := cp.flowClient.GetCollection(cp.ctx, c.CollectionID)
 
 		if err != nil {
-			processed = false
+			// When it do not have a collection transaction yet at that block. It do not have a transaction ID
+			fmt.Println(err.Error())
+			collections[i] = types.NewCollection(block.Height,c.CollectionID.String() , false,nil)
+			continue
 		}
 
-		collections[i] = types.NewCollection(block.Height, collection.ID().String(), processed, collection.TransactionIDs)
+		collections[i] = types.NewCollection(block.Height, c.CollectionID.String(), true, collection.TransactionIDs)
 	}
 	return collections
 }
