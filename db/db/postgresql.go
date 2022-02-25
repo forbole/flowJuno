@@ -117,9 +117,9 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 	_, err = db.Sql.Exec(stmt, params...)
 
 	// When no partitioin is being made it should make a partition (more efficient to handle error)
-	if err!=nil && strings.Contains(err.Error(), "no partition of relation"){
-		err=db.CreatePartitions(int(getPartitionId(int64(block.Height))))
-		if err!=nil{
+	if err != nil && strings.Contains(err.Error(), "no partition of relation") {
+		err = db.CreatePartitions(int(getPartitionId(int64(block.Height))))
+		if err != nil {
 			return err
 		}
 		_, err = db.Sql.Exec(stmt, params...)
@@ -392,7 +392,6 @@ func (db *Database) DropPartition(name string) error {
 func getPartitionId(height int64) float64 {
 	return math.Floor(float64(height / 100))
 }
-
 
 func (db *Database) CreatePartitions(patch int) error {
 

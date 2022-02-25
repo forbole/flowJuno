@@ -153,7 +153,6 @@ func (w Worker) process(height int64) error {
 
 }
 
-
 func (w Worker) ExportTransactionResult(txids []flow.Identifier, height int64) error {
 	txResults, err := w.cp.TransactionResult(txids)
 	if len(txResults) == 0 {

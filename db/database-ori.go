@@ -58,7 +58,6 @@ type Database interface {
 
 	CreatePartitions(id int) error
 
-
 	// Close closes the connection to the database
 	Close()
 }
