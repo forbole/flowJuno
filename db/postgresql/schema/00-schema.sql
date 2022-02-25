@@ -14,9 +14,10 @@ CREATE INDEX block_id_index ON block (id);
 CREATE TABLE block_seal
 (
     height BIGINT NOT NULL REFERENCES block (height),
-    execution_receipt_id TEXT UNIQUE,
-    execution_receipt_signatures TEXT[][]
-);
+    execution_receipt_id TEXT,
+    execution_receipt_signatures TEXT[][],
+    partition_id    INT     NOT NULL
+) PARTITION BY LIST(partition_id);
 
 CREATE INDEX block_seal_index ON block_seal (height);
 CREATE INDEX block_seal_execution_receipt_id_index ON block_seal (execution_receipt_id);
@@ -26,9 +27,9 @@ CREATE TABLE collection
 (  height BIGINT  NOT NULL REFERENCES block (height),
   id TEXT  NOT NULL,
   processed BOOLEAN  NOT NULL ,
-  transaction_id TEXT  NOT NULL DEFAULT ' '
-);
-
+  transaction_id TEXT  NOT NULL DEFAULT ' ',
+  partition_id    INT     NOT NULL
+) PARTITION BY LIST(partition_id);
 CREATE INDEX collection_index ON collection (height);
 CREATE INDEX collection_transaction_id_index ON collection (transaction_id);
 

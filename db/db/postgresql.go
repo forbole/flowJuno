@@ -104,11 +104,11 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 	}
 
 	var params []interface{}
-	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures) VALUES `
+	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures,partition_id) VALUES `
 	for i, seal := range block.Seals {
-		vi := i * 3
-		stmt += fmt.Sprintf("($%d, $%d, $%d),", vi+1, vi+2, vi+3)
-		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures))
+		vi := i * 4
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d),", vi+1, vi+2, vi+3, vi+4)
+		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures), getPartitionId(int64(block.Height)))
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
@@ -304,24 +304,24 @@ func (db *Database) SaveEvents(events []types.Event) error {
 }
 
 func (db *Database) SaveCollection(collection []types.Collection) error {
-	stmt := `INSERT INTO collection(height,id,processed,transaction_id) VALUES `
+	stmt := `INSERT INTO collection(height,id,processed,transaction_id,partition_id) VALUES `
 
 	var params []interface{}
 
 	i := 0
 	for _, rows := range collection {
-		if rows.TransactionIds==nil{
-			ai := i * 4
-			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
-			params = append(params, rows.Height, rows.Id, rows.Processed," ")
+		if !rows.Processed {
+			ai := i * 5
+			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
+			params = append(params, rows.Height, rows.Id, rows.Processed, " ", getPartitionId(int64(rows.Height)))
 			i++
-			continue
-		}
-		for _, txid := range rows.TransactionIds {
-			ai := i * 4
-			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
-			params = append(params, rows.Height, rows.Id, rows.Processed, txid.String())
-			i++
+		} else {
+			for _, txid := range rows.TransactionIds {
+				ai := i * 5
+				stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
+				params = append(params, rows.Height, rows.Id, rows.Processed, txid.String(), getPartitionId(int64(rows.Height)))
+				i++
+			}
 		}
 	}
 	stmt = stmt[:len(stmt)-1]
