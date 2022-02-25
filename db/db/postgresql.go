@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/forbole/flowJuno/logging"
 
@@ -112,8 +113,17 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
-	stmt += " ON CONFLICT DO NOTHING"
+	stmt += " ON CONFLICT DO NOTHING;"
 	_, err = db.Sql.Exec(stmt, params...)
+
+	// When no partitioin is being made it should make a partition (more efficient to handle error)
+	if err!=nil && strings.Contains(err.Error(), "no partition of relation"){
+		err=db.CreatePartitions(int(getPartitionId(int64(block.Height))))
+		if err!=nil{
+			return err
+		}
+		_, err = db.Sql.Exec(stmt, params...)
+	}
 
 	return err
 }
@@ -381,4 +391,34 @@ func (db *Database) DropPartition(name string) error {
 
 func getPartitionId(height int64) float64 {
 	return math.Floor(float64(height / 100))
+}
+
+
+func (db *Database) CreatePartitions(patch int) error {
+
+	err := db.CreatePartition("block_seal", patch)
+	if err != nil {
+		return fmt.Errorf("Error creating partition on patch %d at event table:%s", patch, err)
+	}
+
+	err = db.CreatePartition("collection", patch)
+	if err != nil {
+		return fmt.Errorf("Error creating partition on patch %d at event table:%s", patch, err)
+	}
+
+	err = db.CreatePartition("transaction", patch)
+	if err != nil {
+		return fmt.Errorf("Error creating partition on patch %d at transaction table:%s", patch, err)
+	}
+
+	err = db.CreatePartition("transaction_result", patch)
+	if err != nil {
+		return fmt.Errorf("Error creating partition on patch %d at transaction_result table:%s", patch, err)
+	}
+
+	err = db.CreatePartition("event", patch)
+	if err != nil {
+		return fmt.Errorf("Error creating partition on patch %d at event table:%s", patch, err)
+	}
+	return nil
 }
