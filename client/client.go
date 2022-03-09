@@ -196,7 +196,7 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 		if err != nil {
 			// When it do not have a collection transaction yet at that block. It do not have a transaction ID
 			fmt.Println(err.Error())
-			collections[i] = types.NewCollection(block.Height,c.CollectionID.String() , false,nil)
+			collections[i] = types.NewCollection(block.Height, c.CollectionID.String(), false, nil)
 			continue
 		}
 
