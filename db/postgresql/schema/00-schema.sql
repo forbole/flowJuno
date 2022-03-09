@@ -76,5 +76,4 @@ CREATE TABLE event
 
 CREATE INDEX event_index ON event (height);
 
-/* CREATE TABLE event PARTITION OF event FOR DEFAULT;
- */
+/*CREATE TABLE event PARTITION OF event FOR DEFAULT;*/

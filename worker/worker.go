@@ -153,17 +153,17 @@ func (w Worker) process(height int64) error {
 
 func (w Worker) CreateDbPartition(height int64)error{
 
-	err := w.db.CreatePartition("transaction", height,100)
+	err := w.db.CreatePartition("transaction", height,10000)
 	if err != nil {
 		return fmt.Errorf("Error creating partition on patch %d at transaction table:%s", height, err)
 	}
 
-	err = w.db.CreatePartition("transaction_result", height,100)
+	err = w.db.CreatePartition("transaction_result", height,10000)
 	if err != nil {
 		return fmt.Errorf("Error creating partition on patch %d at transaction_result table:%s", height, err)
 	}
 
-	err = w.db.CreatePartition("event", height,100)
+	err = w.db.CreatePartition("event", height,10000)
 	if err != nil {
 		return fmt.Errorf("Error creating partition on patch %d at event table:%s", height, err)
 	}
