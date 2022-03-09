@@ -52,7 +52,7 @@ type Database interface {
 	SaveTransactionResult(txResults []types.TransactionResult, height uint64) error
 
 	//Partition
-	CreatePartition(table string, id int) error
+	CreatePartition(table string, height int64, heightRange int64) error
 
 	DropPartition(name string) error
 

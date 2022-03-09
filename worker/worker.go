@@ -98,10 +98,9 @@ func (w Worker) process(height int64) error {
 	// create partition for all table indexed by height
 	// the table should have a computed field which is int(height/100) round to 10^3
 	if height%100 == 0 {
-		patch := int(height / 100)
-		log.Debug().Int64("height", height).Msg(fmt.Sprintf("Making partition #%d", patch))
+		log.Debug().Int64("height", height).Msg(fmt.Sprintf("Making partition #%d", height))
 
-		err=w.CreateDbPartition(patch)
+		err=w.CreateDbPartition(height)
 		if err!=nil{
 			return err
 		}
@@ -152,21 +151,21 @@ func (w Worker) process(height int64) error {
 	
 }
 
-func (w Worker) CreateDbPartition(patch int)error{
+func (w Worker) CreateDbPartition(height int64)error{
 
-	err := w.db.CreatePartition("transaction", patch)
+	err := w.db.CreatePartition("transaction", height,100)
 	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at transaction table:%s", patch, err)
+		return fmt.Errorf("Error creating partition on patch %d at transaction table:%s", height, err)
 	}
 
-	err = w.db.CreatePartition("transaction_result", patch)
+	err = w.db.CreatePartition("transaction_result", height,100)
 	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at transaction_result table:%s", patch, err)
+		return fmt.Errorf("Error creating partition on patch %d at transaction_result table:%s", height, err)
 	}
 
-	err = w.db.CreatePartition("event", patch)
+	err = w.db.CreatePartition("event", height,100)
 	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at event table:%s", patch, err)
+		return fmt.Errorf("Error creating partition on patch %d at event table:%s", height, err)
 	}
 	return nil
 }
