@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"math"
 
 	"github.com/forbole/flowJuno/logging"
 
@@ -370,8 +369,4 @@ func (db *Database) DropPartition(name string) error {
 	)
 	_, err := db.Sql.Exec(stmt)
 	return err
-}
-
-func getPartitionId(height int64) float64 {
-	return math.Floor(float64(height / 100))
 }

@@ -50,7 +50,7 @@ CREATE TABLE transaction
 ) PARTITION BY RANGE(height);
 CREATE INDEX transaction_index ON transaction (height);
 
-/* CREATE TABLE transaction_default PARTITION OF transaction FOR DEFAULT; */
+CREATE TABLE transaction_default PARTITION OF transaction DEFAULT; 
 
 
 
@@ -62,7 +62,7 @@ CREATE TABLE transaction_result
 ) PARTITION BY RANGE(height);
 
 CREATE INDEX transaction_result_index ON transaction_result (height);
-/*CREATE TABLE transaction_result_default PARTITION OF transaction_result FOR DEFAULT;*/
+CREATE TABLE transaction_result_default PARTITION OF transaction_result DEFAULT;
 
 CREATE TABLE event
 (
@@ -76,4 +76,4 @@ CREATE TABLE event
 
 CREATE INDEX event_index ON event (height);
 
-/*CREATE TABLE event PARTITION OF event FOR DEFAULT;*/
+CREATE TABLE event_default PARTITION OF event DEFAULT;

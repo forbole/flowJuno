@@ -97,7 +97,7 @@ func (w Worker) process(height int64) error {
 
 	// create partition for all table indexed by height
 	// the table should have a computed field which is int(height/100) round to 10^3
-	if height%100 == 0 {
+	if height%10000 == 0 {
 		log.Debug().Int64("height", height).Msg(fmt.Sprintf("Making partition #%d", height))
 
 		err=w.CreateDbPartition(height)
