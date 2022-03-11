@@ -49,7 +49,7 @@ func Builder(cfg types.DatabaseConfig, encodingConfig *params.EncodingConfig) (d
 	postgresDb.SetMaxOpenConns(cfg.GetMaxOpenConnections())
 	postgresDb.SetMaxIdleConns(cfg.GetMaxIdleConnections())
 
-	return &Database{Sql: postgresDb, EncodingConfig: encodingConfig}, nil
+	return &Database{Sql: postgresDb, EncodingConfig: encodingConfig,PartitionSize: cfg.GetPartitionSize()}, nil
 }
 
 // type check to ensure interface is properly implemented
@@ -61,6 +61,8 @@ type Database struct {
 	Sql            *sql.DB
 	EncodingConfig *params.EncodingConfig
 	Logger         logging.Logger
+	PartitionSize int
+
 }
 
 // LastBlockHeight implements db.Database
@@ -327,6 +329,7 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 	return nil
 }
 func (db *Database) SaveTransactionResult(transactionResult []types.TransactionResult, height uint64) error {
+	if height % db.
 	stmt := `INSERT INTO transaction_result(height,transaction_id,status,error) VALUES `
 
 	var params []interface{}

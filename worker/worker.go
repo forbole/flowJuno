@@ -95,17 +95,6 @@ func (w Worker) process(height int64) error {
 		return w.HandleGenesis(block)
 	}
 
-	// create partition for all table indexed by height
-	// the table should have a computed field which is int(height/100) round to 10^3
-	if height%10000 == 0 {
-		log.Debug().Int64("height", height).Msg(fmt.Sprintf("Making partition #%d", height))
-
-		err=w.CreateDbPartition(height)
-		if err!=nil{
-			return err
-		}
-	}
-
 	txs, err := w.cp.Txs(block)
 	if err != nil {
 		log.Error().Err(err).Int64("height", height).Msg("failed to get transaction Result for block")
@@ -151,24 +140,6 @@ func (w Worker) process(height int64) error {
 	
 }
 
-func (w Worker) CreateDbPartition(height int64)error{
-
-	err := w.db.CreatePartition("transaction", height,10000)
-	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at transaction table:%s", height, err)
-	}
-
-	err = w.db.CreatePartition("transaction_result", height,10000)
-	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at transaction_result table:%s", height, err)
-	}
-
-	err = w.db.CreatePartition("event", height,10000)
-	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at event table:%s", height, err)
-	}
-	return nil
-}
 
 func (w Worker) ExportTransactionResult(txids []flow.Identifier, height int64) error {
 	txResults, err := w.cp.TransactionResult(txids)
