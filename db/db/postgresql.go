@@ -352,8 +352,8 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 }
 
 // createPartition allows to create a partition with the id for the given table name
-func (db *Database) CreatePartition(table string, height int64, heightRange int64) error {
-	endHeight:=height+heightRange
+func (db *Database) CreatePartition(table string, height uint64) error {
+	endHeight:=height+uint64(db.PartitionSize)
 	stmt := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v_%d_%d PARTITION OF %v FOR VALUES FROM (%d) TO (%d);",
 		table,
 		height,endHeight,
@@ -373,3 +373,4 @@ func (db *Database) DropPartition(name string) error {
 	_, err := db.Sql.Exec(stmt)
 	return err
 }
+
