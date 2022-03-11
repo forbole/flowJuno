@@ -329,9 +329,7 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 	return nil
 }
 func (db *Database) SaveTransactionResult(transactionResult []types.TransactionResult, height uint64) error {
-	if height % db.
 	stmt := `INSERT INTO transaction_result(height,transaction_id,status,error) VALUES `
-
 	var params []interface{}
 
 	for i, rows := range transactionResult {
@@ -374,3 +372,6 @@ func (db *Database) DropPartition(name string) error {
 	return err
 }
 
+func (db *Database) GetPartitionSize()int{
+	return db.PartitionSize
+}

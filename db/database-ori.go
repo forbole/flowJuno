@@ -56,6 +56,8 @@ type Database interface {
 
 	DropPartition(name string) error
 
+	GetPartitionSize()int
+
 	// Close closes the connection to the database
 	Close()
 }
