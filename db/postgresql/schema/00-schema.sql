@@ -15,7 +15,8 @@ CREATE TABLE block_seal
 (
     height BIGINT NOT NULL REFERENCES block (height),
     execution_receipt_id TEXT UNIQUE,
-    execution_receipt_signatures TEXT[][]
+    execution_receipt_signatures TEXT[][],
+    result_approval_signatures TEXT[][]
 );
 
 CREATE INDEX block_seal_index ON block_seal (height);
