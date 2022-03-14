@@ -52,9 +52,11 @@ type Database interface {
 	SaveTransactionResult(txResults []types.TransactionResult, height uint64) error
 
 	//Partition
-	CreatePartition(table string, id int) error
+	CreatePartition(table string, height uint64) error
 
 	DropPartition(name string) error
+
+	GetPartitionSize()int
 
 	// Close closes the connection to the database
 	Close()

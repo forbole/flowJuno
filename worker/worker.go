@@ -85,6 +85,21 @@ func (w Worker) process(height int64) error {
 
 	// To get all transaction and event from the block, follow the order so that wont double call:
 	// block -> collection_grauntee -> transaction -> event
+	if height%int64(w.db.GetPartitionSize())==0{
+		err=w.db.CreatePartition("transaction",uint64(height))
+		if err!=nil{
+			return err
+		}
+		err=w.db.CreatePartition("transaction_result",uint64(height))
+		if err!=nil{
+			return err
+		}
+		err=w.db.CreatePartition("event",uint64(height))
+		if err!=nil{
+			return err
+		}
+	}
+	
 
 	block, err := w.cp.Block(height)
 	if err != nil {
@@ -94,18 +109,6 @@ func (w Worker) process(height int64) error {
 
 	if height == int64(w.cp.GetGenesisHeight()) {
 		return w.HandleGenesis(block)
-	}
-
-	// create partition for all table indexed by height
-	// the table should have a computed field which is int(height/100) round to 10^3
-	if height%100 == 0 {
-		patch := int(height / 100)
-		log.Debug().Int64("height", height).Msg(fmt.Sprintf("Making partition #%d", patch))
-
-		err = w.CreateDbPartition(patch)
-		if err != nil {
-			return err
-		}
 	}
 
 	txs, err := w.cp.Txs(block)
@@ -151,25 +154,6 @@ func (w Worker) process(height int64) error {
 
 	return w.ExportTransactionResult(transactionIDs, height)
 
-}
-
-func (w Worker) CreateDbPartition(patch int) error {
-
-	err := w.db.CreatePartition("transaction", patch)
-	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at transaction table:%s", patch, err)
-	}
-
-	err = w.db.CreatePartition("transaction_result", patch)
-	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at transaction_result table:%s", patch, err)
-	}
-
-	err = w.db.CreatePartition("event", patch)
-	if err != nil {
-		return fmt.Errorf("Error creating partition on patch %d at event table:%s", patch, err)
-	}
-	return nil
 }
 
 func (w Worker) ExportTransactionResult(txids []flow.Identifier, height int64) error {

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"math"
 
 	"github.com/forbole/flowJuno/logging"
 
@@ -50,7 +49,7 @@ func Builder(cfg types.DatabaseConfig, encodingConfig *params.EncodingConfig) (d
 	postgresDb.SetMaxOpenConns(cfg.GetMaxOpenConnections())
 	postgresDb.SetMaxIdleConns(cfg.GetMaxIdleConnections())
 
-	return &Database{Sql: postgresDb, EncodingConfig: encodingConfig}, nil
+	return &Database{Sql: postgresDb, EncodingConfig: encodingConfig,PartitionSize: cfg.GetPartitionSize()}, nil
 }
 
 // type check to ensure interface is properly implemented
@@ -62,6 +61,8 @@ type Database struct {
 	Sql            *sql.DB
 	EncodingConfig *params.EncodingConfig
 	Logger         logging.Logger
+	PartitionSize int
+
 }
 
 // LastBlockHeight implements db.Database
@@ -125,16 +126,16 @@ func (db *Database) SaveTxs(txs types.Txs) error {
 	}
 	sqlStatement := `
 INSERT INTO transaction 
-    (height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures,partition_id ) 
+    (height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures) 
 VALUES `
 
 	var vparams []interface{}
 	for i, tx := range txs {
-		vi := i * 12
-		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d,$%d),`,
-			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11, vi+12)
+		vi := i * 11
+		sqlStatement += fmt.Sprintf(`($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),`,
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7, vi+8, vi+9, vi+10, vi+11)
 		vparams = append(vparams, tx.Height, tx.TransactionID, tx.Script, pq.ByteaArray(tx.Arguments), tx.ReferenceBlockID, tx.GasLimit, tx.ProposalKey, tx.Payer, pq.StringArray(tx.Authorizers),
-			tx.PayloadSignatures, tx.EnvelopeSignatures, getPartitionId(int64(tx.Height)))
+			tx.PayloadSignatures, tx.EnvelopeSignatures)
 
 	}
 	sqlStatement = sqlStatement[:len(sqlStatement)-1] // Remove trailing ,
@@ -285,16 +286,16 @@ func (db *Database) SaveEvents(events []types.Event) error {
 	}
 
 	stmt := `INSERT INTO event (
-		height,type,transaction_id,transaction_index,event_index,value, partition_id
+		height,type,transaction_id,transaction_index,event_index,value
 	) VALUES `
 
 	var vparams []interface{}
 	for i, event := range events {
-		vi := i * 7
+		vi := i * 6
 
-		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d),",
-			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6, vi+7)
-		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value.String(), getPartitionId(int64(event.Height)))
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d),",
+			vi+1, vi+2, vi+3, vi+4, vi+5, vi+6)
+		vparams = append(vparams, event.Height, event.Type, event.TransactionID, event.TransactionIndex, event.EventIndex, event.Value.String())
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
@@ -335,15 +336,14 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 	return nil
 }
 func (db *Database) SaveTransactionResult(transactionResult []types.TransactionResult, height uint64) error {
-	stmt := `INSERT INTO transaction_result(height,transaction_id,status,error,partition_id) VALUES `
-
+	stmt := `INSERT INTO transaction_result(height,transaction_id,status,error) VALUES `
 	var params []interface{}
 
 	for i, rows := range transactionResult {
-		ai := i * 5
-		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4, ai+5)
+		ai := i * 4
+		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
 
-		params = append(params, height, rows.TransactionId, rows.Status, rows.Error, getPartitionId(int64(height)))
+		params = append(params, height, rows.TransactionId, rows.Status, rows.Error)
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
@@ -357,13 +357,13 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 }
 
 // createPartition allows to create a partition with the id for the given table name
-func (db *Database) CreatePartition(table string, id int) error {
-	stmt := fmt.Sprintf(
-		"CREATE TABLE IF NOT EXISTS %v_%d PARTITION OF %v FOR VALUES IN (%d)",
+func (db *Database) CreatePartition(table string, height uint64) error {
+	endHeight:=height+uint64(db.PartitionSize)
+	stmt := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v_%d_%d PARTITION OF %v FOR VALUES FROM (%d) TO (%d);",
 		table,
-		id,
+		height,endHeight,
 		table,
-		id,
+		height,endHeight,
 	)
 	_, err := db.Sql.Exec(stmt)
 	return err
@@ -379,6 +379,6 @@ func (db *Database) DropPartition(name string) error {
 	return err
 }
 
-func getPartitionId(height int64) float64 {
-	return math.Floor(float64(height / 100))
+func (db *Database) GetPartitionSize()int{
+	return db.PartitionSize
 }
