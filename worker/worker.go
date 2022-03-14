@@ -53,6 +53,7 @@ func (w Worker) Start() {
 	logging.WorkerCount.Inc()
 
 	for i := range w.queue {
+		fmt.Println(i)
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
 			// TODO: Implement exponential backoff or max retries for a block height.
@@ -101,8 +102,8 @@ func (w Worker) process(height int64) error {
 		patch := int(height / 100)
 		log.Debug().Int64("height", height).Msg(fmt.Sprintf("Making partition #%d", patch))
 
-		err=w.CreateDbPartition(patch)
-		if err!=nil{
+		err = w.CreateDbPartition(patch)
+		if err != nil {
 			return err
 		}
 	}
@@ -149,10 +150,10 @@ func (w Worker) process(height int64) error {
 	}
 
 	return w.ExportTransactionResult(transactionIDs, height)
-	
+
 }
 
-func (w Worker) CreateDbPartition(patch int)error{
+func (w Worker) CreateDbPartition(patch int) error {
 
 	err := w.db.CreatePartition("transaction", patch)
 	if err != nil {
