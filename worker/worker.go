@@ -53,6 +53,7 @@ func (w Worker) Start() {
 	logging.WorkerCount.Inc()
 
 	for i := range w.queue {
+		fmt.Println(i)
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
 			// TODO: Implement exponential backoff or max retries for a block height.
@@ -152,9 +153,8 @@ func (w Worker) process(height int64) error {
 	}
 
 	return w.ExportTransactionResult(transactionIDs, height)
-	
-}
 
+}
 
 func (w Worker) ExportTransactionResult(txids []flow.Identifier, height int64) error {
 	txResults, err := w.cp.TransactionResult(txids)

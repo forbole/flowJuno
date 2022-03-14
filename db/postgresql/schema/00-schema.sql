@@ -15,7 +15,8 @@ CREATE TABLE block_seal
 (
     height BIGINT NOT NULL REFERENCES block (height),
     execution_receipt_id TEXT UNIQUE,
-    execution_receipt_signatures TEXT[][]
+    execution_receipt_signatures TEXT[][],
+    result_approval_signatures TEXT[][]
 );
 
 CREATE INDEX block_seal_index ON block_seal (height);
@@ -26,7 +27,7 @@ CREATE TABLE collection
 (  height BIGINT  NOT NULL REFERENCES block (height),
   id TEXT  NOT NULL,
   processed BOOLEAN  NOT NULL ,
-  transaction_id TEXT  NOT NULL UNIQUE
+  transaction_id TEXT  NOT NULL DEFAULT ' '
 );
 
 CREATE INDEX collection_index ON collection (height);
@@ -36,7 +37,7 @@ CREATE INDEX collection_transaction_id_index ON collection (transaction_id);
 CREATE TABLE transaction
 (
 		height BIGINT NOT NULL REFERENCES block (height),
-        transaction_id TEXT NOT NULL REFERENCES collection (transaction_id),
+        transaction_id TEXT NOT NULL,
 
 		script TEXT ,
 		arguments TEXT[],
@@ -56,7 +57,7 @@ CREATE TABLE transaction_default PARTITION OF transaction DEFAULT;
 
 CREATE TABLE transaction_result
 (  height BIGINT  NOT NULL REFERENCES block (height),
-  transaction_id TEXT  NOT NULL REFERENCES collection (transaction_id),
+  transaction_id TEXT  NOT NULL,
   status TEXT  NOT NULL ,
   error TEXT
 ) PARTITION BY RANGE(height);
@@ -68,7 +69,7 @@ CREATE TABLE event
 (
     height BIGINT NOT NULL REFERENCES block (height),
     type TEXT,
-    transaction_id TEXT REFERENCES collection (transaction_id),
+    transaction_id TEXT  ,
     transaction_index TEXT,
     event_index BIGINT,
     value TEXT
