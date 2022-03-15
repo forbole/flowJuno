@@ -3,35 +3,36 @@ package coingecko
 import (
 	"math"
 	"net/http"
-	coingecko "github.com/superoo7/go-gecko/v3"
 	"time"
+
 	"github.com/forbole/flowJuno/types"
+	coingecko "github.com/superoo7/go-gecko/v3"
 )
 
-type CoingeckoClient struct{
+type CoingeckoClient struct {
 	client *coingecko.Client
 }
 
-func NewCoingeckoClient(timeout int)CoingeckoClient{
+func NewCoingeckoClient(timeout int) CoingeckoClient {
 	httpClient := &http.Client{
 		Timeout: time.Second * time.Duration(10),
 	}
-	client:=coingecko.NewClient(httpClient)
+	client := coingecko.NewClient(httpClient)
 	return CoingeckoClient{
-		client:client,
+		client: client,
 	}
 }
 
 // GetCoinsList allows to fetch from the remote APIs the list of all the supported tokens
 func (c CoingeckoClient) GetCoinsList() (coins Tokens, err error) {
 	//err = queryCoinGecko("/coins/list", &coins)
-	coinlist,err:=c.client.CoinsList()
-	if err!=nil{
-		return nil,err
+	coinlist, err := c.client.CoinsList()
+	if err != nil {
+		return nil, err
 	}
-	token:=make(Tokens,len(*coinlist))
-	for i,coin:=range *coinlist{
-		token[i]=NewToken(coin.ID,coin.Symbol,coin.Name)
+	token := make(Tokens, len(*coinlist))
+	for i, coin := range *coinlist {
+		token[i] = NewToken(coin.ID, coin.Symbol, coin.Name)
 	}
 	return coins, err
 }
@@ -40,15 +41,15 @@ func (c CoingeckoClient) GetCoinsList() (coins Tokens, err error) {
 func (c CoingeckoClient) GetTokensPrices(ids []string) ([]types.TokenPrice, error) {
 	//query := "/coins/markets?vs_currency=usd&ids=flow"
 	//err := queryCoinGecko(query, &prices)
-	prices,err:=c.client.CoinsMarket("usd",[]string{"flow"},"",0,0,false,nil)
+	prices, err := c.client.CoinsMarket("usd", []string{"flow"}, "", 0, 0, false, nil)
 	if err != nil {
 		return nil, err
 	}
 	tokenPrices := make([]types.TokenPrice, len(*prices))
 	for i, price := range *prices {
-		timestamp,err:=time.Parse("2021-07-30 00:00:00 +0000 UTC",price.LastUpdated)
-		if err!=nil{
-			return nil,err
+		timestamp, err := time.Parse(time.RFC3339, price.LastUpdated)
+		if err != nil {
+			return nil, err
 		}
 		tokenPrices[i] = types.NewTokenPrice(
 			price.Symbol,
@@ -57,7 +58,6 @@ func (c CoingeckoClient) GetTokensPrices(ids []string) ([]types.TokenPrice, erro
 			timestamp,
 		)
 	}
-
 
 	return tokenPrices, nil
 }

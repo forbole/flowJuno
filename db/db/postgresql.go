@@ -49,7 +49,7 @@ func Builder(cfg types.DatabaseConfig, encodingConfig *params.EncodingConfig) (d
 	postgresDb.SetMaxOpenConns(cfg.GetMaxOpenConnections())
 	postgresDb.SetMaxIdleConns(cfg.GetMaxIdleConnections())
 
-	return &Database{Sql: postgresDb, EncodingConfig: encodingConfig,PartitionSize: cfg.GetPartitionSize()}, nil
+	return &Database{Sql: postgresDb, EncodingConfig: encodingConfig, PartitionSize: cfg.GetPartitionSize()}, nil
 }
 
 // type check to ensure interface is properly implemented
@@ -61,8 +61,7 @@ type Database struct {
 	Sql            *sql.DB
 	EncodingConfig *params.EncodingConfig
 	Logger         logging.Logger
-	PartitionSize int
-
+	PartitionSize  int
 }
 
 // LastBlockHeight implements db.Database
@@ -109,7 +108,7 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 	for i, seal := range block.Seals {
 		vi := i * 4
 		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d),", vi+1, vi+2, vi+3, vi+4)
-		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures),pq.ByteaArray(seal.ResultApprovalSignatures))
+		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures), pq.ByteaArray(seal.ResultApprovalSignatures))
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
@@ -358,12 +357,12 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 
 // createPartition allows to create a partition with the id for the given table name
 func (db *Database) CreatePartition(table string, height uint64) error {
-	endHeight:=height+uint64(db.PartitionSize)
+	endHeight := height + uint64(db.PartitionSize)
 	stmt := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v_%d_%d PARTITION OF %v FOR VALUES FROM (%d) TO (%d);",
 		table,
-		height,endHeight,
+		height, endHeight,
 		table,
-		height,endHeight,
+		height, endHeight,
 	)
 	_, err := db.Sql.Exec(stmt)
 	return err
@@ -379,6 +378,6 @@ func (db *Database) DropPartition(name string) error {
 	return err
 }
 
-func (db *Database) GetPartitionSize()int{
+func (db *Database) GetPartitionSize() int {
 	return db.PartitionSize
 }

@@ -21,7 +21,7 @@ type Db struct {
 	*database.Database
 	Sqlx                *sqlx.DB
 	storeHistoricalData bool
-	PartitionSize int
+	PartitionSize       int
 }
 
 // Builder allows to create a new Db instance implementing the db.Builder type
@@ -45,7 +45,7 @@ func Builder(cfg juno.Config, codec *params.EncodingConfig) (db.Database, error)
 		Database:            psqlDb,
 		Sqlx:                sqlx.NewDb(psqlDb.Sql, "postgresql"),
 		storeHistoricalData: true,
-		PartitionSize: cfg.GetDatabaseConfig().GetPartitionSize(),
+		PartitionSize:       cfg.GetDatabaseConfig().GetPartitionSize(),
 	}, nil
 }
 

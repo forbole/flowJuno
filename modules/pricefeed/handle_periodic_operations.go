@@ -67,7 +67,7 @@ func updatePrice(db *database.Db) error {
 		log.Debug().Str("module", "pricefeed").Msg("no traded tokens found")
 		return nil
 	}
-	coingeckoClient:=coingecko.NewCoingeckoClient(10)
+	coingeckoClient := coingecko.NewCoingeckoClient(10)
 
 	// Get the tokens prices
 	prices, err := coingeckoClient.GetTokensPrices(ids)

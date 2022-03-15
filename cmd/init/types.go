@@ -43,7 +43,7 @@ func DefaultConfigCreator(cmd *cobra.Command) types.Config {
 	dbSchema, _ := cmd.Flags().GetString(flagDatabaseSchema)
 	dbMaxOpenConnections, _ := cmd.Flags().GetInt(flagDatabaseMaxOpenConnections)
 	dbMaxIdleConnections, _ := cmd.Flags().GetInt(flagDatabaseMaxIdleConnections)
-	dbPartitionSize,_ := cmd.Flags().GetInt(flagDatabaseMaxIdleConnections)
+	dbPartitionSize, _ := cmd.Flags().GetInt(flagDatabaseMaxIdleConnections)
 
 	loggingLevel, _ := cmd.Flags().GetString(flagLoggingLevel)
 	loggingFormat, _ := cmd.Flags().GetString(flagLoggingFormat)
