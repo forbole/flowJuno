@@ -3,6 +3,7 @@ package worker
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/forbole/flowJuno/logging"
 	"github.com/onflow/flow-go-sdk"
@@ -61,6 +62,7 @@ func (w Worker) Start() {
 			if err!=nil&&strings.Contains(err.Error(), "could not retrieve resource: key not found") {
 				for err!=nil&&strings.Contains(err.Error(), "could not retrieve resource: key not found") {
 					//If it cannot find the key, retry until can parse
+					time.Sleep(time.Second)
 					err = w.process(i)
 
 				}
@@ -112,7 +114,7 @@ func (w Worker) process(height int64) error {
 
 	block, err := w.cp.Block(height)
 	if err != nil {
-		log.Error().Err(err).Int64("height", height).Msg("failed to get block")
+		//log.Error().Err(err).Int64("height", height).Msg("failed to get block")
 		return err
 	}
 
