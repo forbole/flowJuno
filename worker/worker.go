@@ -85,21 +85,20 @@ func (w Worker) process(height int64) error {
 
 	// To get all transaction and event from the block, follow the order so that wont double call:
 	// block -> collection_grauntee -> transaction -> event
-	if height%int64(w.db.GetPartitionSize())==0{
-		err=w.db.CreatePartition("transaction",uint64(height))
-		if err!=nil{
+	if height%int64(w.db.GetPartitionSize()) == 0 {
+		err = w.db.CreatePartition("transaction", uint64(height))
+		if err != nil {
 			return err
 		}
-		err=w.db.CreatePartition("transaction_result",uint64(height))
-		if err!=nil{
+		err = w.db.CreatePartition("transaction_result", uint64(height))
+		if err != nil {
 			return err
 		}
-		err=w.db.CreatePartition("event",uint64(height))
-		if err!=nil{
+		err = w.db.CreatePartition("event", uint64(height))
+		if err != nil {
 			return err
 		}
 	}
-	
 
 	block, err := w.cp.Block(height)
 	if err != nil {

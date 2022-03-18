@@ -267,7 +267,7 @@ type databaseConfig struct {
 	Schema             string `toml:"schema"`
 	MaxOpenConnections int    `toml:"max_open_connections"`
 	MaxIdleConnections int    `toml:"max_idle_connections"`
-	PartitionSize int `toml:"partition_size"`
+	PartitionSize      int    `toml:"partition_size"`
 }
 
 func NewDatabaseConfig(
@@ -285,7 +285,7 @@ func NewDatabaseConfig(
 		Schema:             schema,
 		MaxOpenConnections: maxOpenConnections,
 		MaxIdleConnections: maxIdleConnections,
-		PartitionSize: partitionSize,
+		PartitionSize:      partitionSize,
 	}
 }
 
@@ -337,6 +337,7 @@ func (d *databaseConfig) GetMaxIdleConnections() int {
 func (d *databaseConfig) GetPartitionSize() int {
 	return d.PartitionSize
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 // LoggingConfig represents the configuration for the logging part

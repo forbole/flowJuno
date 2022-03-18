@@ -1,64 +1,63 @@
 package coingecko
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"math"
 	"net/http"
+	"time"
 
 	"github.com/forbole/flowJuno/types"
+	coingecko "github.com/superoo7/go-gecko/v3"
 )
 
+type CoingeckoClient struct {
+	client *coingecko.Client
+}
+
+func NewCoingeckoClient(timeout int) CoingeckoClient {
+	httpClient := &http.Client{
+		Timeout: time.Second * time.Duration(10),
+	}
+	client := coingecko.NewClient(httpClient)
+	return CoingeckoClient{
+		client: client,
+	}
+}
+
 // GetCoinsList allows to fetch from the remote APIs the list of all the supported tokens
-func GetCoinsList() (coins Tokens, err error) {
-	err = queryCoinGecko("/coins/list", &coins)
+func (c CoingeckoClient) GetCoinsList() (coins Tokens, err error) {
+	//err = queryCoinGecko("/coins/list", &coins)
+	coinlist, err := c.client.CoinsList()
+	if err != nil {
+		return nil, err
+	}
+	token := make(Tokens, len(*coinlist))
+	for i, coin := range *coinlist {
+		token[i] = NewToken(coin.ID, coin.Symbol, coin.Name)
+	}
 	return coins, err
 }
 
 // GetTokensPrices queries the remote APIs to get the token prices of all the tokens having the given ids
-func GetTokensPrices(ids []string) ([]types.TokenPrice, error) {
-	var prices []MarketTicker
-	query := "/coins/markets?vs_currency=usd&ids=flow"
-	err := queryCoinGecko(query, &prices)
+func (c CoingeckoClient) GetTokensPrices(ids []string) ([]types.TokenPrice, error) {
+	//query := "/coins/markets?vs_currency=usd&ids=flow"
+	//err := queryCoinGecko(query, &prices)
+	prices, err := c.client.CoinsMarket("usd", []string{"flow"}, "", 0, 0, false, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	return ConvertCoingeckoPrices(prices), nil
-}
-
-func ConvertCoingeckoPrices(prices []MarketTicker) []types.TokenPrice {
-	tokenPrices := make([]types.TokenPrice, len(prices))
-	for i, price := range prices {
+	tokenPrices := make([]types.TokenPrice, len(*prices))
+	for i, price := range *prices {
+		timestamp, err := time.Parse(time.RFC3339, price.LastUpdated)
+		if err != nil {
+			return nil, err
+		}
 		tokenPrices[i] = types.NewTokenPrice(
 			price.Symbol,
 			price.CurrentPrice,
 			int64(math.Trunc(price.MarketCap)),
-			price.LastUpdated,
+			timestamp,
 		)
 	}
-	return tokenPrices
-}
 
-// queryCoinGecko queries the CoinGecko APIs for the given endpoint
-func queryCoinGecko(endpoint string, ptr interface{}) error {
-	resp, err := http.Get("https://api.coingecko.com/api/v3" + endpoint)
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	bz, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error while reading response body: %s", err)
-	}
-
-	err = json.Unmarshal(bz, &ptr)
-	if err != nil {
-		return fmt.Errorf("error while unmarshaling response body: %s", err)
-	}
-
-	return nil
+	return tokenPrices, nil
 }
