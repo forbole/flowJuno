@@ -59,8 +59,8 @@ func (w Worker) Start() {
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
 			// TODO: Implement exponential backoff or max retries for a block height.
-			if err!=nil&&strings.Contains(err.Error(), "could not retrieve resource: key not found") {
-				for err!=nil&&strings.Contains(err.Error(), "could not retrieve resource: key not found") {
+			if err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found") {
+				for err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found") {
 					//If it cannot find the key, retry until can parse
 					time.Sleep(time.Second)
 					err = w.process(i)
@@ -309,4 +309,3 @@ func (w Worker) HandleGenesis(block *flow.Block) error {
 	}
 	return nil
 }
-

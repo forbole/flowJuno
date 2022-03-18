@@ -205,15 +205,15 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 	for i, c := range collectionsID {
 		collection, err := cp.flowClient.GetCollection(ctx, c.CollectionID)
 
-		if err != nil && strings.Contains(err.Error(),"please retry for collection in finalized block"){
+		if err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
 			// When it do not have a collection transaction yet at that block. It do not have a transaction ID
-			for err != nil && strings.Contains(err.Error(),"please retry for collection in finalized block") {
-				time.Sleep(2*time.Second)
+			for err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
+				time.Sleep(2 * time.Second)
 				collection, err = cp.flowClient.GetCollection(ctx, c.CollectionID)
 			}
 
 		}
-		if err!=nil{
+		if err != nil {
 			collections[i] = types.NewCollection(block.Height, c.CollectionID.String(), false, nil)
 			continue
 		}
@@ -235,7 +235,7 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 	txResponses := make([]types.Tx, len(transactionIDs))
 	for i, txID := range transactionIDs {
-		ctx, cancel := context.WithTimeout(context.Background(),10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		transaction, err := cp.flowClient.GetTransaction(ctx, txID)
 		cancel()
 
@@ -341,5 +341,3 @@ func (cp *Proxy) Stop() {
 		log.Fatal().Str("module", "client proxy").Err(err).Msg("error while stopping proxy")
 	}
 }
-
-
