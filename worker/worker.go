@@ -309,3 +309,4 @@ func (w Worker) HandleGenesis(block *flow.Block) error {
 	}
 	return nil
 }
+

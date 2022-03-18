@@ -227,8 +227,6 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 // in the TransactionResult format which internally contains an array of Transactions. An error is
 // returned if any query fails.
 func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 	var transactionIDs []flow.Identifier
 	collections := cp.Collections(block)
 	for _, collection := range collections {
@@ -237,7 +235,10 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 	txResponses := make([]types.Tx, len(transactionIDs))
 	for i, txID := range transactionIDs {
+		ctx, cancel := context.WithTimeout(context.Background(),10*time.Second)
 		transaction, err := cp.flowClient.GetTransaction(ctx, txID)
+		cancel()
+
 		if err != nil {
 			return nil, err
 		}
@@ -340,3 +341,5 @@ func (cp *Proxy) Stop() {
 		log.Fatal().Str("module", "client proxy").Err(err).Msg("error while stopping proxy")
 	}
 }
+
+
