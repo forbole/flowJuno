@@ -2,6 +2,7 @@ package worker
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/forbole/flowJuno/logging"
 	"github.com/onflow/flow-go-sdk"
@@ -57,12 +58,21 @@ func (w Worker) Start() {
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
 			// TODO: Implement exponential backoff or max retries for a block height.
-			go func() {
-				log.Error().Err(err).Int64("height", i).Msg("re-enqueueing failed block")
-				w.queue <- i
-			}()
+			if err!=nil&&strings.Contains(err.Error(), "could not retrieve resource: key not found") {
+				for err!=nil&&strings.Contains(err.Error(), "could not retrieve resource: key not found") {
+					//If it cannot find the key, retry until can parse
+					err = w.process(i)
+
+				}
+			} else {
+				go func() {
+					log.Error().Err(err).Int64("height", i).Msg("re-enqueueing failed block")
+					w.queue <- i
+				}()
+			}
+
+			logging.WorkerHeight.WithLabelValues(fmt.Sprintf("%d", w.index)).Set(float64(i))
 		}
-		logging.WorkerHeight.WithLabelValues(fmt.Sprintf("%d", w.index)).Set(float64(i))
 	}
 }
 

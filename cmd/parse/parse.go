@@ -144,9 +144,14 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, data *ParserData) {
 		}
 	} else {
 		data.Logger.Info("syncing missing blocks...", "latest_block_height", latestBlockHeight)
-		for i := cfg.GetStartHeight(); i <= latestBlockHeight; i++ {
-			data.Logger.Debug("enqueueing missing block", "height", i)
-			exportQueue <- i
+		for i := cfg.GetStartHeight(); i <= latestBlockHeight; {
+			if len(exportQueue) < 25 {
+				data.Logger.Debug("enqueueing missing block", "height", i)
+
+				exportQueue <- i
+				i++
+				latestBlockHeight++
+			}
 		}
 	}
 }

@@ -40,7 +40,7 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		return nil, err
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Minute)
+	ctx := context.Background()
 
 	var contracts Contracts
 	if cfg.GetRPCConfig().GetContracts() == "Mainnet" {
@@ -68,7 +68,10 @@ func (cp *Proxy) GetGenesisHeight() uint64 {
 // LatestHeight returns the latest block height on the active chain. An error
 // is returned if the query fails.
 func (cp *Proxy) LatestHeight() (int64, error) {
-	block, err := cp.flowClient.GetLatestBlock(cp.ctx, true)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	block, err := cp.flowClient.GetLatestBlock(ctx, true)
 	if err != nil {
 		return -1, err
 	}
@@ -79,7 +82,9 @@ func (cp *Proxy) LatestHeight() (int64, error) {
 
 // Block queries for a block by height. An error is returned if the query fails.
 func (cp *Proxy) Block(height int64) (*flow.Block, error) {
-	block, err := cp.flowClient.GetBlockByHeight(cp.ctx, uint64(height))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	block, err := cp.flowClient.GetBlockByHeight(ctx, uint64(height))
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +94,9 @@ func (cp *Proxy) Block(height int64) (*flow.Block, error) {
 // GetTransaction queries for a transaction by hash. An error is returned if the
 // query fails.
 func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
-	transaction, err := cp.flowClient.GetTransaction(cp.ctx, flow.HashToID([]byte(hash)))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	transaction, err := cp.flowClient.GetTransaction(ctx, flow.HashToID([]byte(hash)))
 	if err != nil {
 		return nil, err
 	}
@@ -191,10 +198,12 @@ func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEv
 
 // Collections get all the collection from block
 func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	collectionsID := block.CollectionGuarantees
 	collections := make([]types.Collection, len(block.CollectionGuarantees))
 	for i, c := range collectionsID {
-		collection, err := cp.flowClient.GetCollection(cp.ctx, c.CollectionID)
+		collection, err := cp.flowClient.GetCollection(ctx, c.CollectionID)
 
 		if err != nil {
 			// When it do not have a collection transaction yet at that block. It do not have a transaction ID
@@ -212,7 +221,8 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 // in the TransactionResult format which internally contains an array of Transactions. An error is
 // returned if any query fails.
 func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
-
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	var transactionIDs []flow.Identifier
 	collections := cp.Collections(block)
 	for _, collection := range collections {
@@ -221,7 +231,7 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 	txResponses := make([]types.Tx, len(transactionIDs))
 	for i, txID := range transactionIDs {
-		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID)
+		transaction, err := cp.flowClient.GetTransaction(ctx, txID)
 		if err != nil {
 			return nil, err
 		}
@@ -255,9 +265,12 @@ func (cp *Proxy) TransactionResult(transactionIds []flow.Identifier) ([]types.Tr
 		return nil, nil
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	txResults := make([]types.TransactionResult, len(transactionIds))
 	for i, txid := range transactionIds {
-		result, err := cp.flowClient.GetTransactionResult(cp.ctx, txid)
+		result, err := cp.flowClient.GetTransactionResult(ctx, txid)
 		if err != nil {
 			return nil, err
 		}
@@ -299,7 +312,9 @@ func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 
 // Events get events from a transaction ID
 func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error) {
-	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.HexToID(transactionID))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	transactionResult, err := cp.flowClient.GetTransactionResult(ctx, flow.HexToID(transactionID))
 	if err != nil {
 		return []types.Event{}, err
 	}
