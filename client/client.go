@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -39,7 +40,9 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		return nil, err
 	}
 
-	contracts := MainnetContracts()
+	ctx, _ := context.WithTimeout(context.Background(), time.Minute)
+
+	var contracts Contracts
 	if cfg.GetRPCConfig().GetContracts() == "Mainnet" {
 		contracts = MainnetContracts()
 	} else if cfg.GetRPCConfig().GetContracts() == "Testnet" {
@@ -48,7 +51,7 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 
 	return &Proxy{
 		encodingConfig:  encodingConfig,
-		ctx:             context.Background(),
+		ctx:             ctx,
 		flowClient:      *flowClient,
 		grpConnection:   nil,
 		txServiceClient: nil,
