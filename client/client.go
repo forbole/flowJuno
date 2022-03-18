@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -205,9 +205,15 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 	for i, c := range collectionsID {
 		collection, err := cp.flowClient.GetCollection(ctx, c.CollectionID)
 
-		if err != nil {
+		if err != nil && strings.Contains(err.Error(),"please retry for collection in finalized block"){
 			// When it do not have a collection transaction yet at that block. It do not have a transaction ID
-			fmt.Println(err.Error())
+			for err != nil && strings.Contains(err.Error(),"please retry for collection in finalized block") {
+				time.Sleep(2*time.Second)
+				collection, err = cp.flowClient.GetCollection(ctx, c.CollectionID)
+			}
+
+		}
+		if err!=nil{
 			collections[i] = types.NewCollection(block.Height, c.CollectionID.String(), false, nil)
 			continue
 		}
