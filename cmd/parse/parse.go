@@ -107,7 +107,7 @@ func StartParsing(data *ParserData) error {
 		go enqueueNewBlocks(exportQueue, data)
 	}
 
-	if cfg.ShouldParseOldBlocks(){
+	if cfg.ShouldParseOldBlocks() {
 		go enqueueMissingBlocks(exportQueue, data)
 
 	}
@@ -137,7 +137,6 @@ func enqueueNewBlocks(exportQueue types.HeightQueue, data *ParserData) {
 
 }
 
-
 // enqueueMissingBlocks enqueues jobs (block heights) for missed blocks starting
 // at the startHeight up until the latest known height.
 func enqueueMissingBlocks(exportQueue types.HeightQueue, data *ParserData) {
@@ -150,11 +149,11 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, data *ParserData) {
 		panic(fmt.Errorf("failed to get last block from RPC client: %s", err))
 	}
 	data.Logger.Info("syncing missing blocks...", "latest_block_height", latestBlockHeight)
-	for i := cfg.GetStartHeight();i<latestBlockHeight;i++{
-			data.Logger.Debug("enqueueing missing block", "height", i)
-			worker.WaitUntilQueueAvailable(exportQueue)
-			exportQueue <- i
-			latestBlockHeight++
+	for i := cfg.GetStartHeight(); i < latestBlockHeight; i++ {
+		data.Logger.Debug("enqueueing missing block", "height", i)
+		worker.WaitUntilQueueAvailable(exportQueue)
+		exportQueue <- i
+		latestBlockHeight++
 
 	}
 }

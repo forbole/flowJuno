@@ -208,12 +208,12 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 		if err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
 			// When it do not have a collection transaction yet at that block. It do not have a transaction ID
 			// Retry until collection is produced
-			
-			sleeptime:=1
+
+			sleeptime := 1
 			for err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
 				time.Sleep(time.Duration(sleeptime) * time.Second)
 				collection, err = cp.flowClient.GetCollection(ctx, c.CollectionID)
-				sleeptime=sleeptime*2
+				sleeptime = sleeptime * 2
 			}
 
 		}
@@ -323,9 +323,17 @@ func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 
 // Events get events from a transaction ID
 func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	sleeptime := 1
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleeptime)*time.Second)
 	transactionResult, err := cp.flowClient.GetTransactionResult(ctx, flow.HexToID(transactionID))
+	cancel()
+
+	for err != nil && strings.Contains(err.Error(), "context deadline exceeded") {
+		sleeptime = sleeptime * 2
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleeptime)*time.Second)
+		transactionResult, err = cp.flowClient.GetTransactionResult(ctx, flow.HexToID(transactionID))
+		cancel()
+	}
 	if err != nil {
 		return []types.Event{}, err
 	}
