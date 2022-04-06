@@ -127,12 +127,10 @@ func enqueueNewBlocks(exportQueue types.HeightQueue, data *ParserData) {
 	}
 	data.Logger.Info("syncing missing blocks...", "latest_block_height", latestBlockHeight)
 	for {
-		if len(exportQueue) < 25 {
-			data.Logger.Debug("enqueueing latest block", "height", latestBlockHeight)
-			worker.WaitUntilQueueAvailable(exportQueue)
-			exportQueue <- latestBlockHeight
-			latestBlockHeight++
-		}
+		data.Logger.Debug("enqueueing latest block", "height", latestBlockHeight)
+		worker.WaitUntilQueueAvailable(exportQueue)
+		exportQueue <- latestBlockHeight
+		latestBlockHeight++
 	}
 
 }
@@ -156,6 +154,8 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, data *ParserData) {
 		latestBlockHeight++
 
 	}
+	data.Logger.Debug("Finish Enqueu Missing Block")
+
 }
 
 // trapSignal will listen for any OS signal and invoke Done on the main

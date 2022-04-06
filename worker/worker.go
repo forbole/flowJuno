@@ -60,7 +60,11 @@ func (w Worker) Start() {
 			// TODO: Implement exponential backoff or max retries for a block height when the block is not generated.
 			if err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found") {
 				sleeptime := 1
-				for err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found") {
+				for (err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found")) {
+					if sleeptime>=16{
+						w.ReenqueueFailBlock(i)
+						break
+					}
 					//If it cannot find the key, retry until can parse
 					time.Sleep(time.Second * time.Duration(sleeptime))
 					err = w.process(i)
@@ -68,17 +72,19 @@ func (w Worker) Start() {
 				}
 
 			} else {
-				WaitUntilQueueAvailable(w.queue)
-
-				go func() {
-					log.Error().Err(err).Int64("height", i).Msg("re-enqueueing failed block")
-					w.queue <- i
-				}()
+				w.ReenqueueFailBlock(i)
 			}
 
 			logging.WorkerHeight.WithLabelValues(fmt.Sprintf("%d", w.index)).Set(float64(i))
 		}
 	}
+}
+
+func (w Worker) ReenqueueFailBlock(i int64){
+	go func() {
+		WaitUntilQueueAvailable(w.queue)
+		w.queue <- i
+	}()
 }
 
 //nolint:gocyclo
