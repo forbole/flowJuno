@@ -207,9 +207,13 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 
 		if err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
 			// When it do not have a collection transaction yet at that block. It do not have a transaction ID
+			// Retry until collection is produced
+			
+			sleeptime:=1
 			for err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
-				time.Sleep(2 * time.Second)
+				time.Sleep(time.Duration(sleeptime) * time.Second)
 				collection, err = cp.flowClient.GetCollection(ctx, c.CollectionID)
+				sleeptime=sleeptime*2
 			}
 
 		}

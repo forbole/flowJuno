@@ -55,20 +55,23 @@ func (w Worker) Start() {
 	logging.WorkerCount.Inc()
 
 	for i := range w.queue {
-		fmt.Println(i)
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
-			// TODO: Implement exponential backoff or max retries for a block height.
+			// TODO: Implement exponential backoff or max retries for a block height when the block is not generated.
 			if err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found") {
+				sleeptime:=1
 				for err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found") {
 					//If it cannot find the key, retry until can parse
-					time.Sleep(time.Second)
-					err = w.process(i)
+						time.Sleep(time.Second*time.Duration(sleeptime))
+						err = w.process(i)
+						sleeptime=sleeptime*2
+					}
 
-				}
 			} else {
+				WaitUntilQueueAvailable(w.queue)
+
 				go func() {
-					log.Error().Err(err).Int64("height", i).Msg("re-enqueueing failed block")
+					log.Error().Err(err).Int64("height", i).Msg("re-enqueueing failed block",)
 					w.queue <- i
 				}()
 			}
