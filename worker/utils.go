@@ -39,6 +39,5 @@ func WaitUntilQueueAvailable(queue types.HeightQueue) {
 	sleeptime := 1
 	for len(queue) == cap(queue) {
 		time.Sleep(time.Second * time.Duration(sleeptime))
-		sleeptime = sleeptime * 2
 	}
 }
