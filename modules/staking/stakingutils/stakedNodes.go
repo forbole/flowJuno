@@ -23,21 +23,21 @@ func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, height int64, 
 
 	totalCommitment, err := getNodeTotalCommitment(nodeInfofromNodeId, height, flowClient)
 	if err != nil {
-		return fmt.Errorf("fail to get data from nodeID:%s", err)
+		return fmt.Errorf("fail to get total commitment from nodeID:%s", err)
 	}
 
 	err = db.SaveNodeTotalCommitment(totalCommitment)
 	if err != nil {
-		return fmt.Errorf("fail to get data from nodeID:%s", err)
+		return fmt.Errorf("fail to save total commitment from nodeID:%s", err)
 	}
 
 	totalCommitmentNoDelegators, err := getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, height, flowClient)
 	if err != nil {
-		return fmt.Errorf("fail to get data from nodeID:%s", err)
+		return fmt.Errorf("fail to get totalCommitmentNoDelegators from nodeID:%s", err)
 	}
 	err = db.SaveNodeTotalCommitmentWithoutDelegators(totalCommitmentNoDelegators)
 	if err != nil {
-		return fmt.Errorf("fail to get data from nodeID:%s", err)
+		return fmt.Errorf("fail to save totalCommitmentNoDelegators from nodeID:%s", err)
 	}
 
 	return nil
@@ -77,7 +77,7 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
 		if err != nil {
 			// When validator exist 10000, cadence exceed computation limit. It need to calculate in raw
-			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
+			if strings.Contains(err.Error(), "Error Code: 1110") {
 				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, height, flowClient)
 				if err != nil {
 					return nil, err
