@@ -138,7 +138,7 @@ func enqueueNewBlocks(exportQueue types.HeightQueue, data *ParserData) {
 			data.Logger.Debug("enqueueing new block", "height", currHeight)
 			exportQueue <- currHeight
 		}
-		time.Sleep(time.Second*1)
+		time.Sleep(time.Second * 1)
 	}
 
 }

@@ -205,21 +205,20 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 	for i, c := range collectionsID {
 		collection, err := cp.flowClient.GetCollection(ctx, c.CollectionID)
 
-			// When it do not have a collection transaction yet at that block. It do not have a transaction ID
-			// Retry until collection is produced
+		// When it do not have a collection transaction yet at that block. It do not have a transaction ID
+		// Retry until collection is produced
 
-			sleeptime := 1
-			for err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
-				// It is not because block not finalized. Just unprocessable block
-				if sleeptime>=16{
-					break 
-				}
-				time.Sleep(time.Duration(sleeptime) * time.Second)
-				collection, err = cp.flowClient.GetCollection(ctx, c.CollectionID)
-				sleeptime = sleeptime * 2
+		sleeptime := 1
+		for err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
+			// It is not because block not finalized. Just unprocessable block
+			if sleeptime >= 16 {
+				break
 			}
+			time.Sleep(time.Duration(sleeptime) * time.Second)
+			collection, err = cp.flowClient.GetCollection(ctx, c.CollectionID)
+			sleeptime = sleeptime * 2
+		}
 
-		
 		if err != nil {
 			collections[i] = types.NewCollection(block.Height, c.CollectionID.String(), false, nil)
 			continue
@@ -332,7 +331,7 @@ func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error)
 	cancel()
 
 	for err != nil && strings.Contains(err.Error(), "context deadline exceeded") {
-		if sleeptime>=16{
+		if sleeptime >= 16 {
 			// fail
 			return []types.Event{}, err
 		}
