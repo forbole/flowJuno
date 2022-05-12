@@ -101,7 +101,7 @@ func (w Worker) process(height int64) error {
 
 	block, err := w.cp.Block(height)
 	if err != nil {
-		//log.Error().Err(err).Int64("height", height).Msg("failed to get block")
+		log.Error().Err(err).Int64("height", height).Msg("failed to get block")
 		return err
 	}
 
