@@ -2,8 +2,6 @@ package worker
 
 import (
 	"fmt"
-	"strings"
-	"time"
 
 	"github.com/forbole/flowJuno/logging"
 	"github.com/onflow/flow-go-sdk"
