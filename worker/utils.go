@@ -1,8 +1,6 @@
 package worker
 
 import (
-	"time"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -32,12 +30,4 @@ func sumGasTxs(txs types.Txs) uint64 {
 	}
 
 	return totalGas
-}
-
-// WaitUntilQueueEmpty wait until queue is available
-func WaitUntilQueueAvailable(queue types.HeightQueue) {
-	sleeptime := 1
-	for len(queue) == cap(queue) {
-		time.Sleep(time.Second * time.Duration(sleeptime))
-	}
 }

@@ -2,8 +2,6 @@ package worker
 
 import (
 	"fmt"
-	"strings"
-	"time"
 
 	"github.com/forbole/flowJuno/logging"
 	"github.com/onflow/flow-go-sdk"
@@ -58,33 +56,13 @@ func (w Worker) Start() {
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
 			// TODO: Implement exponential backoff or max retries for a block height when the block is not generated.
-			if err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found") {
-				sleeptime := 1
-				for err != nil && strings.Contains(err.Error(), "could not retrieve resource: key not found") {
-					if sleeptime >= 16 {
-						w.ReenqueueFailBlock(i)
-						break
-					}
-					//If it cannot find the key, retry until can parse
-					time.Sleep(time.Second * time.Duration(sleeptime))
-					err = w.process(i)
-					sleeptime = sleeptime * 2
-				}
-
-			} else {
-				w.ReenqueueFailBlock(i)
+			if err != nil {
+				w.queue <- i
 			}
 
 			logging.WorkerHeight.WithLabelValues(fmt.Sprintf("%d", w.index)).Set(float64(i))
 		}
 	}
-}
-
-func (w Worker) ReenqueueFailBlock(i int64) {
-	go func() {
-		WaitUntilQueueAvailable(w.queue)
-		w.queue <- i
-	}()
 }
 
 //nolint:gocyclo
@@ -123,7 +101,7 @@ func (w Worker) process(height int64) error {
 
 	block, err := w.cp.Block(height)
 	if err != nil {
-		//log.Error().Err(err).Int64("height", height).Msg("failed to get block")
+		log.Error().Err(err).Int64("height", height).Msg("failed to get block")
 		return err
 	}
 
