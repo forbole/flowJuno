@@ -50,6 +50,7 @@ CREATE TABLE transaction
 		envelope_signatures JSONB
 ) PARTITION BY RANGE(height);
 CREATE INDEX transaction_index ON transaction (height);
+CREATE INDEX transaction_id_index ON transaction (transaction_id);
 
 CREATE TABLE transaction_default PARTITION OF transaction DEFAULT; 
 
@@ -76,5 +77,6 @@ CREATE TABLE event
 )  PARTITION BY RANGE(height);
 
 CREATE INDEX event_index ON event (height);
+CREATE INDEX event_transaction_index ON event (transaction_id);
 
 CREATE TABLE event_default PARTITION OF event DEFAULT;

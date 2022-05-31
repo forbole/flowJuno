@@ -105,6 +105,8 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 
 // getNodeTotalCommitmentRaw add up all delegator's delegatorFullCommittedBalance in a node
 func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64, flowClient client.Proxy) (*types.NodeTotalCommitment, error) {
+	log.Trace().Str("module", "staking").Int64("height", height).
+	Msg("getNodeTotalCommitmentRaw")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(node:String,begin:UInt32,end:UInt32): UFix64{
@@ -165,7 +167,8 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64, flow
 // getNodeTotalCommitmentWithoutDelegators get all node's total commitment without delegator
 func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitmentWithoutDelegators, error) {
 	log.Trace().Str("module", "staking").Int64("height", height).
-		Msg("updating node unstaking tokens")
+		Msg("getNodeTotalCommitmentWithoutDelegators")
+		
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(nodeID: String): UFix64 {

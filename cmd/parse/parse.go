@@ -103,17 +103,44 @@ func StartParsing(data *ParserData) error {
 		exportQueue <- 0
 	}
 
-	if cfg.ShouldParseOldBlocks() {
-		go enqueueMissingBlocks(exportQueue, data)
+	if cfg.ShouldParseNewBlocks() {
+		go enqueueNewBlocks(exportQueue, data)
 	}
 
-	if cfg.ShouldParseNewBlocks() {
-		//go startNewBlockListener(exportQueue, data)
+	if cfg.ShouldParseOldBlocks() {
+		go enqueueMissingBlocks(exportQueue, data)
+
 	}
 
 	// Block main process (signal capture will call WaitGroup's Done)
 	waitGroup.Wait()
 	return nil
+}
+
+// enqueueMissingBlocks enqueues jobs (block heights) for missed blocks starting
+// at the startHeight up until the latest known height.
+func enqueueNewBlocks(exportQueue types.HeightQueue, data *ParserData) {
+	// Get the latest height
+	currHeight, err := data.Proxy.LatestHeight()
+	if err != nil {
+		panic(fmt.Errorf("failed to get last block from RPC client: %s", err))
+	}
+
+	data.Logger.Info("syncing missing blocks...", "latest_block_height", currHeight)
+	for {
+		latestBlockHeight, err := data.Proxy.LatestHeight()
+		if err != nil {
+			panic(fmt.Errorf("failed to get last block from RPCConfig client: %s", err))
+		}
+
+		// Enqueue all heights from the current height up to the latest height
+		for ; currHeight <= latestBlockHeight; currHeight++ {
+			data.Logger.Debug("enqueueing new block", "height", currHeight)
+			exportQueue <- currHeight
+		}
+		time.Sleep(time.Second * 1)
+	}
+
 }
 
 // enqueueMissingBlocks enqueues jobs (block heights) for missed blocks starting
@@ -127,52 +154,14 @@ func enqueueMissingBlocks(exportQueue types.HeightQueue, data *ParserData) {
 	if err != nil {
 		panic(fmt.Errorf("failed to get last block from RPC client: %s", err))
 	}
-
-	if cfg.UseFastSync() {
-		data.Logger.Info("fast sync is enabled, ignoring all previous blocks", "latest_block_height", latestBlockHeight)
-		for _, module := range data.Modules {
-			if mod, ok := module.(modules.FastSyncModule); ok {
-				err := mod.DownloadState(latestBlockHeight)
-				if err != nil {
-					data.Logger.Error("error while performing fast sync",
-						"err", err,
-						"last_block_height", latestBlockHeight,
-						"module", module.Name(),
-					)
-				}
-			}
-		}
-	} else {
-		data.Logger.Info("syncing missing blocks...", "latest_block_height", latestBlockHeight)
-		for i := cfg.GetStartHeight(); i <= latestBlockHeight; i++ {
-			data.Logger.Debug("enqueueing missing block", "height", i)
-			exportQueue <- i
-		}
+	data.Logger.Info("syncing missing blocks...", "latest_block_height", latestBlockHeight)
+	for i := cfg.GetStartHeight(); i < latestBlockHeight; i++ {
+		data.Logger.Debug("enqueueing missing block", "height", i)
+		exportQueue <- i
 	}
+	data.Logger.Debug("Finish Enqueue Missing Block")
+
 }
-
-/*
-// startNewBlockListener subscribes to new block events via the Tendermint RPC
-// and enqueues each new block height onto the provided queue. It blocks as new
-// blocks are incoming.
-func startNewBlockListener(exportQueue types.HeightQueue, data *ParserData) {
-	eventCh, cancel, err := data.Proxy.SubscribeNewBlocks(types.Cfg.GetRPCConfig().GetClientName() + "-blocks")
-	defer cancel()
-
-	if err != nil {
-		log.Fatal().Err(fmt.Errorf("failed to subscribe to new blocks: %s", err))
-	}
-
-	log.Info().Msg("listening for new block events...")
-
-	for e := range eventCh {
-		newBlock := e.Data.(tmtypes.EventDataNewBlock).Block
-		height := newBlock.Header.Height
-
-		log.Debug().Int64("height", height).Msg("enqueueing new block")
-		exportQueue <- height
-	}
-} */
 
 // trapSignal will listen for any OS signal and invoke Done on the main
 // WaitGroup allowing the main process to gracefully exit.

@@ -345,6 +345,8 @@ func GetTable(height int64, flowClient client.Proxy) (*types.StakingTable, error
 
 // GetNodeInfosFromTable get all staker node info in the system
 func GetNodeInfosFromTable(height int64, flowClient client.Proxy) ([]types.StakerNodeInfo, error) {
+	log.Trace().Str("module", "staking").Int64("height", height).
+	Msg("GetNodeInfosFromTable")
 
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
@@ -375,6 +377,9 @@ func GetNodeInfosFromTable(height int64, flowClient client.Proxy) ([]types.Stake
 }
 
 func getAddressesFromAccounts(accounts []types.Account) []string {
+	log.Trace().Str("module", "staking").
+	Msg("getAddressesFromAccounts")
+
 	addresses := make([]string, len(accounts))
 	for i, account := range accounts {
 		addresses[i] = account.Address

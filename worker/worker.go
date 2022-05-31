@@ -53,16 +53,15 @@ func (w Worker) Start() {
 	logging.WorkerCount.Inc()
 
 	for i := range w.queue {
-		fmt.Println(i)
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
-			// TODO: Implement exponential backoff or max retries for a block height.
-			go func() {
-				log.Error().Err(err).Int64("height", i).Msg("re-enqueueing failed block")
+			// TODO: Implement exponential backoff or max retries for a block height when the block is not generated.
+			if err != nil {
 				w.queue <- i
-			}()
+			}
+
+			logging.WorkerHeight.WithLabelValues(fmt.Sprintf("%d", w.index)).Set(float64(i))
 		}
-		logging.WorkerHeight.WithLabelValues(fmt.Sprintf("%d", w.index)).Set(float64(i))
 	}
 }
 
