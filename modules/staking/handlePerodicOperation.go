@@ -20,7 +20,7 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 
 	if _, err := scheduler.Every(1).Minute().StartImmediately().Do(func() {
 		utils.WatchMethod(func() error {
-			startEpoch, err := utils.CheckStartEpochEvent(flowClient)
+			startEpoch, err := utils.CheckRewardPaidEvent(flowClient)
 			if err != nil {
 				return err
 			}

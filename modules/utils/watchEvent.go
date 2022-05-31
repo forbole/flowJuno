@@ -7,7 +7,7 @@ import (
 	flowclient "github.com/onflow/flow-go-sdk/client"
 )
 
-func CheckStartEpochEvent(flowClient client.Proxy) (bool, error) {
+func CheckRewardPaidEvent(flowClient client.Proxy) (bool, error) {
 	height, err := flowClient.LatestHeight()
 	if err != nil {
 		return false, err
@@ -16,8 +16,8 @@ func CheckStartEpochEvent(flowClient client.Proxy) (bool, error) {
 	// With this to indicate how close to the end of epoch
 	events, err := flowClient.Client().GetEventsForHeightRange(flowClient.Ctx(),
 		flowclient.EventRangeQuery{
-			Type:        fmt.Sprintf("A.%s.FlowIDTableStaking.NewEpoch", flowClient.Contract().StakingTable[2:]),
-			StartHeight: uint64(height - 50),
+			Type:        fmt.Sprintf("A.%s.FlowIDTableStaking.RewardsPaid", flowClient.Contract().StakingTable[2:]),
+			StartHeight: uint64(height-249),
 			EndHeight:   uint64(height),
 		})
 	if err != nil {
