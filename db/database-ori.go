@@ -50,6 +50,14 @@ type Database interface {
 	SaveCollection(collection []types.Collection) error
 
 	SaveTransactionResult(txResults []types.TransactionResult, height uint64) error
+
+	//Partition
+	CreatePartition(table string, height uint64) error
+
+	DropPartition(name string) error
+
+	GetPartitionSize() int
+
 	// Close closes the connection to the database
 	Close()
 }

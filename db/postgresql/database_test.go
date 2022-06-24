@@ -15,7 +15,7 @@ import (
 	database "github.com/forbole/flowJuno/db/postgresql"
 	"github.com/forbole/flowJuno/types"
 
-	juno "github.com/desmos-labs/juno/types"
+	juno "github.com/forbole/flowJuno/types"
 
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/stretchr/testify/suite"
@@ -51,10 +51,11 @@ func (suite *DbTestSuite) SetupTest() {
 				"public",
 				-1,
 				-1,
+				10,
 			),
 			true,
 		),
-		nil, nil, nil,
+		nil, nil, nil, nil,
 	)
 
 	db, err := database.Builder(cfg, &codec)

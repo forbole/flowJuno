@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
@@ -39,7 +41,9 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 		return nil, err
 	}
 
-	contracts := MainnetContracts()
+	ctx := context.Background()
+
+	var contracts Contracts
 	if cfg.GetRPCConfig().GetContracts() == "Mainnet" {
 		contracts = MainnetContracts()
 	} else if cfg.GetRPCConfig().GetContracts() == "Testnet" {
@@ -48,7 +52,7 @@ func NewClientProxy(cfg types.Config, encodingConfig *params.EncodingConfig) (*P
 
 	return &Proxy{
 		encodingConfig:  encodingConfig,
-		ctx:             context.Background(),
+		ctx:             ctx,
 		flowClient:      *flowClient,
 		grpConnection:   nil,
 		txServiceClient: nil,
@@ -65,7 +69,10 @@ func (cp *Proxy) GetGenesisHeight() uint64 {
 // LatestHeight returns the latest block height on the active chain. An error
 // is returned if the query fails.
 func (cp *Proxy) LatestHeight() (int64, error) {
-	block, err := cp.flowClient.GetLatestBlock(cp.ctx, true)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	block, err := cp.flowClient.GetLatestBlock(ctx, true)
 	if err != nil {
 		return -1, err
 	}
@@ -76,7 +83,9 @@ func (cp *Proxy) LatestHeight() (int64, error) {
 
 // Block queries for a block by height. An error is returned if the query fails.
 func (cp *Proxy) Block(height int64) (*flow.Block, error) {
-	block, err := cp.flowClient.GetBlockByHeight(cp.ctx, uint64(height))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	block, err := cp.flowClient.GetBlockByHeight(ctx, uint64(height))
 	if err != nil {
 		return nil, err
 	}
@@ -86,49 +95,15 @@ func (cp *Proxy) Block(height int64) (*flow.Block, error) {
 // GetTransaction queries for a transaction by hash. An error is returned if the
 // query fails.
 func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
-	transaction, err := cp.flowClient.GetTransaction(cp.ctx, flow.HashToID([]byte(hash)))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	transaction, err := cp.flowClient.GetTransaction(ctx, flow.HashToID([]byte(hash)))
 	if err != nil {
 		return nil, err
 	}
 
 	return transaction, nil
 }
-
-/*
-// NodeOperators returns all the known flow node operators for a given block
-// height. An error is returned if the query fails.
-func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(): [FlowIDTableStaking.NodeInfo] {
-		let nodes:[FlowIDTableStaking.NodeInfo]=[]
-		for node in FlowIDTableStaking.getStakedNodeIDs() {
-			nodes.append(FlowIDTableStaking.NodeInfo(node))
-		}
-		return nodes
-	}`, cp.contract.StakingTable)
-
-	result, err := cp.flowClient.ExecuteScriptAtLatestBlock(cp.ctx, []byte(script), nil)
-	if err != nil {
-		return nil, err
-	}
-	value := result.ToGoValue()
-	nodes, ok := value.([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("candance value cannot change to valid []interface{}")
-	}
-	nodeInfos := make([]*types.NodeInfo, len(nodes))
-	for i, node := range nodes {
-		nodeInfo, err := types.NewNodeInfoFromCandance(node)
-		if err != nil {
-			return nil, err
-		}
-		nodeInfos[i] = &nodeInfo
-	}
-
-	nodeOperators := types.NewNodeOperators(height, nodeInfos)
-	return &nodeOperators, nil
-} */
 
 func (cp *Proxy) Client() *client.Client {
 	return &cp.flowClient
@@ -147,58 +122,36 @@ func (cp *Proxy) GetChainID() string {
 	return cp.contract.ChainID
 }
 
-/*
-// Genesis returns the genesis state
-func (cp *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {
-	return cp.flowClient.Genesis(cp.ctx)
-}
-
-// ConsensusState returns the consensus state of the chain
-func (cp *Proxy) ConsensusState() (*constypes.RoundStateSimple, error) {
-	state, err := cp.flowClient.ConsensusState(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
-	var data constypes.RoundStateSimple
-	err = tmjson.Unmarshal(state.RoundState, &data)
-	if err != nil {
-		return nil, err
-	}
-	return &data, nil
-}
-*/
-// SubscribeEvents subscribes to new events with the given query through the RPC
-// client with the given subscriber name. A receiving only channel, context
-// cancel function and an error is returned. It is up to the caller to cancel
-// the context and handle any errors appropriately.
-/* func (cp *Proxy) SubscribeEvents(subscriber, query string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	eventCh, err := cp.flowClient.event
-	return eventCh, cancel, err
-}
-
-// SubscribeNewBlocks subscribes to the new block event handler through the RPC
-// client with the given subscriber name. An receiving only channel, context
-// cancel function and an error is returned. It is up to the caller to cancel
-// the context and handle any errors appropriately.
-func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
-	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
-} */
 
 // Collections get all the collection from block
 func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 	collectionsID := block.CollectionGuarantees
 	collections := make([]types.Collection, len(block.CollectionGuarantees))
 	for i, c := range collectionsID {
-		processed := true
-		collection, err := cp.flowClient.GetCollection(cp.ctx, c.CollectionID)
+		collection, err := cp.flowClient.GetCollection(ctx, c.CollectionID)
 
-		if err != nil {
-			processed = false
+		// When it do not have a collection transaction yet at that block. It do not have a transaction ID
+		// Retry until collection is produced
+
+		sleeptime := 1
+		for err != nil && strings.Contains(err.Error(), "please retry for collection in finalized block") {
+			// It is not because block not finalized. Just unprocessable block
+			if sleeptime >= 16 {
+				break
+			}
+			time.Sleep(time.Duration(sleeptime) * time.Second)
+			collection, err = cp.flowClient.GetCollection(ctx, c.CollectionID)
+			sleeptime = sleeptime * 2
 		}
 
-		collections[i] = types.NewCollection(block.Height, collection.ID().String(), processed, collection.TransactionIDs)
+		if err != nil {
+			collections[i] = types.NewCollection(block.Height, c.CollectionID.String(), false, nil)
+			continue
+		}
+
+		collections[i] = types.NewCollection(block.Height, c.CollectionID.String(), true, collection.TransactionIDs)
 	}
 	return collections
 }
@@ -207,7 +160,6 @@ func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
 // in the TransactionResult format which internally contains an array of Transactions. An error is
 // returned if any query fails.
 func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
-
 	var transactionIDs []flow.Identifier
 	collections := cp.Collections(block)
 	for _, collection := range collections {
@@ -216,7 +168,10 @@ func (cp *Proxy) Txs(block *flow.Block) (types.Txs, error) {
 
 	txResponses := make([]types.Tx, len(transactionIDs))
 	for i, txID := range transactionIDs {
-		transaction, err := cp.flowClient.GetTransaction(cp.ctx, txID)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		transaction, err := cp.flowClient.GetTransaction(ctx, txID)
+		cancel()
+
 		if err != nil {
 			return nil, err
 		}
@@ -250,9 +205,12 @@ func (cp *Proxy) TransactionResult(transactionIds []flow.Identifier) ([]types.Tr
 		return nil, nil
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	txResults := make([]types.TransactionResult, len(transactionIds))
 	for i, txid := range transactionIds {
-		result, err := cp.flowClient.GetTransactionResult(cp.ctx, txid)
+		result, err := cp.flowClient.GetTransactionResult(ctx, txid)
 		if err != nil {
 			return nil, err
 		}
@@ -272,7 +230,6 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 	}
 	var event []types.Event
 	for _, tx := range txs {
-		fmt.Println(tx.TransactionID)
 		ev, err := cp.Events(tx.TransactionID, int(tx.Height))
 		if err != nil {
 			return []types.Event{}, err
@@ -285,10 +242,9 @@ func (cp *Proxy) EventsInBlock(block *flow.Block) ([]types.Event, error) {
 func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 	var event []types.Event
 
-	fmt.Println(tx.TransactionID)
 	ev, err := cp.Events(tx.TransactionID, int(tx.Height))
 	if err != nil {
-		return []types.Event{}, err
+		return nil, err
 	}
 	event = append(event, ev...)
 	return event, nil
@@ -296,11 +252,24 @@ func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 
 // Events get events from a transaction ID
 func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error) {
-	transactionResult, err := cp.flowClient.GetTransactionResult(cp.ctx, flow.HexToID(transactionID))
-	if err != nil {
-		return []types.Event{}, err
+	sleeptime := 1
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleeptime)*time.Second)
+	transactionResult, err := cp.flowClient.GetTransactionResult(ctx, flow.HexToID(transactionID))
+	cancel()
+
+	for err != nil && strings.Contains(err.Error(), "context deadline exceeded") {
+		if sleeptime >= 16 {
+			// fail
+			return nil, err
+		}
+		sleeptime = sleeptime * 2
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleeptime)*time.Second)
+		transactionResult, err = cp.flowClient.GetTransactionResult(ctx, flow.HexToID(transactionID))
+		cancel()
 	}
-	fmt.Println(transactionResult.Status)
+	if err != nil {
+		return nil, fmt.Errorf("Error:%s,TxID:%s",err,transactionID)
+	}
 
 	ev := make([]types.Event, len(transactionResult.Events))
 	for i, event := range transactionResult.Events {

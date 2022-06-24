@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/forbole/flowJuno/types/logging"
+	"github.com/forbole/flowJuno/logging"
 
 	"github.com/onflow/flow-go-sdk"
 	"github.com/rs/zerolog/log"
@@ -49,7 +49,7 @@ func Builder(cfg types.DatabaseConfig, encodingConfig *params.EncodingConfig) (d
 	postgresDb.SetMaxOpenConns(cfg.GetMaxOpenConnections())
 	postgresDb.SetMaxIdleConns(cfg.GetMaxIdleConnections())
 
-	return &Database{Sql: postgresDb, EncodingConfig: encodingConfig}, nil
+	return &Database{Sql: postgresDb, EncodingConfig: encodingConfig, PartitionSize: cfg.GetPartitionSize()}, nil
 }
 
 // type check to ensure interface is properly implemented
@@ -61,6 +61,7 @@ type Database struct {
 	Sql            *sql.DB
 	EncodingConfig *params.EncodingConfig
 	Logger         logging.Logger
+	PartitionSize  int
 }
 
 // LastBlockHeight implements db.Database
@@ -103,11 +104,11 @@ func (db *Database) SaveBlock(block *flow.Block) error {
 	}
 
 	var params []interface{}
-	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures) VALUES `
+	stmt = `INSERT INTO block_seal (height,execution_receipt_id ,execution_receipt_signatures,result_approval_signatures) VALUES `
 	for i, seal := range block.Seals {
-		vi := i * 3
-		stmt += fmt.Sprintf("($%d, $%d, $%d),", vi+1, vi+2, vi+3)
-		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures))
+		vi := i * 4
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d),", vi+1, vi+2, vi+3, vi+4)
+		params = append(params, block.Height, seal.ExecutionReceiptID.String(), pq.ByteaArray(seal.ExecutionReceiptSignatures), pq.ByteaArray(seal.ResultApprovalSignatures))
 	}
 
 	stmt = stmt[:len(stmt)-1] // Remove trailing ,
@@ -124,7 +125,7 @@ func (db *Database) SaveTxs(txs types.Txs) error {
 	}
 	sqlStatement := `
 INSERT INTO transaction 
-    (height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures ) 
+    (height,transaction_id,script,arguments,reference_block_id,gas_limit,proposal_key ,payer,authorizers,payload_signature,envelope_signatures) 
 VALUES `
 
 	var vparams []interface{}
@@ -309,6 +310,13 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 
 	i := 0
 	for _, rows := range collection {
+		if rows.TransactionIds == nil {
+			ai := i * 4
+			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
+			params = append(params, rows.Height, rows.Id, rows.Processed, " ")
+			i++
+			continue
+		}
 		for _, txid := range rows.TransactionIds {
 			ai := i * 4
 			stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
@@ -328,7 +336,6 @@ func (db *Database) SaveCollection(collection []types.Collection) error {
 }
 func (db *Database) SaveTransactionResult(transactionResult []types.TransactionResult, height uint64) error {
 	stmt := `INSERT INTO transaction_result(height,transaction_id,status,error) VALUES `
-
 	var params []interface{}
 
 	for i, rows := range transactionResult {
@@ -336,7 +343,6 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 		stmt += fmt.Sprintf("($%d,$%d,$%d,$%d),", ai+1, ai+2, ai+3, ai+4)
 
 		params = append(params, height, rows.TransactionId, rows.Status, rows.Error)
-
 	}
 	stmt = stmt[:len(stmt)-1]
 	stmt += ` ON CONFLICT DO NOTHING`
@@ -347,4 +353,31 @@ func (db *Database) SaveTransactionResult(transactionResult []types.TransactionR
 	}
 
 	return nil
+}
+
+// createPartition allows to create a partition with the id for the given table name
+func (db *Database) CreatePartition(table string, height uint64) error {
+	endHeight := height + uint64(db.PartitionSize)
+	stmt := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %v_%d_%d PARTITION OF %v FOR VALUES FROM (%d) TO (%d);",
+		table,
+		height, endHeight,
+		table,
+		height, endHeight,
+	)
+	_, err := db.Sql.Exec(stmt)
+	return err
+}
+
+// dropPartition allows to drop a partition with the given partition name
+func (db *Database) DropPartition(name string) error {
+	stmt := fmt.Sprintf(
+		"DROP TABLE IF EXISTS %v",
+		name,
+	)
+	_, err := db.Sql.Exec(stmt)
+	return err
+}
+
+func (db *Database) GetPartitionSize() int {
+	return db.PartitionSize
 }

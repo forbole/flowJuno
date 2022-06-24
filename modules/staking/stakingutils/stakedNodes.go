@@ -23,21 +23,21 @@ func GetDataFromNodeID(nodeInfofromNodeId []types.StakerNodeInfo, height int64, 
 
 	totalCommitment, err := getNodeTotalCommitment(nodeInfofromNodeId, height, flowClient)
 	if err != nil {
-		return fmt.Errorf("fail to get data from nodeID:%s", err)
+		return fmt.Errorf("fail to get total commitment from nodeID:%s", err)
 	}
 
 	err = db.SaveNodeTotalCommitment(totalCommitment)
 	if err != nil {
-		return fmt.Errorf("fail to get data from nodeID:%s", err)
+		return fmt.Errorf("fail to save total commitment from nodeID:%s", err)
 	}
 
 	totalCommitmentNoDelegators, err := getNodeTotalCommitmentWithoutDelegators(nodeInfofromNodeId, height, flowClient)
 	if err != nil {
-		return fmt.Errorf("fail to get data from nodeID:%s", err)
+		return fmt.Errorf("fail to get totalCommitmentNoDelegators from nodeID:%s", err)
 	}
 	err = db.SaveNodeTotalCommitmentWithoutDelegators(totalCommitmentNoDelegators)
 	if err != nil {
-		return fmt.Errorf("fail to get data from nodeID:%s", err)
+		return fmt.Errorf("fail to save totalCommitmentNoDelegators from nodeID:%s", err)
 	}
 
 	return nil
@@ -75,17 +75,16 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 	for i, id := range nodeInfos {
 		nodeId := []cadence.Value{cadence.NewString(id.Id)}
 		value, err := flowClient.Client().ExecuteScriptAtLatestBlock(flowClient.Ctx(), []byte(script), nodeId)
-		if err != nil {
 			// When validator exist 10000, cadence exceed computation limit. It need to calculate in raw
-			if strings.Contains(err.Error(), "computation limited exceeded: 100000") {
-				fmt.Println(id.Id)
+		if err!=nil && (strings.Contains(err.Error(), "Error Code: 1110") || strings.Contains(err.Error(), "Error Code: 1111") ){
 				nodeTotalCommitment, err := getNodeTotalCommitmentRaw(id, height, flowClient)
 				if err != nil {
 					return nil, err
 				}
 				totalStakeArr[i] = *nodeTotalCommitment
 				continue
-			}
+		}
+		if err!=nil{
 			return nil, err
 		}
 
@@ -106,6 +105,8 @@ func getNodeTotalCommitment(nodeInfos []types.StakerNodeInfo, height int64, flow
 
 // getNodeTotalCommitmentRaw add up all delegator's delegatorFullCommittedBalance in a node
 func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64, flowClient client.Proxy) (*types.NodeTotalCommitment, error) {
+	log.Trace().Str("module", "staking").Int64("height", height).
+	Msg("getNodeTotalCommitmentRaw")
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(node:String,begin:UInt32,end:UInt32): UFix64{
@@ -166,7 +167,8 @@ func getNodeTotalCommitmentRaw(nodeInfo types.StakerNodeInfo, height int64, flow
 // getNodeTotalCommitmentWithoutDelegators get all node's total commitment without delegator
 func getNodeTotalCommitmentWithoutDelegators(nodeInfos []types.StakerNodeInfo, height int64, flowClient client.Proxy) ([]types.NodeTotalCommitmentWithoutDelegators, error) {
 	log.Trace().Str("module", "staking").Int64("height", height).
-		Msg("updating node unstaking tokens")
+		Msg("getNodeTotalCommitmentWithoutDelegators")
+		
 	script := fmt.Sprintf(`
 	import FlowIDTableStaking from %s
 	pub fun main(nodeID: String): UFix64 {

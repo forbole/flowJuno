@@ -17,7 +17,8 @@ import (
 // GetDataFromNodeDelegatorID get all data that need staker node info as input and
 // save it into database
 func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, height int64, db *database.Db, flowClient client.Proxy) error {
-
+	log.Info().Str("module", "staking").Int64("height", height).
+		Msg("GetDataFromNodeDelegatorID")
 	for _, node := range nodeInfo {
 
 		delegatorNodeInfoArray, err := getDelegatorInfo(node, height, flowClient)
@@ -28,7 +29,6 @@ func GetDataFromNodeDelegatorID(nodeInfo []types.StakerNodeInfo, height int64, d
 		splittedDelegatorInfos := utils.SplitDelegatorNodeInfo(delegatorNodeInfoArray, 9)
 
 		for _, arr := range splittedDelegatorInfos {
-			fmt.Println(len(arr))
 			if len(arr) == 0 {
 				continue
 			}

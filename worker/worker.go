@@ -3,6 +3,7 @@ package worker
 import (
 	"fmt"
 
+	"github.com/forbole/flowJuno/logging"
 	"github.com/onflow/flow-go-sdk"
 
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -23,40 +24,48 @@ import (
 // Worker defines a job consumer that is responsible for getting and
 // aggregating block and associated data and exporting it to a database.
 type Worker struct {
+	index int
+
 	queue          types.HeightQueue
 	encodingConfig *params.EncodingConfig
 	cp             *client.Proxy
 	db             db.Database
 	modules        []modules.Module
+	logger         logging.Logger
 }
 
 // NewWorker allows to create a new Worker implementation.
-func NewWorker(config *Config) Worker {
+func NewWorker(index int, config *Config) Worker {
 	return Worker{
+		index:          index,
 		encodingConfig: config.EncodingConfig,
 		cp:             config.ClientProxy,
 		queue:          config.Queue,
 		db:             config.Database,
 		modules:        config.Modules,
+		logger:         config.Logger,
 	}
 }
 
 // Start starts a worker by listening for new jobs (block heights) from the
 // given worker queue. Any failed job is logged and re-enqueued.
 func (w Worker) Start() {
+	logging.WorkerCount.Inc()
 
 	for i := range w.queue {
 		if err := w.process(i); err != nil {
 			// re-enqueue any failed job
-			// TODO: Implement exponential backoff or max retries for a block height.
-			go func() {
-				log.Error().Err(err).Int64("height", i).Msg("re-enqueueing failed block")
+			// TODO: Implement exponential backoff or max retries for a block height when the block is not generated.
+			if err != nil {
 				w.queue <- i
-			}()
+			}
+
+			logging.WorkerHeight.WithLabelValues(fmt.Sprintf("%d", w.index)).Set(float64(i))
 		}
 	}
 }
 
+//nolint:gocyclo
 // process defines the job consumer workflow. It will fetch a block for a given
 // height and associated metadata and export it to a database. It returns an
 // error if any export process fails.
@@ -75,6 +84,20 @@ func (w Worker) process(height int64) error {
 
 	// To get all transaction and event from the block, follow the order so that wont double call:
 	// block -> collection_grauntee -> transaction -> event
+	if height%int64(w.db.GetPartitionSize()) == 0 {
+		err = w.db.CreatePartition("transaction", uint64(height))
+		if err != nil {
+			return err
+		}
+		err = w.db.CreatePartition("transaction_result", uint64(height))
+		if err != nil {
+			return err
+		}
+		err = w.db.CreatePartition("event", uint64(height))
+		if err != nil {
+			return err
+		}
+	}
 
 	block, err := w.cp.Block(height)
 	if err != nil {
@@ -97,7 +120,7 @@ func (w Worker) process(height int64) error {
 		if blockModule, ok := module.(modules.BlockModule); ok {
 			err = blockModule.HandleBlock(block, &txs)
 			if err != nil {
-				log.Error().Err(err).Int64("height", height).Msg("failed to handle block")
+				w.logger.BlockError(module, block, err)
 				return err
 			}
 		}
@@ -127,12 +150,8 @@ func (w Worker) process(height int64) error {
 		transactionIDs = append(transactionIDs, (collection.TransactionIds)...)
 	}
 
-	err = w.ExportTransactionResult(transactionIDs, height)
-	if err != nil {
-		return err
-	}
+	return w.ExportTransactionResult(transactionIDs, height)
 
-	return nil
 }
 
 func (w Worker) ExportTransactionResult(txids []flow.Identifier, height int64) error {
@@ -236,6 +255,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 				if messageModule, ok := module.(modules.MessageModule); ok {
 					err = messageModule.HandleEvent(event.Height, event, &tx)
 					if err != nil {
+						w.logger.EventsError(module, &event, err)
 						return err
 					}
 				}
@@ -253,7 +273,7 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 			if transactionModule, ok := module.(modules.TransactionModule); ok {
 				err = transactionModule.HandleTx(int(tx.Height), &tx)
 				if err != nil {
-					//w.logger.TxError(module, tx, err)
+					w.logger.TxError(module, &tx, err)
 					return err
 				}
 			}
@@ -267,11 +287,10 @@ func (w Worker) ExportTx(txs *types.Txs) error {
 // in the order in which they have been registered.
 func (w Worker) HandleGenesis(block *flow.Block) error {
 	// Call the genesis handlers
-	fmt.Println("Parsing Handle Geneis")
 	for _, module := range w.modules {
 		if genesisModule, ok := module.(modules.GenesisModule); ok {
 			if err := genesisModule.HandleGenesis(block, w.cp.GetChainID()); err != nil {
-				//w.logger.GenesisError(module, err)
+				w.logger.GenesisError(module, err)
 			}
 		}
 	}

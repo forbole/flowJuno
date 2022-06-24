@@ -26,7 +26,7 @@ func (suite *ProxyTestSuite) SetupTest() {
 		"auth", "messages", "staking", "consensus", "token"}
 	cosmosConfig := types.NewCosmosConfig("", modules, 19050753)
 
-	config := types.NewConfig(rpcConfig, nil, cosmosConfig, nil, nil, nil, nil)
+	config := types.NewConfig(rpcConfig, nil, cosmosConfig, nil, nil, nil, nil, nil)
 
 	proxy, err := client.NewClientProxy(config, nil)
 	suite.Require().NoError(err)
