@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -104,42 +105,6 @@ func (cp *Proxy) GetTransaction(hash string) (*flow.Transaction, error) {
 	return transaction, nil
 }
 
-/*
-// NodeOperators returns all the known flow node operators for a given block
-// height. An error is returned if the query fails.
-func (cp *Proxy) NodeOperators(height int64) (*types.NodeOperators, error) {
-	script := fmt.Sprintf(`
-	import FlowIDTableStaking from %s
-	pub fun main(): [FlowIDTableStaking.NodeInfo] {
-		let nodes:[FlowIDTableStaking.NodeInfo]=[]
-		for node in FlowIDTableStaking.getStakedNodeIDs() {
-			nodes.append(FlowIDTableStaking.NodeInfo(node))
-		}
-		return nodes
-	}`, cp.contract.StakingTable)
-
-	result, err := cp.flowClient.ExecuteScriptAtLatestBlock(cp.ctx, []byte(script), nil)
-	if err != nil {
-		return nil, err
-	}
-	value := result.ToGoValue()
-	nodes, ok := value.([]interface{})
-	if !ok {
-		return nil, fmt.Errorf("candance value cannot change to valid []interface{}")
-	}
-	nodeInfos := make([]*types.NodeInfo, len(nodes))
-	for i, node := range nodes {
-		nodeInfo, err := types.NewNodeInfoFromCandance(node)
-		if err != nil {
-			return nil, err
-		}
-		nodeInfos[i] = &nodeInfo
-	}
-
-	nodeOperators := types.NewNodeOperators(height, nodeInfos)
-	return &nodeOperators, nil
-} */
-
 func (cp *Proxy) Client() *client.Client {
 	return &cp.flowClient
 }
@@ -157,44 +122,6 @@ func (cp *Proxy) GetChainID() string {
 	return cp.contract.ChainID
 }
 
-/*
-// Genesis returns the genesis state
-func (cp *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {
-	return cp.flowClient.Genesis(cp.ctx)
-}
-
-// ConsensusState returns the consensus state of the chain
-func (cp *Proxy) ConsensusState() (*constypes.RoundStateSimple, error) {
-	state, err := cp.flowClient.ConsensusState(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
-	var data constypes.RoundStateSimple
-	err = tmjson.Unmarshal(state.RoundState, &data)
-	if err != nil {
-		return nil, err
-	}
-	return &data, nil
-}
-*/
-// SubscribeEvents subscribes to new events with the given query through the RPC
-// client with the given subscriber name. A receiving only channel, context
-// cancel function and an error is returned. It is up to the caller to cancel
-// the context and handle any errors appropriately.
-/* func (cp *Proxy) SubscribeEvents(subscriber, query string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	eventCh, err := cp.flowClient.event
-	return eventCh, cancel, err
-}
-
-// SubscribeNewBlocks subscribes to the new block event handler through the RPC
-// client with the given subscriber name. An receiving only channel, context
-// cancel function and an error is returned. It is up to the caller to cancel
-// the context and handle any errors appropriately.
-func (cp *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEvent, context.CancelFunc, error) {
-	return cp.SubscribeEvents(subscriber, "tm.event = 'NewBlock'")
-} */
 
 // Collections get all the collection from block
 func (cp *Proxy) Collections(block *flow.Block) []types.Collection {
@@ -317,7 +244,7 @@ func (cp *Proxy) EventsInTransaction(tx types.Tx) ([]types.Event, error) {
 
 	ev, err := cp.Events(tx.TransactionID, int(tx.Height))
 	if err != nil {
-		return []types.Event{}, err
+		return nil, err
 	}
 	event = append(event, ev...)
 	return event, nil
@@ -333,7 +260,7 @@ func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error)
 	for err != nil && strings.Contains(err.Error(), "context deadline exceeded") {
 		if sleeptime >= 16 {
 			// fail
-			return []types.Event{}, err
+			return nil, err
 		}
 		sleeptime = sleeptime * 2
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(sleeptime)*time.Second)
@@ -341,7 +268,7 @@ func (cp *Proxy) Events(transactionID string, height int) ([]types.Event, error)
 		cancel()
 	}
 	if err != nil {
-		return []types.Event{}, err
+		return nil, fmt.Errorf("Error:%s,TxID:%s",err,transactionID)
 	}
 
 	ev := make([]types.Event, len(transactionResult.Events))
