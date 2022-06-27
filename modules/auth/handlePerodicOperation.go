@@ -15,7 +15,7 @@ import (
 func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClient client.Proxy) error {
 	log.Debug().Str("module", "staking").Msg("setting up periodic tasks")
 
-	if _, err := scheduler.Every(1).Day().StartImmediately().Do(func() {
+	if _, err := scheduler.Every(1).Week().Tuesday().At("15:00").StartImmediately().Do(func() {
 		utils.WatchMethod(func() error { return HandleAccounts(db, flowClient) })
 	}); err != nil {
 		return err
@@ -26,7 +26,6 @@ func RegisterPeriodicOps(scheduler *gocron.Scheduler, db *database.Db, flowClien
 
 func HandleAccounts(db *db.Db, flowClient client.Proxy) error {
 	//get Accounts
-
 	accountStringArray, err := db.GetAddresses()
 	if err != nil {
 		return err
